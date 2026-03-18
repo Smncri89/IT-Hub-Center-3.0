@@ -1,0 +1,5 @@
+{
+  "name": "IT Hub Center 3.0",
+  "description": "A comprehensive web application for IT management, including ticket handling, asset and license management, incident logging, and a knowledge base, with role-based access and multi-language support.",
+  "requestFramePermissions": []
+}

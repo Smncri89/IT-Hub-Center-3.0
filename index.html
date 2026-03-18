@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT Hub Center</title>
+    <link id="manifest-link" rel="manifest" href="/manifest/manifest.json" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // On page load or when changing themes
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+            },
+            colors: {
+              // Sophisticated Indigo/Violet primary
+              primary: {
+                DEFAULT: '#6366f1',
+                '50': '#eef2ff',
+                '100': '#e0e7ff',
+                '200': '#c7d2fe',
+                '300': '#a5b4fc',
+                '400': '#818cf8',
+                '500': '#6366f1',
+                '600': '#4f46e5',
+                '700': '#4338ca',
+                '800': '#3730a3',
+                '900': '#312e81',
+                '950': '#1e1b4b',
+              },
+              // Slate for a high-tech, premium feel
+              neutral: {
+                '50': '#f8fafc',
+                '100': '#f1f5f9',
+                '200': '#e2e8f0',
+                '300': '#cbd5e1',
+                '400': '#94a3b8',
+                '500': '#64748b',
+                '600': '#475569',
+                '700': '#334155',
+                '800': '#1e293b',
+                '900': '#0f172a',
+                '950': '#020617', 
+              },
+            },
+            boxShadow: {
+              'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+              'soft': '0 10px 40px -10px rgba(0,0,0,0.05)',
+              'glow': '0 0 20px rgba(99, 102, 241, 0.15)',
+              'inner-light': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.6s ease-out',
+              'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+              'scale-in': 'scaleIn 0.2s ease-out',
+              'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { transform: 'translateY(20px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+              },
+              scaleIn: {
+                '0%': { transform: 'scale(0.95)', opacity: '0' },
+                '100%': { transform: 'scale(1)', opacity: '1' },
+              }
+            },
+          }
+        }
+      }
+    </script>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.5",
+    "recharts": "https://aistudiocdn.com/recharts@^3.3.0",
+    "otpauth": "https://aistudiocdn.com/otpauth@^9.2.2",
+    "qrcode": "https://aistudiocdn.com/qrcode@^1.5.3",
+    "jsqr": "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/+esm",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
+    "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm",
+    "lodash-es": "https://aistudiocdn.com/lodash-es@^4.17.21",
+    "xlsx": "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/xlsx.mjs",
+    "jspdf": "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/+esm",
+    "jspdf-autotable": "https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/+esm",
+    "html2canvas": "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm",
+    "path": "https://aistudiocdn.com/path@^0.12.7",
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 antialiased selection:bg-primary-500/30">
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+    <script>
+      const origin = window.location.origin;
+      const pathname = window.location.pathname;
+      const basePath = pathname.substring(0, pathname.lastIndexOf('/'));
+      
+      const manifestLink = document.getElementById('manifest-link');
+      if (manifestLink) {
+        manifestLink.href = new URL(`${basePath}/manifest.json`, origin).href;
+      }
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+              registration.unregister().then(boolean => {
+                  console.log('Service worker unregistered:', boolean);
+              });
+            }
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
