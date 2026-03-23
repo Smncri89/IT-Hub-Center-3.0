@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import { createLicense } from '@/services/api';
 import LicenseDetail from './LicenseDetail';
+import ImportModal from '@/components/ImportModal';
 
 const parseCsvRow = (row: string): string[] => {
     const values = [];
@@ -164,66 +165,55 @@ const LicensesList: React.FC = () => {
         document.body.removeChild(link);
     };
 
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
     const handleImportClick = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-            fileInputRef.current.click();
-        }
+        setIsUploadModalOpen(true);
     };
 
-    const handleFileImport = async (file: File) => {
-        setIsImporting(true);
+    const handleBulkImport = async (data: any[]) => {
         setImportStatus({ success: 0, errors: [] });
         setIsImportModalOpen(true);
 
-        const text = await file.text();
-        const rows = text.trim().split('\n');
-        const headerRow = rows.shift()?.trim() || '';
-        const headers = parseCsvRow(headerRow);
-        
         const requiredHeaders = ['name', 'software', 'total_seats'];
+        const headers = Object.keys(data[0] || {});
         if (!requiredHeaders.every(h => headers.includes(h))) {
-            setImportStatus({ success: 0, errors: [`Invalid headers. CSV must include: ${requiredHeaders.join(', ')}.`] });
-            setIsImporting(false);
+            setImportStatus({ success: 0, errors: [`Invalid headers. File must include: ${requiredHeaders.join(', ')}.`] });
             return;
         }
-        
-        const headerMap = headers.reduce((acc, h, i) => ({ ...acc, [h.trim()]: i }), {} as Record<string, number>);
 
-        const importPromises = rows.map(async (rowStr, index) => {
-            if (!rowStr.trim()) return { status: 'skipped' };
-            const row = parseCsvRow(rowStr);
+        const importPromises = data.map(async (row, index) => {
             try {
-                const totalSeatsStr = row[headerMap['total_seats']];
+                const totalSeatsStr = row['total_seats'];
                 const totalSeats = parseInt(totalSeatsStr, 10);
                 if (isNaN(totalSeats) || totalSeats < 0) {
                     throw new Error(`Invalid 'total_seats' value: '${totalSeatsStr}'. Must be a non-negative number.`);
                 }
 
                 let totalCost: number | undefined = undefined;
-                if (isAdmin && row[headerMap['total_cost']]) {
-                    const parsedTotalCost = parseFloat(row[headerMap['total_cost']]);
+                if (isAdmin && row['total_cost']) {
+                    const parsedTotalCost = parseFloat(row['total_cost']);
                     if (isNaN(parsedTotalCost) || parsedTotalCost < 0) {
-                        throw new Error(`Invalid 'total_cost' value: '${row[headerMap['total_cost']]}'. Must be a non-negative number.`);
+                        throw new Error(`Invalid 'total_cost' value: '${row['total_cost']}'. Must be a non-negative number.`);
                     }
                     totalCost = parsedTotalCost;
                 }
 
                 let costPerSeat: number | undefined = undefined;
-                if (isAdmin && row[headerMap['cost_per_seat']]) {
-                    const parsedCostPerSeat = parseFloat(row[headerMap['cost_per_seat']]);
+                if (isAdmin && row['cost_per_seat']) {
+                    const parsedCostPerSeat = parseFloat(row['cost_per_seat']);
                     if (isNaN(parsedCostPerSeat) || parsedCostPerSeat < 0) {
-                        throw new Error(`Invalid 'cost_per_seat' value: '${row[headerMap['cost_per_seat']]}'. Must be a non-negative number.`);
+                        throw new Error(`Invalid 'cost_per_seat' value: '${row['cost_per_seat']}'. Must be a non-negative number.`);
                     }
                     costPerSeat = parsedCostPerSeat;
                 }
 
                 const licenseData: Partial<License> = {
-                    name: row[headerMap['name']],
-                    software: row[headerMap['software']],
+                    name: row['name'],
+                    software: row['software'],
                     totalSeats: totalSeats,
-                    purchaseDate: row[headerMap['purchase_date']] || null,
-                    expirationDate: row[headerMap['expiration_date']] || null,
+                    purchaseDate: row['purchase_date'] || null,
+                    expirationDate: row['expiration_date'] || null,
                     totalCost: totalCost,
                     costPerSeat: costPerSeat,
                 };
@@ -257,7 +247,6 @@ const LicensesList: React.FC = () => {
             });
 
         setImportStatus({ success: successCount, errors });
-        setIsImporting(false);
         refetchData('licenses');
     };
 
@@ -288,7 +277,6 @@ const LicensesList: React.FC = () => {
                         {React.cloneElement(ICONS.upload, { className: "h-4 w-4"})}
                         <span>{t('import')}</span>
                     </button>
-                    <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={e => {if(e.target.files?.[0]) handleFileImport(e.target.files[0])}} />
                     <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700 shadow-sm transition-all">
                         {React.cloneElement(ICONS.download, { className: "h-4 w-4"})}
                         <span>{t('export')}</span>
@@ -497,36 +485,13 @@ const LicensesList: React.FC = () => {
                 onClose={() => setSelectedLicenseId(null)}
             />
 
-            {isImportModalRendered && (
-                <div className={`fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-50 flex justify-center items-center transition-opacity duration-200 ${isImportModalAnimating ? 'opacity-100' : 'opacity-0'}`} onClick={() => setIsImportModalOpen(false)}>
-                    <div className={`bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-all duration-300 transform ${isImportModalAnimating ? 'scale-100' : 'scale-95'}`} onClick={e => e.stopPropagation()}>
-                        <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-4">{t('import status')}</h2>
-                        {isImporting ? (
-                            <div className="py-12 text-center">
-                                <p className="text-neutral-500 mb-4">{t('importing data')}</p>
-                                <Spinner />
-                            </div>
-                        ) : (
-                            importStatus && (
-                                <div className="mt-4">
-                                    <p className="text-emerald-600 font-bold text-lg mb-2">{t('import success', { count: importStatus.success })}</p>
-                                    {importStatus.errors.length > 0 && (
-                                        <div className="mt-6 bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-800">
-                                            <h3 className="font-bold text-red-600 dark:text-red-400 mb-2">{t('import errors')}</h3>
-                                            <ul className="list-disc list-inside text-sm text-red-600 dark:text-red-400 space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                                                {importStatus.errors.map((err, i) => <li key={i}>{err}</li>)}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </div>
-                            )
-                        )}
-                        <div className="flex justify-end pt-6 mt-6 border-t border-neutral-100 dark:border-neutral-700">
-                            <button onClick={() => setIsImportModalOpen(false)} className="px-6 py-2.5 text-sm font-bold rounded-xl bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30">{t('close')}</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ImportModal 
+                isOpen={isUploadModalOpen}
+                onClose={() => setIsUploadModalOpen(false)}
+                onImport={handleBulkImport}
+                title={t('Import Licenses')}
+                expectedColumns={['name', 'software', 'total_seats', 'total_cost', 'cost_per_seat', 'purchase_date', 'expiration_date']}
+            />
         </div>
     );
 };

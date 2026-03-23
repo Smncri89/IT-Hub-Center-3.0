@@ -10,6 +10,7 @@ import { ICONS, STATUS_COLORS, PRIORITY_COLORS, TICKET_CATEGORIES } from '@/cons
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import * as api from '@/services/api';
+import ImportModal from '@/components/ImportModal';
 
 // Helper for CSV parsing (copied from other lists)
 const parseCsvRow = (row: string): string[] => {
@@ -403,88 +404,65 @@ export const TicketsList: React.FC = () => {
     };
 
     const handleImportClick = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-            fileInputRef.current.click();
-        }
+        setIsImportModalOpen(true);
     };
     
-    const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files?.[0]) {
-            const file = e.target.files[0];
-            setIsImporting(true);
-            setImportStatus({ success: 0, errors: [] });
-            setIsImportModalOpen(true);
-            
-            try {
-                const text = await file.text();
-                const rows = text.trim().split('\n');
-                const headerRow = rows.shift()?.trim() || '';
-                const headers = parseCsvRow(headerRow);
+    const handleBulkImport = async (data: any[]) => {
+        setImportStatus({ success: 0, errors: [] });
+        setIsImportModalOpen(true);
 
-                const requiredHeaders = ['subject', 'description', 'requester_email'];
-                if (!requiredHeaders.every(h => headers.includes(h))) {
-                    setImportStatus({ success: 0, errors: [`Invalid headers. CSV must include: ${requiredHeaders.join(', ')}.`] });
-                    setIsImporting(false);
-                    return;
-                }
-
-                const headerMap = headers.reduce((acc, h, i) => ({ ...acc, [h.trim()]: i }), {} as Record<string, number>);
-
-                const importPromises = rows.map(async (rowStr, index) => {
-                    if (!rowStr.trim()) return { status: 'skipped' as const };
-                    const row = parseCsvRow(rowStr);
-                    try {
-                        const requesterEmail = row[headerMap['requester_email']];
-                        const requester = users.find(u => u.email === requesterEmail);
-                        if (!requester) throw new Error(`Requester email '${requesterEmail}' not found.`);
-
-                        const assigneeEmail = row[headerMap['assignee_email']];
-                        const assignee = assigneeEmail ? users.find(u => u.email === assigneeEmail) : undefined;
-
-                        const ticketData = {
-                            subject: row[headerMap['subject']],
-                            description: row[headerMap['description']],
-                            priority: (row[headerMap['priority']] as TicketPriority) || TicketPriority.Medium,
-                            category: row[headerMap['category']] || 'Other',
-                            subcategory: row[headerMap['subcategory']] || 'Other',
-                            assignee_id: assignee?.id
-                        };
-
-                        await api.createTicket(ticketData, requester, []); // No attachments for CSV import
-                        return { status: 'success' as const };
-                    } catch (error: any) {
-                        return { status: 'error' as const, message: `Row ${index + 2}: ${error.message}` };
-                    }
-                });
-
-                const results = await Promise.allSettled(importPromises);
-                const successCount = results.filter(r => r.status === 'fulfilled' && r.value.status === 'success').length;
-                const errors = results
-                    .filter((r): r is PromiseRejectedResult | { status: 'fulfilled'; value: { status: 'error'; message: string } } => r.status === 'rejected' || (r.status === 'fulfilled' && (r.value as any).status === 'error'))
-                    .map(r => {
-                        if (r.status === 'rejected') {
-                            const reason = r.reason;
-                            let message = 'An unknown error occurred';
-                            if (reason && typeof reason === 'object' && 'message' in reason) {
-                                message = String((reason as any).message);
-                            } else {
-                                message = String(reason);
-                            }
-                            return message;
-                        }
-                        return (r.value as any).message;
-                    });
-
-                setImportStatus({ success: successCount, errors });
-                refetchData('tickets');
-            } catch (err: any) {
-                setImportStatus({ success: 0, errors: [err.message || 'Failed to process file'] });
-            } finally {
-                setIsImporting(false);
-                if (fileInputRef.current) fileInputRef.current.value = ''; // Reset input
-            }
+        const requiredHeaders = ['subject', 'description', 'requester_email'];
+        const headers = Object.keys(data[0] || {});
+        if (!requiredHeaders.every(h => headers.includes(h))) {
+            setImportStatus({ success: 0, errors: [`Invalid headers. File must include: ${requiredHeaders.join(', ')}.`] });
+            return;
         }
+
+        const importPromises = data.map(async (row, index) => {
+            try {
+                const requesterEmail = row['requester_email'];
+                const requester = users.find(u => u.email === requesterEmail);
+                if (!requester) throw new Error(`Requester email '${requesterEmail}' not found.`);
+
+                const assigneeEmail = row['assignee_email'];
+                const assignee = assigneeEmail ? users.find(u => u.email === assigneeEmail) : undefined;
+
+                const ticketData = {
+                    subject: row['subject'],
+                    description: row['description'],
+                    priority: (row['priority'] as TicketPriority) || TicketPriority.Medium,
+                    category: row['category'] || 'Other',
+                    subcategory: row['subcategory'] || 'Other',
+                    assignee_id: assignee?.id
+                };
+
+                await api.createTicket(ticketData, requester, []); // No attachments for CSV import
+                return { status: 'success' as const };
+            } catch (error: any) {
+                return { status: 'error' as const, message: `Row ${index + 2}: ${error.message}` };
+            }
+        });
+
+        const results = await Promise.allSettled(importPromises);
+        const successCount = results.filter(r => r.status === 'fulfilled' && r.value.status === 'success').length;
+        const errors = results
+            .filter((r): r is PromiseRejectedResult | { status: 'fulfilled'; value: { status: 'error'; message: string } } => r.status === 'rejected' || (r.status === 'fulfilled' && (r.value as any).status === 'error'))
+            .map(r => {
+                if (r.status === 'rejected') {
+                    const reason = r.reason;
+                    let message = 'An unknown error occurred';
+                    if (reason && typeof reason === 'object' && 'message' in reason) {
+                        message = String((reason as any).message);
+                    } else {
+                        message = String(reason);
+                    }
+                    return message;
+                }
+                return (r.value as any).message;
+            });
+
+        setImportStatus({ success: successCount, errors });
+        refetchData('tickets');
     };
 
     if (isLoading) return <Spinner />;
@@ -618,37 +596,13 @@ export const TicketsList: React.FC = () => {
                 defaults={modalDefaults}
             />
             
-            {isImportModalRendered && (
-                 <div className={`fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-50 flex justify-center items-center transition-opacity duration-200 ${isImportModalAnimating ? 'opacity-100' : 'opacity-0'}`} onClick={() => setIsImportModalOpen(false)}>
-                    <div className={`bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-all duration-300 transform ${isImportModalAnimating ? 'scale-100' : 'scale-95'}`} onClick={e => e.stopPropagation()}>
-                        <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-4">{t('import status')}</h2>
-                        {isImporting ? (
-                            <div className="py-12 text-center">
-                                <p className="text-neutral-500 mb-4">{t('importing data')}</p>
-                                <Spinner />
-                            </div>
-                        ) : (
-                            importStatus && (
-                                <div className="mt-4">
-                                    <p className="text-emerald-600 font-bold text-lg mb-2">{t('import success', { count: importStatus.success })}</p>
-                                    {importStatus.errors.length > 0 && (
-                                        <div className="mt-6 bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-800">
-                                            <h3 className="font-bold text-red-600 dark:text-red-400 mb-2">{t('import errors')}</h3>
-                                            <ul className="list-disc list-inside text-sm text-red-600 dark:text-red-400 space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                                                {importStatus.errors.map((err, i) => <li key={i}>{err}</li>)}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </div>
-                            )
-                        )}
-                        <div className="flex justify-end pt-6 mt-6 border-t border-neutral-100 dark:border-neutral-700">
-                            <button onClick={() => setIsImportModalOpen(false)} className="px-6 py-2.5 text-sm font-bold rounded-xl bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30">{t('close')}</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={handleFileImport} />
+            <ImportModal 
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
+                onImport={handleBulkImport}
+                title={t('Import Tickets')}
+                expectedColumns={['subject', 'description', 'priority', 'category', 'subcategory', 'requester_email', 'assignee_email']}
+            />
         </div>
     );
 };

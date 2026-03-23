@@ -12,6 +12,8 @@ import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import { createAsset, updateAsset } from '@/services/api';
 import AssetMap from '@/components/maps/AssetMap';
 
+import ImportModal from '@/components/ImportModal';
+
 // --- HELPER: CSV PARSER ---
 const parseCsvRow = (row: string): string[] => {
     const values = [];
@@ -293,72 +295,62 @@ export const AssetsList: React.FC = () => {
         document.body.removeChild(link);
     };
 
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
     const handleImportClick = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-            fileInputRef.current.click();
-        }
+        setIsUploadModalOpen(true);
     };
 
-    const handleFileImport = async (file: File) => {
-        setIsImporting(true);
+    const handleBulkImport = async (data: any[]) => {
         setImportStatus({ success: 0, errors: [] });
         setIsImportModalOpen(true);
 
-        const text = await file.text();
-        const rows = text.trim().split('\n');
-        const headerRow = rows.shift()?.trim() || '';
-        const headers = parseCsvRow(headerRow);
-        
         const requiredHeaders = ['name', 'type', 'status'];
+        const headers = Object.keys(data[0] || {});
         if (!requiredHeaders.every(h => headers.includes(h))) {
-            setImportStatus({ success: 0, errors: [`Invalid headers. CSV must include: ${requiredHeaders.join(', ')}.`] });
-            setIsImporting(false);
+            setImportStatus({ success: 0, errors: [`Invalid headers. File must include: ${requiredHeaders.join(', ')}.`] });
             return;
         }
         
-        const headerMap = headers.reduce((acc, h, i) => ({ ...acc, [h.trim()]: i }), {} as Record<string, number>);
         const validAssetTypes = Object.keys(ASSET_TYPES_CONFIG);
         const validAssetStatuses = Object.values(ASSET_TYPES_CONFIG).flatMap(config => 
             config.fields.find(f => f.id === 'status')?.options?.map((opt: {value: string}) => opt.value) || []
         ).filter((value, index, self) => self.indexOf(value) === index);
 
-        const importPromises = rows.map(async (rowStr, index) => {
-            if (!rowStr.trim()) return { status: 'skipped' };
-            const row = parseCsvRow(rowStr);
+        const importPromises = data.map(async (row, index) => {
             try {
-                const assignedToEmail = row[headerMap['assigned_to_email']];
+                const assignedToEmail = row['assigned_to_email'];
                 let assignedToUser = undefined;
                 if (assignedToEmail) {
                     assignedToUser = users.find(u => u.email === assignedToEmail);
                     if (!assignedToUser) throw new Error(`Assigned user '${assignedToEmail}' not found.`);
                 }
 
-                const type = row[headerMap['type']];
+                const type = row['type'];
                 if (!type || !validAssetTypes.includes(type)) throw new Error(`Invalid type '${type}'.`);
                 
-                const status = row[headerMap['status']];
+                const status = row['status'];
                 if (!status || !validAssetStatuses.includes(status)) throw new Error(`Invalid status '${status}'.`);
 
-                const quantityStr = row[headerMap['quantity']];
+                const quantityStr = row['quantity'];
                 let quantity = quantityStr ? parseInt(quantityStr, 10) : (ASSET_TYPES_CONFIG[type as keyof typeof ASSET_TYPES_CONFIG]?.required.includes('quantity') ? 1 : undefined);
 
                 const assetData: Partial<Asset> = {
-                    name: row[headerMap['name']],
+                    name: row['name'],
                     type: type,
                     status: status as Asset['status'],
-                    model: row[headerMap['model']] || null,
-                    serialNumber: row[headerMap['serial_number']] || null,
-                    purchaseDate: row[headerMap['purchase_date']] || null,
-                    warrantyEndDate: row[headerMap['warranty_end_date']] || null,
+                    model: row['model'] || null,
+                    serialNumber: row['serial_number'] || null,
+                    purchaseDate: row['purchase_date'] || null,
+                    warrantyEndDate: row['warranty_end_date'] || null,
                     assignedTo: assignedToUser,
-                    location: row[headerMap['location']] || null,
+                    location: row['location'] || null,
                     quantity: quantity,
-                    phoneNumber: row[headerMap['phone_number']] || null,
-                    carrier: row[headerMap['carrier']] || null,
-                    simSerial: row[headerMap['sim_serial']] || null,
-                    esimSerial: row[headerMap['esim_serial']] || null,
-                    notes: row[headerMap['notes']] || null,
+                    phoneNumber: row['phone_number'] || null,
+                    carrier: row['carrier'] || null,
+                    simSerial: row['sim_serial'] || null,
+                    esimSerial: row['esim_serial'] || null,
+                    notes: row['notes'] || null,
                 };
 
                 await createAsset(assetData);
@@ -388,7 +380,6 @@ export const AssetsList: React.FC = () => {
             });
 
         setImportStatus({ success: successCount, errors });
-        setIsImporting(false);
         refetchData('assets');
     };
 
@@ -507,7 +498,6 @@ export const AssetsList: React.FC = () => {
                                 </button>
                             )}
                             
-                            <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={e => {if(e.target.files?.[0]) handleFileImport(e.target.files[0])}} />
                             <button onClick={handleImportClick} className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700">
                                 {React.cloneElement(ICONS.upload as React.ReactElement<{ className?: string }>, { className: "h-4 w-4"})}
                                 <span>{t('import')}</span>
@@ -756,6 +746,14 @@ export const AssetsList: React.FC = () => {
                 selectedCount={selectedAssetIds.length}
                 users={users}
                 onConfirm={handleBulkSave}
+            />
+
+            <ImportModal 
+                isOpen={isUploadModalOpen}
+                onClose={() => setIsUploadModalOpen(false)}
+                onImport={handleBulkImport}
+                title={t('Import Assets')}
+                expectedColumns={['name', 'type', 'status', 'model', 'serial_number', 'purchase_date', 'warranty_end_date', 'assigned_to_email', 'location', 'quantity', 'phone_number', 'carrier', 'sim_serial', 'esim_serial', 'notes']}
             />
         </div>
     );
