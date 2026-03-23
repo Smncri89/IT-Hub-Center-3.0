@@ -9,6 +9,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import { ICONS } from '@/constants';
 import { useData } from '@/hooks/useData';
+import ImportModal from '@/components/ImportModal';
 
 const parseCsvRow = (row: string): string[] => {
     const values = [];
@@ -143,63 +144,6 @@ const UserFormModal: React.FC<{
     );
 };
 
-const ImportUsersModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  onImport: (file: File) => void;
-  isImporting: boolean;
-  importStatus: { success: number; errors: string[] } | null;
-}> = ({ isOpen, onClose, onImport, isImporting, importStatus }) => {
-    const { t } = useLocalization();
-    const { isRendered, isAnimating } = useAnimatedModal(isOpen);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileSelect = () => fileInputRef.current?.click();
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files?.[0]) {
-            onImport(e.target.files[0]);
-        }
-    };
-
-    if (!isRendered) return null;
-
-    return (
-        <div className={`fixed inset-0 bg-black z-50 flex justify-center items-center transition-opacity duration-200 ${isAnimating ? 'bg-opacity-50' : 'bg-opacity-0'}`} onClick={onClose}>
-            <div className={`bg-white dark:bg-neutral-800 rounded-lg shadow-xl p-6 w-full max-w-2xl transition-all duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0 -translate-y-10 scale-95'}`} onClick={e => e.stopPropagation()}>
-                <h2 className="text-xl font-semibold">{t('import users')}</h2>
-                {isImporting ? (
-                    <div className="py-8 text-center">{t('importing data')}<Spinner /></div>
-                ) : importStatus ? (
-                    <div className="mt-4">
-                        <p className="text-green-600">{t('import success', { count: importStatus.success })}</p>
-                        {importStatus.errors.length > 0 && (
-                            <div className="mt-4">
-                                <h3 className="font-semibold text-red-500">{t('import errors')}</h3>
-                                <ul className="list-disc list-inside mt-2 text-sm text-red-500 max-h-48 overflow-y-auto bg-neutral-100 dark:bg-neutral-700 p-2 rounded">
-                                    {importStatus.errors.map((err, i) => <li key={i}>{err}</li>)}
-                                </ul>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div className="mt-4 space-y-4">
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t('user import instructions')}</p>
-                        <code className="block text-xs bg-neutral-100 dark:bg-neutral-700 p-2 rounded">email,name,role,company</code>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{t('user import desc')}</p>
-                        <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={handleFileChange} />
-                        <button onClick={handleFileSelect} className="w-full px-4 py-2 text-sm font-medium border rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700">
-                            {t('select csv file')}
-                        </button>
-                    </div>
-                )}
-                 <div className="flex justify-end pt-4 mt-4 border-t dark:border-neutral-700">
-                    <button onClick={onClose} className="px-4 py-2 text-sm font-medium rounded-md bg-primary-600 text-white">{t('close')}</button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 export const UsersSettings: React.FC = () => {
     const { t } = useLocalization();
     const { users, isLoading, refetchData } = useData();
@@ -209,8 +153,6 @@ export const UsersSettings: React.FC = () => {
     const [userToEdit, setUserToEdit] = useState<User | null>(null);
 
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-    const [importStatus, setImportStatus] = useState<{ success: number; errors: string[] } | null>(null);
-    const [isImporting, setIsImporting] = useState(false);
 
     const handleEditUser = (user: User) => {
         setUserToEdit(user);
@@ -222,32 +164,20 @@ export const UsersSettings: React.FC = () => {
         setIsModalOpen(true);
     };
     
-    const handleFileImport = async (file: File) => {
-        setIsImporting(true);
-        setImportStatus({ success: 0, errors: [] });
-
-        const text = await file.text();
-        const rows = text.trim().split('\n');
-        const headerRow = rows.shift()?.trim() || '';
-        const headers = parseCsvRow(headerRow);
-        
+    const handleBulkImport = async (data: any[]) => {
         const requiredHeaders = ['email', 'name', 'role'];
+        const headers = Object.keys(data[0] || {});
         if (!requiredHeaders.every(h => headers.includes(h))) {
-            setImportStatus({ success: 0, errors: [`Invalid headers. CSV must include: ${requiredHeaders.join(', ')}.`] });
-            setIsImporting(false);
-            return;
+            // Error handling is managed by ImportModal
+            throw new Error(`Invalid headers. File must include: ${requiredHeaders.join(', ')}.`);
         }
-        
-        const headerMap = headers.reduce((acc, h, i) => ({ ...acc, [h.trim()]: i }), {} as Record<string, number>);
 
-        const results = await Promise.all(rows.map(rowStr => {
-            if (!rowStr.trim()) return { status: 'skipped' as const };
-            const row = parseCsvRow(rowStr);
+        const results = await Promise.all(data.map(row => {
             const userData = {
-                email: row[headerMap['email']],
-                name: row[headerMap['name']],
-                role: row[headerMap['role']] as Role,
-                company: row[headerMap['company']]
+                email: row['email'],
+                name: row['name'],
+                role: row['role'] as Role,
+                company: row['company']
             };
             return importOrUpdateUser(userData);
         }));
@@ -255,9 +185,11 @@ export const UsersSettings: React.FC = () => {
         const successCount = results.filter(r => r && (r.status === 'invited' || r.status === 'updated')).length;
         const errors = results.filter((r): r is { status: 'error', message?: string } => r?.status === 'error').map(r => r.message || 'Unknown error');
         
-        setImportStatus({ success: successCount, errors });
-        setIsImporting(false);
         refetchData('users');
+        
+        if (errors.length > 0) {
+            throw new Error(`Imported ${successCount} users. Errors: ${errors.join(', ')}`);
+        }
     };
 
     const filteredUsers = useMemo(() => {
@@ -279,7 +211,7 @@ export const UsersSettings: React.FC = () => {
                     <p className="text-neutral-500 dark:text-neutral-400">{t('settings users desc')}</p>
                 </div>
                 <div className="flex gap-2">
-                     <button onClick={() => { setImportStatus(null); setIsImportModalOpen(true); }} className="flex items-center gap-2 px-3 py-2 text-sm font-medium border rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700">
+                     <button onClick={() => setIsImportModalOpen(true)} className="flex items-center gap-2 px-3 py-2 text-sm font-medium border rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700">
                         {React.cloneElement(ICONS.upload, { className: 'w-4 h-4' })} {t('import users')}
                     </button>
                     <button onClick={handleNewUser} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">
@@ -341,12 +273,12 @@ export const UsersSettings: React.FC = () => {
                 userToEdit={userToEdit}
             />
 
-            <ImportUsersModal
+            <ImportModal
                 isOpen={isImportModalOpen}
                 onClose={() => setIsImportModalOpen(false)}
-                onImport={handleFileImport}
-                isImporting={isImporting}
-                importStatus={importStatus}
+                onImport={handleBulkImport}
+                title={t('Import Users')}
+                expectedColumns={['email', 'name', 'role', 'company']}
             />
         </div>
     );

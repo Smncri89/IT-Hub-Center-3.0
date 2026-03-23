@@ -62,6 +62,20 @@ export const importOrUpdateUser = async (userData: any): Promise<{ status: 'invi
     return { status: 'invited' };
 };
 
+export const bulkCreateUsers = async (usersData: Partial<User>[]): Promise<void> => {
+    const dbData = usersData.map(userData => ({
+        id: crypto.randomUUID(), // Generate a UUID for the profile
+        name: userData.name,
+        email: userData.email,
+        role: userData.role || 'user',
+        department: userData.department,
+        location: userData.location,
+        status: userData.status || 'active'
+    }));
+    const { error } = await supabase.from('profiles').insert(dbData);
+    if (error) throw error;
+};
+
 export const uploadAvatar = async (userId: string, file: File): Promise<string> => {
   const fileExt = file.name.split('.').pop();
   const fileName = `${userId}-${Math.random()}.${fileExt}`;
@@ -153,6 +167,27 @@ export const createTicket = async (ticketData: Partial<Ticket> & { asset_id?: st
   if (error) throw error;
   // Re-fetch to get full object or map partially
   return getTicketById(data.id) as Promise<Ticket>;
+};
+
+export const bulkCreateTickets = async (ticketsData: Partial<Ticket>[], requesterId: string): Promise<void> => {
+    const dbData = ticketsData.map(ticketData => ({
+        subject: ticketData.subject,
+        description: ticketData.description,
+        status: ticketData.status || TicketStatus.Open,
+        priority: ticketData.priority || TicketPriority.Medium,
+        category: ticketData.category,
+        subcategory: ticketData.subcategory,
+        requester_id: ticketData.requester?.id || requesterId,
+        assignee_id: ticketData.assignee?.id || null,
+        asset_id: ticketData.asset?.id || null,
+        contact_info: ticketData.contactInfo,
+        department: ticketData.department,
+        site: ticketData.site,
+        floor: ticketData.floor,
+        office: ticketData.office
+    }));
+    const { error } = await supabase.from('tickets').insert(dbData);
+    if (error) throw error;
 };
 
 export const updateTicket = async (id: string, updates: Partial<Ticket>): Promise<Ticket> => {
@@ -273,6 +308,32 @@ export const createAsset = async (assetData: Partial<Asset>): Promise<Asset> => 
   return getAssetById(data.id) as Promise<Asset>;
 };
 
+export const bulkCreateAssets = async (assetsData: Partial<Asset>[]): Promise<void> => {
+    const dbData = assetsData.map(assetData => ({
+        name: assetData.name,
+        asset_tag: assetData.assetTag,
+        type: assetData.type,
+        model: assetData.model,
+        status: assetData.status,
+        serial_number: assetData.serialNumber,
+        purchase_date: assetData.purchaseDate,
+        purchase_cost: assetData.purchaseCost,
+        current_value: assetData.currentValue,
+        warranty_end_date: assetData.warrantyEndDate,
+        location: assetData.location,
+        quantity: assetData.quantity,
+        notes: assetData.notes,
+        assigned_to_id: assetData.assignedTo?.id || null,
+        phone_number: assetData.phoneNumber,
+        carrier: assetData.carrier,
+        sim_serial: assetData.simSerial,
+        esim_serial: assetData.esimSerial,
+        image: assetData.image
+    }));
+    const { error } = await supabase.from('assets').insert(dbData);
+    if (error) throw error;
+};
+
 export const updateAsset = async (id: string, updates: Partial<Asset>): Promise<Asset> => {
   const dbData: any = {};
   if (updates.name) dbData.name = updates.name;
@@ -337,6 +398,20 @@ export const createLicense = async (licenseData: Partial<License>): Promise<Lice
     }).select().single();
     if (error) throw error;
     return getLicenses().then(ls => ls.find(l => l.id === data.id)!);
+};
+
+export const bulkCreateLicenses = async (licensesData: Partial<License>[]): Promise<void> => {
+    const dbData = licensesData.map(licenseData => ({
+        name: licenseData.name,
+        software: licenseData.software,
+        total_seats: licenseData.totalSeats,
+        purchase_date: licenseData.purchaseDate,
+        expiration_date: licenseData.expirationDate,
+        total_cost: licenseData.totalCost,
+        cost_per_seat: licenseData.costPerSeat
+    }));
+    const { error } = await supabase.from('licenses').insert(dbData);
+    if (error) throw error;
 };
 
 export const updateLicense = async (id: string, updates: Partial<License>): Promise<void> => {
