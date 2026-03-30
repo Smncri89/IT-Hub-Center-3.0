@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Asset, AssetStatus, Role, User } from '@/types';
@@ -11,8 +10,8 @@ import { useData } from '@/hooks/useData';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import { createAsset, updateAsset } from '@/services/api';
 import AssetMap from '@/components/maps/AssetMap';
-
 import ImportModal from '@/components/ImportModal';
+import { getLocations, Location } from '@/services/locationsService';
 
 // --- HELPER: CSV PARSER ---
 const parseCsvRow = (row: string): string[] => {
@@ -51,11 +50,25 @@ const BulkEditModal: React.FC<{
     const { isRendered, isAnimating } = useAnimatedModal(isOpen);
     const [isSaving, setIsSaving] = useState(false);
     
-    // States for fields. Empty string or specific value means "No Change"
     const [status, setStatus] = useState<string>('__NO_CHANGE__');
     const [assignedTo, setAssignedTo] = useState<string>('__NO_CHANGE__');
     const [location, setLocation] = useState<string>('');
     const [changeLocation, setChangeLocation] = useState(false);
+    const [locations, setLocations] = useState<Location[]>([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            const fetchLocations = async () => {
+                try {
+                    const locs = await getLocations();
+                    setLocations(locs);
+                } catch (err) {
+                    console.error('Failed to fetch locations:', err);
+                }
+            };
+            fetchLocations();
+        }
+    }, [isOpen]);
 
     const statusOptions = [
         'Ready to Deploy', 'In Use', 'Pending', 'Out for Repair', 
@@ -105,11 +118,10 @@ const BulkEditModal: React.FC<{
                     <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
                         Bulk Edit ({selectedCount} Assets)
                     </h2>
-                    <p className="text-sm text-neutral-500 mt-1">Select fields to update. Leave as "No Change" to keep current values.</p>
+                    <p className="text-sm text-neutral-500 mt-1">Select fields to update. Leave as &quot;No Change&quot; to keep current values.</p>
                 </header>
                 
                 <main className="p-6 space-y-4">
-                    {/* Status */}
                     <div>
                         <label className={labelStyle}>{t('status')}</label>
                         <select value={status} onChange={e => setStatus(e.target.value)} className={inputStyle}>
@@ -118,7 +130,6 @@ const BulkEditModal: React.FC<{
                         </select>
                     </div>
 
-                    {/* Assigned To */}
                     <div>
                         <label className={labelStyle}>{t('assigned to')}</label>
                         <select value={assignedTo} onChange={e => setAssignedTo(e.target.value)} className={inputStyle}>
@@ -128,7 +139,6 @@ const BulkEditModal: React.FC<{
                         </select>
                     </div>
 
-                    {/* Location */}
                     <div>
                         <div className="flex items-center justify-between mb-1">
                             <label className={labelStyle}>{t('location')}</label>
@@ -143,14 +153,19 @@ const BulkEditModal: React.FC<{
                                 <label htmlFor="changeLoc" className="text-xs text-neutral-500 cursor-pointer">Update Location</label>
                             </div>
                         </div>
-                        <input 
-                            type="text" 
+                        <select 
                             value={location} 
                             onChange={e => setLocation(e.target.value)} 
                             disabled={!changeLocation}
-                            placeholder={changeLocation ? "Enter new location" : "Check box to update"} 
                             className={`${inputStyle} ${!changeLocation ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        />
+                        >
+                            <option value="">{changeLocation ? "-- Select Location --" : "Check box to update"}</option>
+                            {locations.map(loc => (
+                                <option key={loc.id} value={loc.name}>
+                                    {loc.name}{loc.city ? ` - ${loc.city}` : ''}{loc.is_headquarters ? ' (HQ)' : ''}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </main>
 
@@ -183,11 +198,9 @@ export const AssetsList: React.FC = () => {
     const { user } = useAuth();
     const { assets, users, isLoading, refetchData } = useData();
     
-    // --- STATE ---
     const [searchQuery, setSearchQuery] = useState('');
     const debouncedSearchQuery = useDebounce(searchQuery, 300);
     
-    // View Mode: List or Map
     const [viewMode, setViewMode] = useState<'list' | 'map'>(() => {
         return (localStorage.getItem('assetsViewMode') as 'list' | 'map') || 'list';
     });
@@ -209,9 +222,9 @@ export const AssetsList: React.FC = () => {
         status: 'all',
         type: 'all',
         assignedTo: 'all',
+        location: 'all',
     });
 
-    // --- DERIVED DATA & FILTERING ---
     const assetTypes = useMemo(() => [...new Set(assets.map(a => a.type))].sort(), [assets]);
     
     const filteredAssets = useMemo(() => {
@@ -230,16 +243,16 @@ export const AssetsList: React.FC = () => {
             const statusMatch = filters.status === 'all' || asset.status === filters.status;
             const typeMatch = filters.type === 'all' || asset.type === filters.type;
             
-            // Assigned Logic: 'all' = everyone, 'unassigned' = no user, specific ID = that user
             const assignedMatch = filters.assignedTo === 'all' ? true :
                 filters.assignedTo === 'unassigned' ? !asset.assignedTo :
                 asset.assignedTo?.id === filters.assignedTo;
             
-            return searchMatch && statusMatch && typeMatch && assignedMatch;
+            const locationMatch = filters.location === 'all' || asset.location === filters.location;
+            return searchMatch && statusMatch && typeMatch && assignedMatch && locationMatch;
+            
         });
     }, [assets, debouncedSearchQuery, filters, user]);
 
-    // --- METRICS (KPI CARDS) ---
     const metrics = useMemo(() => {
         const totalValue = assets.reduce((sum, a) => sum + (Number(a.purchaseCost) || 0), 0);
         
@@ -262,7 +275,6 @@ export const AssetsList: React.FC = () => {
         };
     }, [assets]);
 
-    // --- HANDLERS ---
     const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFilters(prev => ({ ...prev, [name]: value }));
@@ -383,7 +395,6 @@ export const AssetsList: React.FC = () => {
         refetchData('assets');
     };
 
-    // --- BULK SELECTION ---
     const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.checked) setSelectedAssetIds(filteredAssets.map(a => a.id));
         else setSelectedAssetIds([]);
@@ -395,27 +406,22 @@ export const AssetsList: React.FC = () => {
 
     const handleBulkSave = async (updates: Partial<Asset>) => {
         if (selectedAssetIds.length === 0) return;
-        // Execute updates in parallel
         await Promise.all(selectedAssetIds.map(id => updateAsset(id, updates)));
         refetchData('assets');
-        setSelectedAssetIds([]); // Clear selection after success
+        setSelectedAssetIds([]);
     };
 
-    // --- HELPERS ---
     const formatCurrency = (amount: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
 
     const getStatusTranslationKey = (status: string) => {
         return `status ${status.toLowerCase().replace(/ /g, ' ')}`;
     };
 
-    // Intelligent Image Resolution
     const resolveAssetImage = (asset: Asset) => {
-        // 1. Prefer user-uploaded image
         if (asset.image) return asset.image;
         
         const searchText = `${asset.model || ''} ${asset.name || ''} ${asset.type || ''}`.toLowerCase();
         
-        // 2. Find best match in library based on keyword scoring
         let bestMatch = null;
         let maxScore = 0;
 
@@ -423,13 +429,10 @@ export const AssetsList: React.FC = () => {
             const entry = ASSET_IMAGE_LIBRARY[key];
             let score = 0;
             
-            // Check for exact phrase matches or strong keywords
             for (const keyword of entry.keywords) {
                 if (searchText.includes(keyword.toLowerCase())) {
-                    score += 2; // Base score for match
-                    // Bonus for specific model match
+                    score += 2;
                     if (asset.model?.toLowerCase().includes(keyword.toLowerCase())) score += 3;
-                    // Bonus for name match
                     if (asset.name?.toLowerCase().includes(keyword.toLowerCase())) score += 1;
                 }
             }
@@ -442,7 +445,6 @@ export const AssetsList: React.FC = () => {
 
         if (bestMatch) return bestMatch;
         
-        // 3. Fallback based on type category
         const typeLower = asset.type.toLowerCase();
         if (typeLower.includes('phone') || typeLower.includes('mobile')) return ASSET_IMAGE_LIBRARY.iphone.url;
         if (typeLower.includes('laptop') || typeLower.includes('pc')) return ASSET_IMAGE_LIBRARY.macbook_pro_16.url;
@@ -452,7 +454,6 @@ export const AssetsList: React.FC = () => {
         if (typeLower.includes('switch')) return ASSET_IMAGE_LIBRARY.switch.url;
         if (typeLower.includes('tablet')) return ASSET_IMAGE_LIBRARY.ipad.url;
         
-        // 4. Generic fallback
         return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=100&q=80';
     };
 
@@ -463,14 +464,12 @@ export const AssetsList: React.FC = () => {
     return (
         <div className="space-y-6 animate-fade-in pb-10">
             
-            {/* HEADER */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{t('page title assets')}</h1>
                 
                 <div className="flex gap-2 items-center">
                     {user?.role !== Role.EndUser && (
                         <>
-                             {/* List / Map Toggle */}
                             <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg flex text-sm font-medium mr-2">
                                 <button 
                                     onClick={() => setViewMode('list')} 
@@ -515,11 +514,8 @@ export const AssetsList: React.FC = () => {
                 </div>
             </div>
 
-            {/* --- KPI CARDS (Only visible in List Mode) --- */}
             {viewMode === 'list' && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                
-                {/* 1. Total Assets */}
                 <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md border border-neutral-200 dark:border-neutral-700 flex flex-col">
                     <div className="flex justify-between items-start mb-2">
                         <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Total Assets</span>
@@ -529,8 +525,6 @@ export const AssetsList: React.FC = () => {
                     </div>
                     <p className="text-2xl font-black text-neutral-900 dark:text-white">{metrics.total}</p>
                 </div>
-
-                {/* 2. Total Value */}
                 <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md border border-neutral-200 dark:border-neutral-700 flex flex-col">
                     <div className="flex justify-between items-start mb-2">
                         <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Total Value</span>
@@ -540,8 +534,6 @@ export const AssetsList: React.FC = () => {
                     </div>
                     <p className="text-2xl font-black text-neutral-900 dark:text-white">{formatCurrency(metrics.totalValue)}</p>
                 </div>
-
-                {/* 3. Ready to Deploy */}
                 <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md border border-neutral-200 dark:border-neutral-700 flex flex-col">
                     <div className="flex justify-between items-start mb-2">
                         <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider truncate" title="Ready to Deploy">Ready</span>
@@ -551,8 +543,6 @@ export const AssetsList: React.FC = () => {
                     </div>
                     <p className="text-2xl font-black text-neutral-900 dark:text-white">{metrics.counts.ready}</p>
                 </div>
-
-                {/* 4. In Use */}
                 <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md border border-neutral-200 dark:border-neutral-700 flex flex-col">
                     <div className="flex justify-between items-start mb-2">
                         <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">In Use</span>
@@ -562,8 +552,6 @@ export const AssetsList: React.FC = () => {
                     </div>
                     <p className="text-2xl font-black text-neutral-900 dark:text-white">{metrics.counts.inUse}</p>
                 </div>
-
-                {/* 5. In Repair */}
                 <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md border border-neutral-200 dark:border-neutral-700 flex flex-col">
                     <div className="flex justify-between items-start mb-2">
                         <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Repair</span>
@@ -573,13 +561,11 @@ export const AssetsList: React.FC = () => {
                     </div>
                     <p className="text-2xl font-black text-neutral-900 dark:text-white">{metrics.counts.repair}</p>
                 </div>
-
             </div>
             )}
 
-            {/* FILTERS */}
             <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div className="lg:col-span-1">
                         <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{t('search')}</label>
                         <div className="relative">
@@ -615,10 +601,15 @@ export const AssetsList: React.FC = () => {
                         <option value="unassigned">{t('unassigned')}</option>
                         {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
                     </FilterSelectWrapper>
+                    <FilterSelectWrapper name="location" value={filters.location} label="Location" onChange={handleFilterChange}>
+                        <option value="all">All Locations</option>
+                        {[...new Set(assets.map(a => a.location).filter(Boolean))].sort().map(loc => (
+                            <option key={loc} value={loc}>{loc}</option>
+                        ))}
+                    </FilterSelectWrapper>
                 </div>
             </div>
 
-            {/* VIEW CONTENT: LIST or MAP */}
             {viewMode === 'map' ? (
                  <AssetMap assets={filteredAssets} />
             ) : (

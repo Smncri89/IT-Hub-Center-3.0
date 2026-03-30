@@ -10,20 +10,35 @@ export const Logo: React.FC<{ className?: string }> = ({ className }) => (
       aria-label="IT Hub Center Logo"
     >
       <defs>
-        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" className="text-primary-400" stopColor="currentColor" />
-          <stop offset="100%" className="text-primary-600" stopColor="currentColor" />
+        <linearGradient id="logoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#818cf8" />
+          <stop offset="50%" stopColor="#6366f1" />
+          <stop offset="100%" stopColor="#4f46e5" />
+        </linearGradient>
+        <linearGradient id="logoGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#c7d2fe" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0.95" />
         </linearGradient>
       </defs>
-      <path 
-        d="M8,8 H44 V18 H34 V28 H44 V38 H34 V44 H8 V34 H18 V24 H8 V14 H18 V8 H8 M8,0 A8,8 0 0,0 0,8 V44 A8,8 0 0,0 8,52 H44 A8,8 0 0,0 52,44 V8 A8,8 0 0,0 44,0 Z" 
-        fill="url(#logoGradient)" 
-      />
-      <path 
-        d="M20 14h12v4H20z M20 24h12v4H20z M20 34h12v4H20z" 
-        className="text-white dark:text-neutral-900" 
-        fill="currentColor" 
-      />
+      <rect x="2" y="2" width="48" height="48" rx="14" ry="14" fill="url(#logoGrad1)" />
+      <rect x="4" y="4" width="44" height="44" rx="12" ry="12" fill="none" stroke="white" strokeOpacity="0.15" strokeWidth="1" />
+      <circle cx="26" cy="26" r="7" fill="url(#logoGrad2)" />
+      <line x1="26" y1="19" x2="26" y2="11" stroke="white" strokeOpacity="0.7" strokeWidth="2" strokeLinecap="round" />
+      <line x1="26" y1="33" x2="26" y2="41" stroke="white" strokeOpacity="0.7" strokeWidth="2" strokeLinecap="round" />
+      <line x1="19" y1="26" x2="11" y2="26" stroke="white" strokeOpacity="0.7" strokeWidth="2" strokeLinecap="round" />
+      <line x1="33" y1="26" x2="41" y2="26" stroke="white" strokeOpacity="0.7" strokeWidth="2" strokeLinecap="round" />
+      <line x1="21.05" y1="21.05" x2="15" y2="15" stroke="white" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="30.95" y1="21.05" x2="37" y2="15" stroke="white" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="21.05" y1="30.95" x2="15" y2="37" stroke="white" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="30.95" y1="30.95" x2="37" y2="37" stroke="white" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="26" cy="10" r="3.5" fill="white" fillOpacity="0.9" />
+      <circle cx="26" cy="42" r="3.5" fill="white" fillOpacity="0.9" />
+      <circle cx="10" cy="26" r="3.5" fill="white" fillOpacity="0.9" />
+      <circle cx="42" cy="26" r="3.5" fill="white" fillOpacity="0.9" />
+      <circle cx="14" cy="14" r="2.5" fill="white" fillOpacity="0.6" />
+      <circle cx="38" cy="14" r="2.5" fill="white" fillOpacity="0.6" />
+      <circle cx="14" cy="38" r="2.5" fill="white" fillOpacity="0.6" />
+      <circle cx="38" cy="38" r="2.5" fill="white" fillOpacity="0.6" />
     </svg>
 );
 
@@ -62,7 +77,7 @@ export const FLAGS = {
 };
 
 export const ICONS = {
-  dashboard: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>,
+  dashboard: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25a2.25 2.25 0 012.25 2.25v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>,
   sparkle_chat: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 00-1.423 1.423z" /></svg>,
   sparkle: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 00-1.423 1.423z" /></svg>,
   refresh: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.634 2.333l-3.182-3.182m0-4.308v-4.992m0 0h-4.992m4.992 0l-3.182-3.182a8.25 8.25 0 00-11.634-2.333l3.181 3.183" /></svg>,
@@ -102,9 +117,7 @@ export const ICONS = {
   language: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.625M21 21l-5.25-11.625M3.75 5.25h16.5M4.5 12h15M5.25 18.75h13.5" /></svg>,
   database: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg>,
   paperclip: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>,
-};
-
-export const ROLES_PERMISSIONS: Record<Role, string[]> = {
+};export const ROLES_PERMISSIONS: Record<Role, string[]> = {
   [Role.Admin]: ['dashboard', 'tickets', 'assets', 'licenses', 'incidents', 'session', 'reports', 'kb', 'settings', 'vendors', 'map'],
   [Role.Agent]: ['dashboard', 'tickets', 'assets', 'licenses', 'incidents', 'session', 'reports', 'kb', 'settings', 'vendors', 'map'],
   [Role.Member]: ['dashboard', 'tickets', 'assets', 'licenses', 'kb', 'settings'],
@@ -124,10 +137,9 @@ export const STATUS_COLORS: Record<string, string> = {
   [TicketStatus.InProgress]: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400',
   [TicketStatus.Resolved]: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
   [TicketStatus.Closed]: 'bg-neutral-100 text-neutral-800 dark:bg-neutral-700/30 dark:text-neutral-400',
-  // Asset Status Colors
   'In Use': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
   'Ready to Deploy': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  'In Stock': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400', // Legacy support
+  'In Stock': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
   'Pending': 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
   'Archived': 'bg-neutral-100 text-neutral-800 dark:bg-neutral-700/30 dark:text-neutral-400',
   'Broken - Not Fixable': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
@@ -197,7 +209,6 @@ export const ASSET_IMAGE_LIBRARY: Record<string, { label: string, url: string, k
     'vr_headset': { label: 'VR Headset', url: 'https://images.unsplash.com/photo-1622979135225-d2ba269fb1ac?auto=format&fit=crop&w=200&q=80', keywords: ['vr', 'oculus', 'quest', 'vision pro'] },
 };
 
-// Standard field configuration for typical IT assets
 export const STANDARD_ASSET_FIELDS: { id: string; labelKey: string; type: 'text' | 'number' | 'date' | 'select' | 'textarea'; required?: boolean; options?: any[]; placeholderKey?: string; grid_span?: string }[] = [
     { id: 'name', labelKey: 'asset_name', type: 'text', required: true },
     { id: 'assetTag', labelKey: 'asset_tag', type: 'text', required: true },
@@ -226,31 +237,11 @@ export const ASSET_TYPES_CONFIG: Record<string, {
     required: string[];
     lifespanYears?: number;
 }> = {
-    'PC/Laptop': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 4
-    },
-    'Desktop': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'All-in-One': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Virtual Machine': {
-        fields: STANDARD_ASSET_FIELDS.filter(f => f.id !== 'serialNumber'),
-        required: ['name', 'status'],
-        lifespanYears: undefined
-    },
-    'Server': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
+    'PC/Laptop': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 4 },
+    'Desktop': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'All-in-One': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Virtual Machine': { fields: STANDARD_ASSET_FIELDS.filter(f => f.id !== 'serialNumber'), required: ['name', 'status'], lifespanYears: undefined },
+    'Server': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
     'Smartphone': {
         fields: [
             ...STANDARD_ASSET_FIELDS,
@@ -262,114 +253,26 @@ export const ASSET_TYPES_CONFIG: Record<string, {
         required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
         lifespanYears: 2
     },
-    'Tablet': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 3
-    },
-    'VoIP Phone': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Conference Phone': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Monitor': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Projector': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Digital Signage': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Printer': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Scanner': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Copier': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Switch': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 7
-    },
-    'Router': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 7
-    },
-    'Firewall': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Access Point': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Load Balancer': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'PDU': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 10
-    },
-    'UPS': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 3
-    },
-    'Docking Station': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'KVM Switch': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 5
-    },
-    'Webcam': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'model', 'serialNumber', 'status'],
-        lifespanYears: 3
-    },
-    'Peripheral': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'status'],
-        lifespanYears: 3
-    },
-    'RAM': {
-        fields: STANDARD_ASSET_FIELDS.filter(f => f.id !== 'serialNumber'),
-        required: ['name', 'status', 'quantity'],
-        lifespanYears: 5
-    },
-    'Other': {
-        fields: STANDARD_ASSET_FIELDS,
-        required: ['name', 'assetTag', 'status'],
-        // No default lifespan, inferred dynamically or manual
-    }
+    'Tablet': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 3 },
+    'VoIP Phone': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Conference Phone': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Monitor': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Projector': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Digital Signage': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Printer': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Scanner': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Copier': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Switch': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 7 },
+    'Router': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 7 },
+    'Firewall': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Access Point': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Load Balancer': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'PDU': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 10 },
+    'UPS': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 3 },
+    'Docking Station': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'KVM Switch': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 5 },
+    'Webcam': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'model', 'serialNumber', 'status'], lifespanYears: 3 },
+    'Peripheral': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'status'], lifespanYears: 3 },
+    'RAM': { fields: STANDARD_ASSET_FIELDS.filter(f => f.id !== 'serialNumber'), required: ['name', 'status', 'quantity'], lifespanYears: 5 },
+    'Other': { fields: STANDARD_ASSET_FIELDS, required: ['name', 'assetTag', 'status'] }
 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,6 +32,9 @@ import Settings from '@/components/settings/Settings';
 import Session from '@/components/pulse/Pulse';
 import VendorsList from '@/components/vendors/VendorsList';
 import AssetMap from '@/components/maps/AssetMap';
+import LocationsList from '@/components/locations/LocationsList';
+import OnboardingList from '@/components/onboarding/OnboardingList';
+import OnboardingDetail from '@/components/onboarding/OnboardingDetail';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -52,8 +54,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, pageId, allow
         if (!allowedRoles.includes(userRole)) {
             return <Navigate to="/dashboard" replace />;
         }
-    } else if (ROLES_PERMISSIONS[userRole]?.includes(pageId) || pageId === 'vendors' || pageId === 'map') {
-        // Temporary bypass for new pages in permissions check
+    } else if (ROLES_PERMISSIONS[userRole]?.includes(pageId) || pageId === 'vendors' || pageId === 'map' || pageId === 'locations' || pageId === 'onboarding') {
         return <>{children}</>;
     } else {
          return <Navigate to="/dashboard" replace />;
@@ -101,15 +102,24 @@ const AppRoutes = () => {
             <Route path="kb/:articleId" element={<ProtectedRoute pageId="kb"><KBArticleDetail /></ProtectedRoute>} />
             <Route path="reports" element={<ProtectedRoute pageId="reports"><Reports /></ProtectedRoute>} />
             <Route path="settings" element={<ProtectedRoute pageId="settings"><Settings /></ProtectedRoute>} />
-            
-            {/* NEW ROUTES */}
-            <Route path="vendors" element={<ProtectedRoute pageId="assets" allowedRoles={[Role.Admin, Role.Agent]}><VendorsList /></ProtectedRoute>} />
-            <Route path="map" element={<ProtectedRoute pageId="assets"><AssetMap /></ProtectedRoute>} />
+
+            {/* Vendors */}
+            <Route path="vendors" element={<ProtectedRoute pageId="vendors" allowedRoles={[Role.Admin, Role.Agent]}><VendorsList /></ProtectedRoute>} />
+
+            {/* Mappa asset */}
+            <Route path="map" element={<ProtectedRoute pageId="map"><AssetMap /></ProtectedRoute>} />
+
+            {/* Sedi aziendali */}
+            <Route path="locations" element={<ProtectedRoute pageId="locations" allowedRoles={[Role.Admin, Role.Agent]}><LocationsList /></ProtectedRoute>} />
+
+            {/* Onboarding / Offboarding */}
+            <Route path="onboarding" element={<ProtectedRoute pageId="onboarding" allowedRoles={[Role.Admin, Role.Agent]}><OnboardingList /></ProtectedRoute>} />
+            <Route path="onboarding/:id" element={<ProtectedRoute pageId="onboarding" allowedRoles={[Role.Admin, Role.Agent]}><OnboardingDetail /></ProtectedRoute>} />
 
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
-           <Route path="/login" element={<Navigate to="/" replace />} />
-           <Route path="/register" element={<Navigate to="/" replace />} />
+          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/register" element={<Navigate to="/" replace />} />
         </Routes>
       </NotificationsProvider>
     </DataProvider>

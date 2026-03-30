@@ -1,174 +1,213 @@
-
-import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { Notification } from '@/types';
-import { useData } from '@/hooks/useData';
+import React, { useState } from 'react';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import * as api from '@/services/api';
+import { useLocalization } from '@/hooks/useLocalization';
+import { ICONS, ROLES_PERMISSIONS, Logo, FLAGS } from '@/constants';
+import { Role, Language } from '@/types';
 
-interface NotificationsContextType {
-  notifications: Notification[];
-  unreadCount: number;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
+interface SidebarProps {
+  isOpen: boolean;
+  toggleSidebar: () => void;
+  isCollapsed: boolean;
+  toggleSidebarCollapse: () => void;
 }
 
-export const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isCollapsed, toggleSidebarCollapse }) => {
+  const { user, logout } = useAuth();
+  const { t, language, setLanguage } = useLocalization();
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  
+  const userRole = user?.role || Role.EndUser;
+  const permissions = ROLES_PERMISSIONS[userRole];
+  const isAdminOrAgent = userRole === Role.Admin || userRole === Role.Agent;
 
-export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { tickets, assets, licenses } = useData();
-  const { user } = useAuth();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [vendorInteractions, setVendorInteractions] = useState<any[]>([]);
+  const navItems = [
+    { id: 'dashboard', labelKey: 'dashboard', icon: ICONS.dashboard, path: '/dashboard' },
+    { id: 'tickets', labelKey: 'tickets', icon: ICONS.tickets, path: '/tickets' },
+    { id: 'assets', labelKey: 'assets', icon: ICONS.assets, path: '/assets' },
+    { id: 'licenses', labelKey: 'licenses', icon: ICONS.licenses, path: '/licenses' },
+    { id: 'incidents', labelKey: 'incidents', icon: ICONS.incidents, path: '/incidents' },
+    { id: 'session', labelKey: 'session', icon: ICONS.session, path: '/session' },
+    { id: 'reports', labelKey: 'reports', icon: ICONS.reports, path: '/reports' },
+    { id: 'kb', labelKey: 'kb', icon: ICONS.kb, path: '/kb' },
+  ];
 
-  useEffect(() => {
-      // Fetch vendor interactions separately since they are not in DataContext (yet)
-      api.getVendorInteractionsAll().then(setVendorInteractions);
-  }, []);
+  // Icona Edificio per Sedi
+  const BuildingIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    </svg>
+  );
 
-  useEffect(() => {
-    if (!user) return;
+  // Icona Partner/Vendors
+  const VendorIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+    </svg>
+  );
 
-    const newPotentialNotifications: Notification[] = [];
-    const now = new Date();
+  // Icona Onboarding — user con freccia/check
+  const OnboardingIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+    </svg>
+  );
 
-    const isMuted = (category?: string) => {
-        if (!user.muteUntil) return false;
-        // Simple check if muteUntil is in future. 
-        // More complex logic for weekends/hours handled in AuthContext but applied here? 
-        // Actually mute logic usually suppresses *new* notifications or push. 
-        // For internal list, we might still show them but marked as 'muted' or just standard.
-        // Let's assume critical ones bypass.
-        if (category === 'SLA') return false; // SLA always shows
-        return new Date(user.muteUntil) > now;
-    };
+  const extraItems = isAdminOrAgent ? [
+    {
+      id: 'onboarding',
+      labelKey: 'Onboarding',
+      icon: OnboardingIcon,
+      path: '/onboarding'
+    },
+    {
+      id: 'locations',
+      labelKey: 'Sedi',
+      icon: BuildingIcon,
+      path: '/locations'
+    },
+    {
+      id: 'vendors',
+      labelKey: 'Vendors',
+      icon: VendorIcon,
+      path: '/vendors'
+    },
+  ] : [];
 
-    // SLA Checks
-    tickets.forEach(ticket => {
-        if ((ticket.status === 'Open' || ticket.status === 'In Progress') && ticket.slaDueAt) {
-            const due = new Date(ticket.slaDueAt);
-            const timeDiff = due.getTime() - now.getTime();
-            const hoursLeft = timeDiff / (1000 * 60 * 60);
+  const allowedNavItems = navItems.filter(item => permissions.includes(item.id));
 
-            if (timeDiff < 0) {
-                // Overdue
-                newPotentialNotifications.push({ 
-                    id: `sla-breach-${ticket.id}`, 
-                    type: 'error', 
-                    message: `SLA Breached: Ticket #${ticket.id}`, 
-                    timestamp: now.toISOString(), 
-                    read: false, 
-                    link: `/tickets/${ticket.id}`,
-                    category: 'SLA'
-                });
-            } else if (hoursLeft < 4) {
-                // Warning
-                 newPotentialNotifications.push({ 
-                    id: `sla-warning-${ticket.id}`, 
-                    type: 'warning', 
-                    message: `SLA Warning: Ticket #${ticket.id} due in < 4h`, 
-                    timestamp: now.toISOString(), 
-                    read: false, 
-                    link: `/tickets/${ticket.id}`,
-                    category: 'SLA'
-                });
-            }
-        }
-    });
-
-    // License Checks
-    licenses.forEach(license => {
-        if (license.expirationDate) {
-            const exp = new Date(license.expirationDate);
-            const daysLeft = Math.ceil((exp.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-            if (daysLeft > 0 && daysLeft <= 30) {
-                 newPotentialNotifications.push({ 
-                    id: `lic-exp-${license.id}`, 
-                    type: 'warning', 
-                    message: `License '${license.name}' expires in ${daysLeft} days`, 
-                    timestamp: now.toISOString(), 
-                    read: false, 
-                    link: `/licenses/${license.id}`,
-                    category: 'LICENSE'
-                });
-            }
-        }
-    });
-
-    // Warranty Checks
-    assets.forEach(asset => {
-        if (asset.warrantyEndDate && asset.warrantyEndDate !== 'Lifetime') {
-            const end = new Date(asset.warrantyEndDate);
-            const daysLeft = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-            if (daysLeft > 0 && daysLeft <= 30) {
-                 newPotentialNotifications.push({ 
-                    id: `warranty-exp-${asset.id}`, 
-                    type: 'info', 
-                    message: `Warranty for '${asset.name}' expires soon`, 
-                    timestamp: now.toISOString(), 
-                    read: false, 
-                    link: `/assets/${asset.id}`,
-                    category: 'ASSET'
-                });
-            }
-        }
-    });
-
-    // Vendor Interaction Schedule checks
-    vendorInteractions.forEach(interaction => {
-        if ((interaction.status === 'Open' || interaction.status === 'Pending Intervention') && interaction.scheduledDate) {
-            const scheduledDate = new Date(interaction.scheduledDate);
-            const isToday = scheduledDate.toDateString() === now.toDateString();
-            if (isToday) {
-                newPotentialNotifications.push({ 
-                    id: `vendor-int-${interaction.id}`,
-                    type: 'warning', 
-                    message: `Scheduled Intervention TODAY: ${interaction.subject}`, 
-                    link: '/vendors', 
-                    category: 'VENDOR',
-                    timestamp: now.toISOString(),
-                    read: false
-                });
-            }
-        }
-    });
-
-    // Filter muted (excluding SLA)
-    const filteredNotifications = newPotentialNotifications.filter(n => !isMuted(n.category));
-    
-    // Merge with existing state to avoid duplicates/re-renders if ID exists
-    setNotifications(prev => {
-        const existingIds = new Set(prev.map(n => n.id));
-        const newUnique = filteredNotifications.filter(n => !existingIds.has(n.id));
-        if (newUnique.length === 0) return prev;
-        return [...newUnique, ...prev];
-    });
-
-  }, [tickets, assets, licenses, vendorInteractions, user]);
-
-  const addNotification = useCallback((n: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
-      const newNotif: Notification = {
-          ...n,
-          id: `manual-${Date.now()}`,
-          timestamp: new Date().toISOString(),
-          read: false
-      };
-      setNotifications(prev => [newNotif, ...prev]);
-  }, []);
-
-  const markAsRead = useCallback((id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-  }, []);
-
-  const markAllAsRead = useCallback(() => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  }, []);
-
-  const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
+  const handleLanguageChange = (lang: Language) => {
+    setLanguage(lang);
+    setIsLangOpen(false);
+  };
 
   return (
-    <NotificationsContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead, addNotification }}>
-      {children}
-    </NotificationsContext.Provider>
+    <>
+      {/* Overlay for mobile */}
+      <div 
+        className={`fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-30 lg:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
+        onClick={toggleSidebar}
+      ></div>
+
+      <aside className={`fixed top-0 left-0 h-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur-2xl border-r border-neutral-200 dark:border-neutral-800 z-40 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 ${isCollapsed ? 'w-20' : 'w-72'} shadow-lg`}>
+        
+        {/* Collapse Button (Desktop Only) */}
+        <button
+            onClick={toggleSidebarCollapse}
+            className="absolute -right-3 top-9 hidden lg:flex items-center justify-center w-6 h-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-full text-neutral-500 dark:text-neutral-400 shadow-md hover:text-primary-600 dark:hover:text-primary-400 hover:border-primary-300 dark:hover:border-primary-700 transition-all z-50"
+            title={t(isCollapsed ? 'expand sidebar' : 'collapse sidebar')}
+        >
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+            >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+
+        <div className={`flex items-center h-20 px-6 flex-shrink-0 ${isCollapsed ? 'justify-center px-0' : 'justify-start'}`}>
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative">
+                <div className="absolute inset-0 bg-primary-500 blur-lg opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
+                <div className="relative p-2 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl shadow-lg shadow-primary-500/30 group-hover:scale-105 transition-transform ring-1 ring-white/10">
+                    <Logo className="h-6 w-6 text-white" />
+                </div>
+            </div>
+            <span className={`font-bold text-xl tracking-tight text-neutral-900 dark:text-white transition-all duration-200 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
+                IT Hub Center
+            </span>
+          </Link>
+        </div>
+        
+        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1.5 custom-scrollbar">
+          <p className={`px-4 text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-3 transition-opacity duration-200 ${isCollapsed ? 'opacity-0 text-center' : 'opacity-100'}`}>Menu</p>
+          <ul>
+            {[...allowedNavItems, ...extraItems].map(item => (
+              <li key={item.id}>
+                <NavLink 
+                  to={item.path} 
+                  className={({ isActive }) => `
+                    flex items-center px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden
+                    ${isActive 
+                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300 shadow-sm ring-1 ring-primary-200 dark:ring-primary-500/20' 
+                        : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-neutral-900 dark:hover:text-neutral-200'
+                    }
+                    ${isCollapsed ? 'justify-center px-0' : ''}
+                  `}
+                  title={isCollapsed ? (t(item.labelKey) === item.labelKey ? item.labelKey : t(item.labelKey)) : undefined}
+                >
+                  {({ isActive }) => (
+                    <>
+                      {isActive && !isCollapsed && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary-600 rounded-r-full"></div>}
+                      <div className={`flex-shrink-0 transition-colors duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300'}`}>
+                        {React.cloneElement(item.icon as React.ReactElement, { className: "w-[20px] h-[20px]" })}
+                      </div>
+                      <span className={`ml-3 whitespace-nowrap transition-all duration-200 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>{t(item.labelKey) === item.labelKey ? item.labelKey : t(item.labelKey)}</span>
+                    </>
+                  )}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        
+        <div className="p-4 border-t border-neutral-200/50 dark:border-neutral-800 space-y-2 bg-neutral-50/80 dark:bg-neutral-900/30 backdrop-blur-md">
+            <div className="relative">
+                <button
+                    onClick={() => setIsLangOpen(!isLangOpen)}
+                    className={`flex items-center w-full p-2.5 rounded-xl text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:shadow-sm hover:text-neutral-900 dark:hover:text-neutral-200 transition-all duration-200 border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 ${isCollapsed ? 'justify-center' : ''}`}
+                    title={t('language')}
+                >
+                    <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 shadow-sm ring-1 ring-neutral-200 dark:ring-neutral-700 transition-all">{FLAGS[language]}</div>
+                    <span className={`ml-3 whitespace-nowrap transition-all duration-200 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>{t(`lang ${language}`)}</span>
+                    {!isCollapsed && <svg xmlns="http://www.w3.org/2000/svg" className={`ml-auto h-4 w-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>}
+                </button>
+                {isLangOpen && (
+                    <div className={`absolute bottom-full left-0 mb-2 w-full bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-100 dark:border-neutral-700 overflow-hidden z-50 animate-scaleIn origin-bottom ${isCollapsed ? 'left-full ml-4 bottom-0 w-48' : ''}`}>
+                        {(Object.keys(Language) as Language[]).map(lang => (
+                            <button
+                                key={lang}
+                                onClick={() => handleLanguageChange(lang)}
+                                className="flex items-center w-full p-3 text-sm text-left hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition-colors"
+                            >
+                                <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 shadow-sm mr-3 ring-1 ring-neutral-200 dark:ring-neutral-600">{FLAGS[lang]}</div>
+                                <span className={`whitespace-nowrap font-medium ${language === lang ? 'text-primary-600 dark:text-primary-400' : ''}`}>{t(`lang ${lang}`)}</span>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+            
+            {permissions.includes('settings') && (
+              <NavLink 
+                to="/settings"
+                className={({ isActive }) => `
+                    flex items-center p-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative
+                    ${isActive 
+                        ? 'bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-neutral-200 dark:ring-neutral-700' 
+                        : 'text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-200 hover:shadow-sm border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700'
+                    }
+                    ${isCollapsed ? 'justify-center' : ''}
+                `}
+                title={t('settings')}
+              >
+                 {({ isActive }) => (
+                    <>
+                      <div className={`flex-shrink-0 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300'}`}>
+                        {React.cloneElement(ICONS.settings, { className: "w-5 h-5" })}
+                      </div>
+                      <span className={`ml-3 whitespace-nowrap transition-all duration-200 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>{t('settings')}</span>
+                    </>
+                  )}
+              </NavLink>
+            )}
+        </div>
+      </aside>
+    </>
   );
 };
+
+export default Sidebar;

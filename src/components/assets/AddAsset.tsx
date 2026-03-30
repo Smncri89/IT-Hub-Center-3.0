@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Asset, User } from '@/types';
@@ -9,6 +8,7 @@ import Spinner from '@/components/Spinner';
 import { ICONS, ASSET_TYPES_CONFIG, ASSET_IMAGE_LIBRARY } from '@/constants';
 import { useData } from '@/hooks/useData';
 import { calculateCurrentValue } from '@/utils/depreciation';
+import { getLocations, Location } from '@/services/locationsService';
 
 const AddAsset: React.FC = () => {
     const { assetId } = useParams<{ assetId: string }>();
@@ -35,10 +35,24 @@ const AddAsset: React.FC = () => {
 
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const [isMatchingImage, setIsMatchingImage] = useState(false); // AI loading state
+    const [isMatchingImage, setIsMatchingImage] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [error, setError] = useState('');
     const [isLifetimeWarranty, setIsLifetimeWarranty] = useState(false);
+    const [locations, setLocations] = useState<Location[]>([]);
+
+    // Fetch locations
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                const locs = await getLocations();
+                setLocations(locs);
+            } catch (err) {
+                console.error('Failed to fetch locations:', err);
+            }
+        };
+        fetchLocations();
+    }, []);
 
     useEffect(() => {
         const loadAsset = async () => {
@@ -59,7 +73,7 @@ const AddAsset: React.FC = () => {
                         });
                         if (fetchedAsset.image) {
                             setImagePreview(fetchedAsset.image);
-                            setImageTab('url'); // Show current image URL by default if exists
+                            setImageTab('url');
                         }
                     } else {
                         setError(t('asset not found'));
@@ -104,7 +118,6 @@ const AddAsset: React.FC = () => {
 
     // --- AUTO-IMAGE DISCOVERY (Local Only) ---
     useEffect(() => {
-        // Only auto-suggest if not in edit mode (or if no image set) and if the user hasn't manually uploaded/pasted an image
         if (!isEditMode && !imageFile && !imagePreview && (formData.name || formData.model)) {
             const searchText = `${formData.model || ''} ${formData.name || ''}`.toLowerCase();
             
@@ -126,11 +139,9 @@ const AddAsset: React.FC = () => {
             }
 
             if (bestMatch && maxScore > 0) {
-                // Automatically set preview from library, but don't switch tab forcefully to be annoying
-                // Just set the value so it saves if they don't change it
                 setFormData(prev => ({ ...prev, image: bestMatch?.url }));
                 setImagePreview(bestMatch.url);
-                setImageTab('library'); // Helpful to show where it came from
+                setImageTab('library');
             }
         }
     }, [formData.name, formData.model, isEditMode, imageFile]);
@@ -188,20 +199,18 @@ const AddAsset: React.FC = () => {
         
         setIsMatchingImage(true);
         try {
-            // 1. Try to learn from existing database first (Dynamic Library)
             const existingImageUrl = await findImageForModel(query);
             
             if (existingImageUrl) {
                 setFormData(prev => ({ ...prev, image: existingImageUrl }));
                 setImagePreview(existingImageUrl);
-                setImageTab('url'); // Set to URL since it's a stored link
+                setImageTab('url');
             } else {
-                // 2. Fallback to Gemini AI matching against static library
                 const suggestionUrl = await getAssetImageSuggestion(query);
                 if (suggestionUrl) {
                     setFormData(prev => ({ ...prev, image: suggestionUrl }));
                     setImagePreview(suggestionUrl);
-                    setImageTab('url'); // Fix: Switch to URL tab so the user sees the result immediately
+                    setImageTab('url');
                 } else {
                     alert("No good match found. Try Web Search.");
                 }
@@ -236,7 +245,6 @@ const AddAsset: React.FC = () => {
             const assignedUser = users.find(u => u.id === (formData.assignedTo as any));
             dataToSave.assignedTo = assignedUser;
 
-            // Upload image if new file selected
             if (imageFile) {
                 const imageUrl = await uploadAssetImage(imageFile);
                 dataToSave.image = imageUrl;
@@ -279,6 +287,23 @@ const AddAsset: React.FC = () => {
         const labelKey = (field.labelKey || '').replace(/_/g, ' ');
         const label = <label htmlFor={field.id} className="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">{t(labelKey)}{field.required && ' *'}</label>;
         
+        // Location field: render as dropdown with locations from DB
+        if (field.id === 'location') {
+            return (
+                <div key={field.id} className={field.grid_span || 'col-span-1'}>
+                    {label}
+                    <select {...commonProps}>
+                        <option value="">{t('select location')}</option>
+                        {locations.map(loc => (
+                            <option key={loc.id} value={loc.name}>
+                                {loc.name}{loc.city ? ` - ${loc.city}` : ''}{loc.is_headquarters ? ' (HQ)' : ''}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            );
+        }
+
         if (field.id === 'warrantyEndDate') {
             return (
                 <div key={field.id} className={field.grid_span || 'col-span-1'}>
@@ -348,12 +373,10 @@ const AddAsset: React.FC = () => {
         const search = (formData.name || '' + ' ' + formData.model || '').toLowerCase();
         if (!search.trim()) return Object.values(ASSET_IMAGE_LIBRARY); 
 
-        // Prioritize exact matches then partials
         return Object.values(ASSET_IMAGE_LIBRARY).filter(item => 
             item.keywords.some(k => search.includes(k)) || 
             item.label.toLowerCase().includes(search)
         ).sort((a, b) => {
-             // Sort by label match first for better relevance
              const aMatch = a.label.toLowerCase().includes(search);
              const bMatch = b.label.toLowerCase().includes(search);
              if (aMatch && !bMatch) return -1;
@@ -367,7 +390,6 @@ const AddAsset: React.FC = () => {
 
     return (
         <div className="max-w-2xl mx-auto">
-            {/* Centered Modal-like layout for standalone page */}
             <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                 <header className="p-6 border-b border-neutral-200 dark:border-neutral-700 flex-shrink-0 flex justify-between items-center bg-neutral-50 dark:bg-neutral-900/50">
                     <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
