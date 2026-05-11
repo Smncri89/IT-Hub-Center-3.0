@@ -11,11 +11,7 @@ import { GoogleGenAI } from '@google/genai';
 import { mapTicketData, mapAssetData, mapLicenseData, mapIncidentData, mapKBArticleData, mapProfileToUser, mapCommentData } from '@/utils/mappers';
 
 // --- AI SETUP ---
-const API_KEY = (typeof process !== 'undefined' && process.env?.API_KEY)
-  ? process.env.API_KEY
-  : (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY)
-  ? process.env.GEMINI_API_KEY
-  : null;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || null;
 
 const genAI = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 const GEMINI_MODEL = 'gemini-2.5-flash';
@@ -38,7 +34,7 @@ export const getUsers = async (): Promise<User[]> => {
 };
 
 export const updateUser = async (userId: string, updates: Partial<User>): Promise<User | null> => {
-  const dbUpdates: any = {};
+  const dbUpdates: Record<string, unknown> = {};
   if (updates.name) dbUpdates.name = updates.name;
   if (updates.role) dbUpdates.role = updates.role;
   if (updates.company) dbUpdates.company = updates.company;
@@ -84,7 +80,7 @@ export const bulkCreateUsers = async (usersData: Partial<User>[]): Promise<void>
 
 export const uploadAvatar = async (userId: string, file: File): Promise<string> => {
   const fileExt = file.name.split('.').pop();
-  const fileName = `${userId}-${Math.random()}.${fileExt}`;
+  const fileName = `${userId}-${crypto.randomUUID()}.${fileExt}`;
   const filePath = `avatars/${fileName}`;
   const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file);
   if (uploadError) throw uploadError;
@@ -130,7 +126,7 @@ export const getTicketById = async (id: string): Promise<Ticket | null> => {
 export const createTicket = async (ticketData: Partial<Ticket> & { asset_id?: string, assignee_id?: string }, requester: User, attachments: File[]): Promise<Ticket> => {
   const attachmentUrls = [];
   for (const file of attachments) {
-    const path = `tickets/${Date.now()}_${file.name}`;
+    const path = `tickets/${crypto.randomUUID()}_${file.name}`;
     const { error: upErr } = await supabase.storage.from('attachments').upload(path, file);
     if (!upErr) {
       const { data } = supabase.storage.from('attachments').getPublicUrl(path);
@@ -207,7 +203,7 @@ export const addCommentToTicket = async (ticketId: string, author: User, content
 export const addAttachmentsToTicket = async (ticketId: string, files: File[], existingUrls: string[]): Promise<Ticket> => {
   const newUrls = [...existingUrls];
   for (const file of files) {
-    const path = `tickets/${ticketId}/${Date.now()}_${file.name}`;
+    const path = `tickets/${ticketId}/${crypto.randomUUID()}_${file.name}`;
     const { error: upErr } = await supabase.storage.from('attachments').upload(path, file);
     if (!upErr) {
       const { data } = supabase.storage.from('attachments').getPublicUrl(path);
@@ -304,7 +300,7 @@ export const deleteAsset = async (id: string): Promise<void> => {
 };
 
 export const uploadAssetImage = async (file: File): Promise<string> => {
-  const path = `assets/${Date.now()}_${file.name}`;
+  const path = `assets/${crypto.randomUUID()}_${file.name}`;
   const { error } = await supabase.storage.from('assets').upload(path, file);
   if (error) throw error;
   const { data } = supabase.storage.from('assets').getPublicUrl(path);
@@ -600,7 +596,7 @@ export const addVendorComment = async (interactionId: string, content: string, u
 };
 
 export const uploadVendorDocument = async (file: File): Promise<string> => {
-  const path = `vendors/${Date.now()}_${file.name}`;
+  const path = `vendors/${crypto.randomUUID()}_${file.name}`;
   const { error } = await supabase.storage.from('documents').upload(path, file);
   if (error) throw error;
   const { data } = supabase.storage.from('documents').getPublicUrl(path);
@@ -608,7 +604,7 @@ export const uploadVendorDocument = async (file: File): Promise<string> => {
 };
 
 export const uploadInteractionAttachment = async (interactionId: string, file: File): Promise<string> => {
-  const path = `interactions/${interactionId}/${Date.now()}_${file.name}`;
+  const path = `interactions/${interactionId}/${crypto.randomUUID()}_${file.name}`;
   const { error } = await supabase.storage.from('attachments').upload(path, file);
   if (error) throw error;
   const { data } = supabase.storage.from('attachments').getPublicUrl(path);

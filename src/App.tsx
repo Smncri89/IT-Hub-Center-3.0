@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -6,6 +6,8 @@ import { LocalizationProvider } from '@/contexts/LocalizationContext';
 import { NotificationsProvider } from '@/contexts/NotificationsContext';
 import { PWAInstallProvider } from '@/contexts/PWAInstallContext';
 import { DataProvider } from '@/contexts/DataContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import Spinner from '@/components/Spinner';
 import Layout from '@/components/Layout';
 import Login from '@/components/Login';
 import Register from '@/components/Register';
@@ -47,17 +49,24 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, pageId, allow
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
-    
+
     const userRole = user?.role || Role.EndUser;
 
     if (allowedRoles) {
         if (!allowedRoles.includes(userRole)) {
             return <Navigate to="/dashboard" replace />;
         }
-    } else if (ROLES_PERMISSIONS[userRole]?.includes(pageId) || pageId === 'vendors' || pageId === 'map' || pageId === 'locations' || pageId === 'onboarding') {
         return <>{children}</>;
-    } else {
-         return <Navigate to="/dashboard" replace />;
+    }
+
+    const hasPermission = ROLES_PERMISSIONS[userRole]?.includes(pageId)
+        || pageId === 'vendors'
+        || pageId === 'map'
+        || pageId === 'locations'
+        || pageId === 'onboarding';
+
+    if (!hasPermission) {
+        return <Navigate to="/dashboard" replace />;
     }
 
     return <>{children}</>;
@@ -128,15 +137,17 @@ const AppRoutes = () => {
 
 const App: React.FC = () => {
   return (
-    <LocalizationProvider>
-      <AuthProvider>
-        <PWAInstallProvider>
-          <HashRouter>
-              <AppRoutes />
-          </HashRouter>
-        </PWAInstallProvider>
-      </AuthProvider>
-    </LocalizationProvider>
+    <ErrorBoundary>
+      <LocalizationProvider>
+        <AuthProvider>
+          <PWAInstallProvider>
+            <HashRouter>
+                <AppRoutes />
+            </HashRouter>
+          </PWAInstallProvider>
+        </AuthProvider>
+      </LocalizationProvider>
+    </ErrorBoundary>
   );
 };
 

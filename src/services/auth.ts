@@ -159,7 +159,7 @@ export const register = async (name: string, email: string, pass: string, role: 
             data: {
                 name,
                 role,
-                avatar_url: `https://picsum.photos/seed/${Math.random()}/100/100`
+                avatar_url: `https://picsum.photos/seed/${crypto.randomUUID()}/100/100`
             }
         }
     });

@@ -31,10 +31,43 @@ const DetailRow: React.FC<{ label: string; children: React.ReactNode }> = ({ lab
     </div>
 );
 
+function sanitizeHtml(html: string): string {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const ALLOWED_TAGS = new Set(['B', 'I', 'U', 'STRONG', 'EM', 'BR', 'P', 'A', 'UL', 'OL', 'LI', 'DIV', 'SPAN', 'HR', 'IMG', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE', 'CODE']);
+    const ALLOWED_ATTRS = new Set(['href', 'target', 'rel', 'src', 'alt', 'style', 'class']);
+
+    function clean(node: Node): void {
+        const children = Array.from(node.childNodes);
+        for (const child of children) {
+            if (child.nodeType === Node.ELEMENT_NODE) {
+                const el = child as Element;
+                if (!ALLOWED_TAGS.has(el.tagName)) {
+                    el.replaceWith(...Array.from(el.childNodes));
+                    continue;
+                }
+                for (const attr of Array.from(el.attributes)) {
+                    if (!ALLOWED_ATTRS.has(attr.name)) el.removeAttribute(attr.name);
+                }
+                if (el.tagName === 'A') {
+                    const href = el.getAttribute('href') || '';
+                    if (href.startsWith('javascript:') || href.startsWith('data:')) {
+                        el.removeAttribute('href');
+                    }
+                    el.setAttribute('rel', 'noopener noreferrer');
+                }
+                clean(el);
+            }
+        }
+    }
+    clean(doc.body);
+    return doc.body.innerHTML;
+}
+
 const CommentBubble: React.FC<{ comment: Comment, isInternal: boolean }> = ({ comment, isInternal }) => {
     const { t } = useLocalization();
     const bgColor = isInternal ? 'bg-yellow-100 dark:bg-yellow-900/40' : 'bg-neutral-100 dark:bg-neutral-700/50';
     const borderColor = isInternal ? 'border-yellow-200 dark:border-yellow-700/60' : 'border-transparent';
+    const sanitizedContent = useMemo(() => sanitizeHtml(comment.content), [comment.content]);
     return (
         <div className={`flex items-start gap-4 p-3 rounded-lg border ${borderColor} ${bgColor}`}>
             <img src={comment.author.avatarUrl} alt={comment.author.name} className="w-10 h-10 rounded-full" />
@@ -49,9 +82,9 @@ const CommentBubble: React.FC<{ comment: Comment, isInternal: boolean }> = ({ co
                         </span>
                     )}
                 </div>
-                <div 
-                    className="prose prose-sm dark:prose-invert max-w-none mt-1" 
-                    dangerouslySetInnerHTML={{ __html: comment.content }}
+                <div
+                    className="prose prose-sm dark:prose-invert max-w-none mt-1"
+                    dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                 ></div>
             </div>
         </div>
@@ -297,7 +330,7 @@ export const TicketDetail: React.FC = () => {
                 <div className="md:col-span-2 space-y-6">
                     <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-md p-6">
                         <h3 className="text-lg font-semibold mb-2 text-neutral-900 dark:text-neutral-100">{t('description')}</h3>
-                        <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: ticket.description.replace(/\n/g, '<br />') }}></div>
+                        <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">{ticket.description}</div>
                     </div>
                     
                     {ticket.attachments && ticket.attachments.length > 0 && (
