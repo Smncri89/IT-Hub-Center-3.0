@@ -8,7 +8,7 @@ import { ICONS, STATUS_COLORS, ASSET_TYPES_CONFIG, ASSET_IMAGE_LIBRARY } from '@
 import { useDebounce } from '@/hooks/useDebounce';
 import { useData } from '@/hooks/useData';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
-import { createAsset, updateAsset } from '@/services/api';
+import { createAsset, updateAsset, findImageForModel } from '@/services/api';
 import AssetMap from '@/components/maps/AssetMap';
 import ImportModal from '@/components/ImportModal';
 import { getLocations, Location } from '@/services/locationsService';
@@ -317,53 +317,162 @@ export const AssetsList: React.FC = () => {
         setImportStatus({ success: 0, errors: [] });
         setIsImportModalOpen(true);
 
-        const requiredHeaders = ['name', 'type', 'status'];
-        const headers = Object.keys(data[0] || {});
-        if (!requiredHeaders.every(h => headers.includes(h))) {
-            setImportStatus({ success: 0, errors: [`Invalid headers. File must include: ${requiredHeaders.join(', ')}.`] });
+        if (!data.length) {
+            setImportStatus({ success: 0, errors: ['No data found in file.'] });
             return;
         }
-        
+
+        const COLUMN_ALIASES: Record<string, string[]> = {
+            name: ['name', 'nome', 'asset_name', 'asset name', 'nome asset', 'hostname'],
+            type: ['type', 'tipo', 'asset_type', 'asset type', 'tipo asset', 'categoria', 'category'],
+            status: ['status', 'stato', 'state', 'asset_status'],
+            model: ['model', 'modello', 'model name', 'nome modello'],
+            serial_number: ['serial_number', 'serial number', 'serialnumber', 's/n', 'sn', 'seriale', 'numero seriale', 'numero di serie'],
+            purchase_date: ['purchase_date', 'purchase date', 'data acquisto', 'data_acquisto'],
+            warranty_end_date: ['warranty_end_date', 'warranty end date', 'fine garanzia', 'scadenza garanzia'],
+            assigned_to_email: ['assigned_to_email', 'assigned to', 'assegnato a', 'email utente', 'utente'],
+            location: ['location', 'sede', 'posizione', 'luogo', 'ubicazione'],
+            quantity: ['quantity', 'quantità', 'qty', 'quantita'],
+            phone_number: ['phone_number', 'phone', 'telefono', 'numero telefono'],
+            carrier: ['carrier', 'operatore', 'gestore'],
+            sim_serial: ['sim_serial', 'sim', 'sim serial', 'seriale sim'],
+            esim_serial: ['esim_serial', 'esim', 'esim serial', 'seriale esim'],
+            notes: ['notes', 'note', 'doppia utenza', 'dual user', 'commenti', 'osservazioni'],
+        };
+
+        const TYPE_DETECTION_RULES: [RegExp, string][] = [
+            [/\b(latitude|inspiron|precision|optiplex|xps|vostro)\b/i, 'PC/Laptop'],
+            [/\b(macbook|imac)\b/i, 'PC/Laptop'],
+            [/\b(thinkpad|ideapad|yoga|legion|thinkcentre|thinkbook)\b/i, 'PC/Laptop'],
+            [/\b(surface\s*(pro|laptop|go|book|studio))\b/i, 'PC/Laptop'],
+            [/\b(elitebook|probook|zbook|pavilion|omen|envy)\b/i, 'PC/Laptop'],
+            [/\b(vivobook|zenbook|rog|tuf)\b/i, 'PC/Laptop'],
+            [/\b(iphone|galaxy\s*s|pixel\s*\d|redmi|poco|oneplus)\b/i, 'Smartphone'],
+            [/\b(ipad|galaxy\s*tab)\b/i, 'Tablet'],
+            [/\b(laserjet|officejet|deskjet|ecotank|pixma)\b/i, 'Printer'],
+            [/\b(ultrasharp|prolite|flexscan|thinkvision)\b/i, 'Monitor'],
+            [/\b(catalyst|meraki|prosafe|aruba\s*switch)\b/i, 'Switch'],
+            [/\b(fortigate|paloalto|sophos\s*xg)\b/i, 'Firewall'],
+            [/\b(poweredge|proliant|thinkserver)\b/i, 'Server'],
+        ];
+
+        const rawHeaders = Object.keys(data[0]);
+        const headerMap: Record<string, string> = {};
+        for (const [canonical, aliases] of Object.entries(COLUMN_ALIASES)) {
+            for (const h of rawHeaders) {
+                const normalized = h.trim().toLowerCase();
+                if (aliases.includes(normalized)) {
+                    headerMap[canonical] = h;
+                    break;
+                }
+            }
+        }
+
+        const detectType = (model: string): string => {
+            for (const [pattern, type] of TYPE_DETECTION_RULES) {
+                if (pattern.test(model)) return type;
+            }
+            return 'PC/Laptop';
+        };
+
+        const matchImageFromLibrary = (model: string, name: string, type: string): string | null => {
+            const searchText = `${model} ${name} ${type}`.toLowerCase();
+            let bestMatch: string | null = null;
+            let maxScore = 0;
+            for (const key in ASSET_IMAGE_LIBRARY) {
+                const entry = ASSET_IMAGE_LIBRARY[key];
+                let score = 0;
+                for (const keyword of entry.keywords) {
+                    if (searchText.includes(keyword.toLowerCase())) {
+                        score += 2;
+                        if (model.toLowerCase().includes(keyword.toLowerCase())) score += 3;
+                    }
+                }
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestMatch = entry.url;
+                }
+            }
+            if (bestMatch) return bestMatch;
+            const typeLower = type.toLowerCase();
+            if (typeLower.includes('phone') || typeLower.includes('mobile')) return ASSET_IMAGE_LIBRARY.iphone?.url || null;
+            if (typeLower.includes('laptop') || typeLower.includes('pc')) return ASSET_IMAGE_LIBRARY.macbook_pro_16?.url || null;
+            if (typeLower.includes('server')) return ASSET_IMAGE_LIBRARY.server_rack?.url || null;
+            if (typeLower.includes('monitor')) return ASSET_IMAGE_LIBRARY.monitor?.url || null;
+            if (typeLower.includes('printer')) return ASSET_IMAGE_LIBRARY.printer?.url || null;
+            if (typeLower.includes('switch')) return ASSET_IMAGE_LIBRARY.switch?.url || null;
+            if (typeLower.includes('tablet')) return ASSET_IMAGE_LIBRARY.ipad_pro?.url || null;
+            return null;
+        };
+
+        const imageCache: Record<string, string | null> = {};
+
         const validAssetTypes = Object.keys(ASSET_TYPES_CONFIG);
-        const validAssetStatuses = Object.values(ASSET_TYPES_CONFIG).flatMap(config => 
+        const validAssetStatuses = Object.values(ASSET_TYPES_CONFIG).flatMap(config =>
             config.fields.find(f => f.id === 'status')?.options?.map((opt: {value: string}) => opt.value) || []
         ).filter((value, index, self) => self.indexOf(value) === index);
 
+        const getVal = (row: any, field: string): string => {
+            const key = headerMap[field];
+            return key ? (row[key] || '').toString().trim() : '';
+        };
+
         const importPromises = data.map(async (row, index) => {
             try {
-                const assignedToEmail = row['assigned_to_email'];
+                const model = getVal(row, 'model');
+                const rawName = getVal(row, 'name');
+                const rawType = getVal(row, 'type');
+                const rawStatus = getVal(row, 'status');
+                const rawNotes = getVal(row, 'notes');
+
+                const name = rawName || model || `Asset ${index + 1}`;
+
+                let type = rawType;
+                if (!type || !validAssetTypes.includes(type)) {
+                    type = model ? detectType(model) : 'Other';
+                }
+
+                let status = rawStatus;
+                if (!status || !validAssetStatuses.includes(status)) {
+                    status = 'Ready to Deploy';
+                }
+
+                const assignedToEmail = getVal(row, 'assigned_to_email');
                 let assignedToUser = undefined;
                 if (assignedToEmail) {
                     assignedToUser = users.find(u => u.email === assignedToEmail);
                     if (!assignedToUser) throw new Error(`Assigned user '${assignedToEmail}' not found.`);
                 }
 
-                const type = row['type'];
-                if (!type || !validAssetTypes.includes(type)) throw new Error(`Invalid type '${type}'.`);
-                
-                const status = row['status'];
-                if (!status || !validAssetStatuses.includes(status)) throw new Error(`Invalid status '${status}'.`);
-
-                const quantityStr = row['quantity'];
+                const quantityStr = getVal(row, 'quantity');
                 let quantity = quantityStr ? parseInt(quantityStr, 10) : (ASSET_TYPES_CONFIG[type as keyof typeof ASSET_TYPES_CONFIG]?.required.includes('quantity') ? 1 : undefined);
 
                 const assetData: Partial<Asset> = {
-                    name: row['name'],
-                    type: type,
+                    name,
+                    type,
                     status: status as Asset['status'],
-                    model: row['model'] || null,
-                    serialNumber: row['serial_number'] || null,
-                    purchaseDate: row['purchase_date'] || null,
-                    warrantyEndDate: row['warranty_end_date'] || null,
+                    model: model || null,
+                    serialNumber: getVal(row, 'serial_number') || null,
+                    purchaseDate: getVal(row, 'purchase_date') || null,
+                    warrantyEndDate: getVal(row, 'warranty_end_date') || null,
                     assignedTo: assignedToUser,
-                    location: row['location'] || null,
-                    quantity: quantity,
-                    phoneNumber: row['phone_number'] || null,
-                    carrier: row['carrier'] || null,
-                    simSerial: row['sim_serial'] || null,
-                    esimSerial: row['esim_serial'] || null,
-                    notes: row['notes'] || null,
+                    location: getVal(row, 'location') || null,
+                    quantity,
+                    phoneNumber: getVal(row, 'phone_number') || null,
+                    carrier: getVal(row, 'carrier') || null,
+                    simSerial: getVal(row, 'sim_serial') || null,
+                    esimSerial: getVal(row, 'esim_serial') || null,
+                    notes: rawNotes || null,
                 };
+
+                const cacheKey = model.toLowerCase();
+                if (!(cacheKey in imageCache)) {
+                    const dbImage = model ? await findImageForModel(model) : null;
+                    imageCache[cacheKey] = dbImage || matchImageFromLibrary(model, name, type);
+                }
+                if (imageCache[cacheKey]) {
+                    assetData.image = imageCache[cacheKey]!;
+                }
 
                 await createAsset(assetData);
                 return { status: 'success' };
@@ -744,7 +853,7 @@ export const AssetsList: React.FC = () => {
                 onClose={() => setIsUploadModalOpen(false)}
                 onImport={handleBulkImport}
                 title={t('Import Assets')}
-                expectedColumns={['name', 'type', 'status', 'model', 'serial_number', 'purchase_date', 'warranty_end_date', 'assigned_to_email', 'location', 'quantity', 'phone_number', 'carrier', 'sim_serial', 'esim_serial', 'notes']}
+                expectedColumns={['model (modello)', 'serial_number (S/N)', 'name (nome)', 'type (tipo)', 'status (stato)', 'notes (note/doppia utenza)', 'purchase_date', 'warranty_end_date', 'assigned_to_email', 'location (sede)', 'quantity (quantità)', 'phone_number', 'carrier', 'sim_serial', 'esim_serial']}
             />
         </div>
     );
