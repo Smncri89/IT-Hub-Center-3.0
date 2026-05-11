@@ -1,18 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 52 52">
   <defs>
-    <linearGradient id="logoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#818cf8" />
       <stop offset="50%" stop-color="#6366f1" />
       <stop offset="100%" stop-color="#4f46e5" />
     </linearGradient>
-    <linearGradient id="logoGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#c7d2fe" stop-opacity="0.9" />
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0.95" />
     </linearGradient>
   </defs>
-  <rect x="2" y="2" width="48" height="48" rx="14" ry="14" fill="url(#logoGrad1)" />
-  <rect x="4" y="4" width="44" height="44" rx="12" ry="12" fill="none" stroke="white" stroke-opacity="0.15" stroke-width="1" />
-  <circle cx="26" cy="26" r="7" fill="url(#logoGrad2)" />
+  <rect width="52" height="52" rx="12" ry="12" fill="url(#g1)" />
+  <circle cx="26" cy="26" r="7" fill="url(#g2)" />
   <line x1="26" y1="19" x2="26" y2="11" stroke="white" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round" />
   <line x1="26" y1="33" x2="26" y2="41" stroke="white" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round" />
   <line x1="19" y1="26" x2="11" y2="26" stroke="white" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round" />
