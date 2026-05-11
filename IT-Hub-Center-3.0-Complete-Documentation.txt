@@ -1,0 +1,1010 @@
+================================================================================
+IT HUB CENTER 3.0 - COMPLETE PROJECT DOCUMENTATION
+================================================================================
+Version: 3.1.0
+Developer: Ciro Simione
+Repository: https://github.com/Smncri89/IT-Hub-Center-3.0
+Last Updated: 2026-05-11
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. Project Overview
+2. Tech Stack
+3. Architecture
+4. Authentication Flow
+5. Data Layer & Real-time Architecture
+6. Component Structure
+7. Context Providers (State Management)
+8. Custom Hooks
+9. Services & API Layer
+10. AI Integration (Claude + Gemini)
+11. Data Types & Models
+12. Constants & Configuration
+13. Utilities
+14. Role-Based Access Control (RBAC)
+15. Localization System
+16. PWA Support
+17. Real-time Data Flow Diagram
+18. Authentication Flow Diagram
+19. Deployment & Configuration
+20. Key Architectural Patterns
+21. Notable Features
+22. Security Improvements (v3.1.0)
+23. File-by-File Reference
+
+================================================================================
+1. PROJECT OVERVIEW
+================================================================================
+
+IT Hub Center 3.0 is an enterprise IT Service Management (ITSM) platform built
+with React, TypeScript, and Supabase. It provides comprehensive management of:
+
+- IT Support Tickets (with SLA tracking)
+- Hardware/Software Assets (with depreciation & QR codes)
+- Software Licenses (with seat assignments & expiration alerts)
+- Operational Incidents (with timeline & AI post-mortem)
+- Knowledge Base (multilingual articles with AI generation)
+- Vendor Management (contracts, interactions, documents)
+- Employee Onboarding/Offboarding workflows
+- Reports & Analytics (PDF & Excel export)
+- AI-powered Assistant (context-aware chatbot)
+
+The platform supports 3 languages (English, Italian, Spanish), role-based access
+control (4 roles), dark/light themes, and is installable as a Progressive Web App.
+
+================================================================================
+2. TECH STACK
+================================================================================
+
+FRONTEND:
+  - React 19.2.0 with TypeScript 5.8
+  - Vite 7.2.4 (build tool)
+  - React Router DOM 7.9.5 (HashRouter)
+  - Tailwind CSS 3 (via CDN)
+  - Lucide React (icon library)
+  - Recharts 3.3.0 (charts/visualizations)
+
+BACKEND & DATA:
+  - Supabase (PostgreSQL + Auth + Storage + Realtime subscriptions)
+  - Supabase Edge Functions (Deno-based serverless)
+
+AI:
+  - Claude (Anthropic) via Supabase Edge Function proxy
+  - Google Gemini 2.5 Flash (direct client integration)
+
+LIBRARIES:
+  - jsPDF + html2canvas (PDF export)
+  - XLSX (spreadsheet export)
+  - QRCode + jsQR (QR code generation/scanning)
+  - PapaParse (CSV parsing)
+  - OTPAuth (2FA/TOTP management)
+  - Leaflet 1.9.4 (maps)
+  - lodash-es (utility functions)
+
+================================================================================
+3. ARCHITECTURE
+================================================================================
+
+The application follows a single-page application (SPA) pattern with:
+
+- Context-based state management (no Redux)
+- Real-time data subscriptions via Supabase
+- Centralized data mapping layer
+- Secured AI proxy via Edge Functions
+- Role-based route protection
+
+Project Structure:
+  src/
+    components/       # React components organized by feature
+      assets/         # Asset management (list, detail, add/edit)
+      incidents/      # Incident management (list, detail)
+      kb/             # Knowledge base (list, detail, editor)
+      licenses/       # License management (list, detail, form)
+      locations/      # Company locations
+      maps/           # Asset geolocation map (Leaflet)
+      onboarding/     # Onboarding/offboarding workflows
+      pulse/          # Team session/activity monitoring
+      reports/        # Reports & analytics
+      settings/       # App settings (9 sub-settings pages)
+      tickets/        # Ticket management (list, detail)
+      vendors/        # Vendor management
+    contexts/         # 5 React Context providers
+    hooks/            # 6 custom React hooks
+    services/         # API, Auth, Supabase, Claude, Locations, Onboarding
+    utils/            # Mappers, localization, depreciation, event bus
+    types.ts          # TypeScript type definitions
+    constants.tsx     # Icons, permissions, categories, colors
+    index.tsx         # App entry point
+
+================================================================================
+4. AUTHENTICATION FLOW
+================================================================================
+
+File: src/contexts/AuthContext.tsx, src/services/auth.ts
+
+FLOW:
+1. User navigates to /login
+2. Enters email + password
+3. auth.ts: login() calls supabase.auth.signInWithPassword()
+4a. If no 2FA: Returns user, AuthContext sets state, navigate to /dashboard
+4b. If 2FA enabled: Returns requires2FA flag, shows TOTP input
+    User enters 6-digit code from authenticator app
+    auth.ts: verify2FA() calls supabase.auth.verifyOtp()
+    AuthContext sets user state, navigate to /dashboard
+5. AuthContext starts activity listeners (mouse, keyboard, touch events)
+6. After 1 hour of inactivity: automatic logout
+7. Real-time auth state listener updates user on session changes
+
+FEATURES:
+- 10-second timeout on login/2FA to prevent hanging
+- 3-second safety valve in AuthContext to prevent infinite loading
+- Retry logic (3 attempts) for profile fetching after signup
+- Fallback profile creation if database trigger is missing
+- User status tracking (Online, Away, Do Not Disturb, Invisible)
+
+REGISTRATION:
+- Email + password + name + role
+- Supabase Auth handles email verification
+- Profile auto-created via database trigger (with fallback)
+
+PASSWORD RESET:
+- Sends reset email via Supabase Auth
+- Redirects to /update-password with token
+
+================================================================================
+5. DATA LAYER & REAL-TIME ARCHITECTURE
+================================================================================
+
+File: src/contexts/DataContext.tsx, src/services/api.ts, src/utils/mappers.ts
+
+INITIAL DATA FETCH:
+On mount, DataProvider fetches ALL data in parallel:
+  Promise.all([
+    getTickets(), getAssets(), getLicenses(),
+    getIncidents(), getKBArticles(), getUsers()
+  ])
+
+REAL-TIME SUBSCRIPTIONS:
+DataContext subscribes to Supabase postgres_changes on ALL tables:
+  - profiles (user changes)
+  - tickets (ticket CRUD)
+  - assets (asset CRUD)
+  - licenses (license CRUD)
+  - license_assignments (seat assignments)
+  - comments (ticket comments)
+  - incidents (incident CRUD)
+  - kb_articles (article CRUD)
+
+Each change triggers a state update using the mapper functions.
+
+DATA MAPPING:
+src/utils/mappers.ts normalizes Supabase rows into TypeScript types:
+  - mapProfileToUser() - DB profile → User
+  - mapTicketData() - DB ticket → Ticket (with user/asset lookups)
+  - mapAssetData() - DB asset → Asset (with user lookup)
+  - mapLicenseData() - DB license → License (with assignments)
+  - mapIncidentData() - DB incident → Incident (with user lookup)
+  - mapKBArticleData() - DB article → KBArticle (with author)
+  - mapCommentData() - DB comment → Comment (with author)
+
+AUTOMATION:
+On DataProvider mount, if user is Admin:
+  checkLicenseExpirationsAndCreateTickets() - auto-creates tickets for
+  licenses nearing expiration.
+
+DATABASE TABLES:
+  - profiles - User accounts & preferences
+  - tickets - Support tickets
+  - comments - Ticket comments
+  - assets - IT equipment inventory
+  - licenses - Software licenses
+  - license_assignments - License-to-user mapping
+  - incidents - Operational incidents
+  - kb_articles - Knowledge base articles
+  - vendors - Vendor contacts
+  - vendor_interactions - Vendor communication threads
+  - vendor_comments - Vendor interaction messages
+  - user_integrations - Third-party API keys
+  - sla_policies - SLA response/resolution times
+
+STORAGE BUCKETS:
+  - avatars - User profile pictures
+  - attachments - Ticket file attachments
+  - assets - Asset images
+  - documents - Vendor documents
+
+================================================================================
+6. COMPONENT STRUCTURE
+================================================================================
+
+LAYOUT COMPONENTS:
+  - Layout.tsx - Main shell with sidebar, header, content area
+  - Sidebar.tsx - Navigation menu (role-filtered), language picker, theme toggle
+  - Header.tsx - Top bar with search, user dropdown, notifications, command palette
+  - ErrorBoundary.tsx - React error boundary (catches render errors)
+
+AUTH PAGES:
+  - Login.tsx - Email/password login with 2FA prompt
+  - Register.tsx - User registration form
+  - ForgotPassword.tsx - Password reset email request
+  - UpdatePassword.tsx - New password input (from reset link)
+
+DASHBOARD:
+  - Dashboard.tsx - Overview widgets:
+    * Ticket status breakdown (pie chart)
+    * Active incidents count
+    * Asset health overview
+    * SLA compliance metrics
+    * Recent activity feed
+    * Quick action buttons
+
+TICKETS MODULE:
+  - TicketsList.tsx - Filterable/sortable table with bulk import
+    * Status/priority/category filters
+    * CSV import support
+    * New ticket creation modal
+  - TicketDetail.tsx - Full ticket view:
+    * Status/priority/assignee management
+    * Comment thread (public + internal notes)
+    * File attachments (drag & drop)
+    * AI-generated reply suggestions
+    * Create KB article from solution
+    * HTML sanitization for XSS protection
+
+ASSETS MODULE:
+  - AssetsList.tsx - Inventory table with QR scanning
+  - AssetDetail.tsx - Asset info with ticket history
+  - AddAsset.tsx - Dynamic form based on asset type
+    * Image library with keyword matching
+    * Auto-depreciation calculation
+    * Type-specific fields (smartphone: carrier, SIM, etc.)
+
+LICENSES MODULE:
+  - LicensesList.tsx - License inventory
+  - LicenseDetail.tsx - License details with seat assignments
+  - LicenseFormModal.tsx - Create/edit license
+
+INCIDENTS MODULE:
+  - IncidentsList.tsx - Incident list with status/severity filters
+  - IncidentDetail.tsx - Timeline view, root cause analysis, AI post-mortem
+
+KNOWLEDGE BASE:
+  - KnowledgeBase.tsx - Article search/browse by category
+  - KBArticleDetail.tsx - Read article (multilingual switching)
+  - KBArticleEditor.tsx - Rich editor with AI content generation
+
+SETTINGS (9 sub-pages):
+  - Settings.tsx - Settings router/navigation
+  - ProfileSettings.tsx - Name, avatar, email signature
+  - AppearanceSettings.tsx - Theme, language, date/time format
+  - NotificationSettings.tsx - Mute settings, quiet hours
+  - SecuritySettings.tsx - Password change, 2FA setup/removal
+  - IntegrationsSettings.tsx - Third-party service API keys
+  - UsersSettings.tsx - User management (admin only)
+  - SLASettings.tsx - SLA policy configuration
+  - PolicySettings.tsx - Organization policies
+  - BackupSettings.tsx - Database backup/restore
+
+ADDITIONAL FEATURES:
+  - Reports.tsx - Asset financials, warranty tracking, audit reports (PDF/Excel)
+  - Pulse.tsx - Real-time team session monitoring
+  - VendorsList.tsx - Vendor CRUD + interaction threads + document management
+  - LocationsList.tsx - Company office locations
+  - OnboardingList.tsx + OnboardingDetail.tsx - Employee lifecycle workflows
+  - AssetMap.tsx - Leaflet map with asset markers
+  - AIAssistant.tsx - Floating chat widget (Claude-powered)
+  - CommandPalette.tsx - Keyboard navigation (Cmd+K / Ctrl+K)
+  - QRScannerModal.tsx - Camera-based QR code scanning
+  - ImportModal.tsx - Bulk CSV/Excel import dialog
+  - PWAInstallBanner.tsx - PWA installation prompt
+  - QuickActionButton.tsx - Floating action buttons
+  - PieChartCard.tsx - Reusable pie chart widget
+  - Spinner.tsx - Loading indicator
+  - Notifications.tsx - Toast notification system
+
+================================================================================
+7. CONTEXT PROVIDERS (STATE MANAGEMENT)
+================================================================================
+
+1. AuthContext (src/contexts/AuthContext.tsx)
+   State: user, status, isAuthenticated
+   Methods: login(), verify2FA(), register(), logout(), updateUser(), setUserStatus()
+   Features: Inactivity timer, real-time auth state, activity tracking
+
+2. DataContext (src/contexts/DataContext.tsx)
+   State: tickets[], assets[], licenses[], incidents[], articles[], users[], isLoading
+   Methods: refetchData(dataType)
+   Features: Real-time subscriptions, data mapping, automation triggers
+
+3. LocalizationContext (src/contexts/LocalizationContext.tsx)
+   State: language
+   Methods: setLanguage(), t(key, params)
+   Features: 3 languages, parametrized translations
+
+4. NotificationsContext (src/contexts/NotificationsContext.tsx)
+   Purpose: In-app toast notifications
+
+5. PWAInstallContext (src/contexts/PWAInstallContext.tsx)
+   State: installPrompt, canInstall, isInstalled
+   Features: Web app install detection
+
+Provider nesting order (src/App.tsx):
+  ErrorBoundary > LocalizationProvider > AuthProvider > PWAInstallProvider >
+  HashRouter > [DataProvider + NotificationsProvider (inside authenticated routes)]
+
+================================================================================
+8. CUSTOM HOOKS
+================================================================================
+
+1. useAuth.ts - Access AuthContext (user, login, logout, etc.)
+2. useData.ts - Access DataContext (tickets, assets, refetchData, etc.)
+3. useLocalization.ts - Access LocalizationContext (t(), language)
+4. useNotifications.ts - Trigger toast notifications
+5. useAnimatedModal.ts - Modal open/close animation management
+   Returns: { isRendered, isAnimating }
+   Delays unmounting for exit animations
+6. useDebounce.ts - Debounced value (delays value update by N ms)
+
+================================================================================
+9. SERVICES & API LAYER
+================================================================================
+
+1. supabaseClient.js
+   - Initializes Supabase client with VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
+   - Disables Web Locks API for cross-origin iframe safety
+
+2. auth.ts - Authentication service
+   Functions:
+   - getFullUser(authUser) - Merge auth user with profile (3 retry attempts)
+   - getCurrentUser() - Get current session user
+   - login(email, password) - Sign in (10s timeout)
+   - verify2FA(token) - TOTP verification (10s timeout)
+   - register(name, email, password, role) - Create account
+   - logout() - Sign out
+   - sendPasswordResetEmail(email) - Password reset
+
+3. api.ts - Main CRUD API (60+ functions)
+   Users: getUsers(), updateUser(), createUser(), uploadAvatar(), bulkCreateUsers()
+   Tickets: getTickets(), getTicketById(), createTicket(), updateTicket(),
+            addCommentToTicket(), addAttachmentsToTicket(), bulkCreateTickets()
+   Assets: getAssets(), getAssetById(), createAsset(), updateAsset(), deleteAsset(),
+           uploadAssetImage(), bulkCreateAssets(), findImageForModel()
+   Licenses: getLicenses(), createLicense(), updateLicense(), deleteLicense(),
+             assignUserToLicense(), unassignUserFromLicense(), bulkCreateLicenses()
+   Incidents: getIncidents(), getIncidentById(), createIncident(), updateIncident()
+   KB: getKBArticles(), getKBArticleById(), createKBArticle(), updateKBArticle(), deleteKBArticle()
+   Vendors: getVendors(), createVendor(), updateVendor(), deleteVendor(),
+            getVendorInteractions(), createVendorInteraction(), addVendorComment(),
+            uploadVendorDocument(), closeVendorInteraction()
+   SLA: getSLAPolicies(), updateSLAPolicies()
+   Integrations: getIntegrations(), saveIntegration(), deleteIntegration()
+   Backup: createBackup(), restoreBackup()
+   AI: generateTicketReply(), generatePostMortemSummary(), translateTextWithAI(),
+       getAIWritingAssistance(), generateArticleContentFromTopic(), getAIChatResponse()
+
+4. claudeService.ts - Claude API wrapper
+   Functions:
+   - askClaude(messages, system, maxTokens) - Multi-turn conversation
+   - askClaudeOnce(userMessage, system) - Single message
+   Endpoint: {SUPABASE_URL}/functions/v1/claude
+   Auth: Bearer token with Supabase anonymous key
+
+5. locationsService.ts - Company location management
+6. onboardingService.ts - Employee onboarding workflows
+7. webhookSimulator.ts - Testing/simulation utilities
+
+================================================================================
+10. AI INTEGRATION (CLAUDE + GEMINI)
+================================================================================
+
+CLAUDE (via Supabase Edge Function):
+  File: supabase/functions/claude/index.ts
+  Model: claude-sonnet-4-5
+  Architecture: Deno edge function as secure proxy
+  Prevents: API key exposure on client side
+
+  Request: POST /functions/v1/claude
+  {
+    messages: [{role: "user"|"assistant", content: "..."}],
+    system: "optional system prompt",
+    max_tokens: 1024
+  }
+
+  Response:
+  {
+    content: [{type: "text", text: "..."}],
+    model: "claude-sonnet-4-5",
+    usage: {input_tokens: N, output_tokens: N}
+  }
+
+GEMINI (direct client integration):
+  Model: gemini-2.5-flash
+  API Key: VITE_GEMINI_API_KEY (via import.meta.env)
+
+  Used for:
+  - generateTicketReply() - Smart ticket reply suggestions
+  - generatePostMortemSummary() - Incident post-mortem analysis
+  - translateTextWithAI() - Text translation between languages
+  - getAIWritingAssistance() - Grammar correction / text completion
+  - generateArticleContentFromTopic() - KB article generation
+  - getAIChatResponse() - AI chatbot responses
+
+AI ASSISTANT COMPONENT (src/components/AIAssistant.tsx):
+  - Floating chat widget (bottom-right corner)
+  - Fetches context: KB articles, tickets, incidents
+  - Maintains conversation history in local state
+  - Language-aware responses
+  - Uses Claude via Edge Function
+
+================================================================================
+11. DATA TYPES & MODELS
+================================================================================
+
+File: src/types.ts
+
+ENUMS:
+  Language: en, it, es
+  Role: Admin, Agent, Member, End User
+  UserStatus: Online, Away, Do Not Disturb, Invisible
+  TicketStatus: Open, In Progress, Resolved, Closed
+  TicketPriority: Urgent, High, Medium, Low
+  AssetStatus: In Use, Ready to Deploy, Pending, Archived,
+               Broken - Not Fixable, Lost/Stolen,
+               Out for Diagnostics, Out for Repair
+
+INTERFACES:
+
+  User {
+    id, name, email, role, company
+    avatarUrl, isTwoFactorEnabled, twoFactorSecret
+    statusMessage, statusMessageTimestamp
+    signatureText, signatureLogo
+    weekStart, timeFormat, dateFormat
+    muteUntil, muteWeekends, muteOutsideHours
+    quietHoursStart, quietHoursEnd
+    loginEnabled
+  }
+
+  Ticket {
+    id, subject, description, status, priority
+    category, subcategory
+    requester (User), assignee (User)
+    createdAt, updatedAt
+    comments (Comment[]), attachments (string[])
+    asset ({id, name})
+    contactInfo, department, site, floor, office
+    slaDueAt, firstResponseAt, resolvedAt
+    isAiTriaged
+  }
+
+  Asset {
+    id, name, assetTag, type, model, status
+    image, serialNumber, location
+    purchaseDate, purchaseCost, currentValue
+    warrantyEndDate, assignedTo (User)
+    lastCheckin, lastCheckout
+    vendorId, vendor (Vendor)
+    latitude, longitude
+    phoneNumber, carrier, simSerial, esimSerial  // Smartphone
+    tickets (Ticket[])
+  }
+
+  License {
+    id, name, software, totalSeats
+    assignments (LicenseAssignment[])
+    purchaseDate, expirationDate
+    totalCost, costPerSeat
+    vendorId, vendor
+  }
+
+  Incident {
+    id, title, description, status, severity, priority
+    category, reporter (User), assignee (User)
+    solution, impactAnalysis, rootCauseAnalysis
+    tags (string[]), timeline (IncidentTimelineEntry[])
+    createdAt, updatedAt
+  }
+
+  KBArticle {
+    id
+    title: {en: string, it: string, es: string}
+    content: {en: string, it: string, es: string}
+    category, author (User)
+    tags (string[]), audience (Role[])
+    createdAt, updatedAt
+  }
+
+  Vendor {
+    id, name, contactName, email, phone
+    website, address, notes, tags
+    contractStartDate, contractEndDate, contractUrl
+    serviceCount, avgResponseTime
+    documents (string[])
+  }
+
+  VendorInteraction {
+    id, vendorId, subject
+    status: Open | Pending Intervention | Resolved | Closed
+    createdAt, resolvedAt, scheduledDate
+    createdBy (User), comments (VendorComment[])
+  }
+
+  Notification {
+    id, type (info|warning|success|error)
+    message, timestamp, read
+    link, category (SLA|GENERAL|ASSET|LICENSE|VENDOR)
+  }
+
+  SLAPolicy {
+    id, priority (TicketPriority)
+    response_time_minutes, resolution_time_minutes
+  }
+
+  Integration {
+    id, user_id, service_name, api_key, created_at
+  }
+
+================================================================================
+12. CONSTANTS & CONFIGURATION
+================================================================================
+
+File: src/constants.tsx
+
+ROLE PERMISSIONS:
+  Admin:    dashboard, tickets, assets, licenses, incidents, session, reports, kb, settings, vendors, map
+  Agent:    dashboard, tickets, assets, licenses, incidents, session, reports, kb, settings, vendors, map
+  Member:   dashboard, tickets, assets, licenses, kb, settings
+  End User: dashboard, tickets, kb, settings
+
+TICKET CATEGORIES:
+  Hardware: Laptop, Desktop, Monitor, Printer, Peripherals
+  Software: OS, Office Suite, Development Tools, Design Tools, Other
+  Network: WiFi, VPN, Internet Access, Firewall
+  Access: Password Reset, New Account, Permissions, MFA
+  Other: General Inquiry, Feedback
+
+ASSET TYPES (28 types):
+  PC/Laptop (4y), Desktop (5y), All-in-One (5y), Virtual Machine,
+  Server (5y), Smartphone (2y), Tablet (3y), VoIP Phone (5y),
+  Conference Phone (5y), Monitor (5y), Projector (5y), Digital Signage (5y),
+  Printer (5y), Scanner (5y), Copier (5y), Switch (7y), Router (7y),
+  Firewall (5y), Access Point (5y), Load Balancer (5y), PDU (10y),
+  UPS (3y), Docking Station (5y), KVM Switch (5y), Webcam (3y),
+  Peripheral (3y), RAM (5y), Other
+
+ASSET IMAGE LIBRARY (30+ entries):
+  MacBook Pro 16", MacBook Air, Dell XPS 15/13, ThinkPad X1,
+  HP Spectre, Surface Laptop/Pro, iMac, Mac Studio, Mac Mini,
+  PC Tower, iPhone Pro/Standard, Galaxy S, Pixel, iPad Pro,
+  Server Rack, Network Switch, Router, Ubiquiti, Monitor,
+  Ultrawide, Keyboard, Mouse, Printer, Headphones, Webcam,
+  Conference Phone, Projector, Drone, VR Headset
+
+================================================================================
+13. UTILITIES
+================================================================================
+
+1. mappers.ts - Data normalization
+   All mapper functions convert Supabase DB rows to TypeScript interfaces.
+   Includes unknown user fallback for deleted/missing profiles.
+
+2. localization.ts - Translation dictionary
+   1000+ translation keys across 3 languages.
+   Categories: general UI, asset statuses, asset types, ticket statuses,
+   incident categories, report labels, settings labels, error messages.
+   Supports parametrized strings: "Hello {name}" -> "Hello World"
+
+3. depreciation.ts - Asset value calculation
+   Straight-line depreciation model.
+   10% salvage value assumption.
+   Type-based lifespan (e.g., Laptop=4y, Desktop=5y, Smartphone=2y).
+   Smart type inference for 'Other' category.
+
+4. eventBus.ts - Pub/sub event system
+   on(event, callback) - Subscribe
+   off(event, callback) - Unsubscribe
+   emit(event, ...args) - Publish
+
+================================================================================
+14. ROLE-BASED ACCESS CONTROL (RBAC)
+================================================================================
+
+Implementation: src/App.tsx - ProtectedRoute component
+
+Route Matrix:
+  Route               Admin  Agent  Member  EndUser
+  /dashboard            Y      Y      Y       Y
+  /tickets              Y      Y      Y       Y
+  /tickets/:id          Y      Y      Y       Y
+  /assets               Y      Y      Y       N
+  /assets/new           Y      Y      N       N
+  /assets/edit/:id      Y      Y      N       N
+  /assets/:id           Y      Y      Y       N
+  /licenses             Y      Y      Y       N
+  /licenses/:id         Y      Y      Y       N
+  /incidents            Y      Y      N       N
+  /incidents/:id        Y      Y      N       N
+  /session              Y      Y      N       N
+  /reports              Y      Y      N       N
+  /kb                   Y      Y      Y       Y
+  /kb/new               Y      Y      N       N
+  /kb/edit/:id          Y      Y      N       N
+  /kb/:id               Y      Y      Y       Y
+  /settings             Y      Y      Y       Y
+  /vendors              Y      Y      N       N
+  /map                  Y      Y      N       N
+  /locations            Y      Y      N       N
+  /onboarding           Y      Y      N       N
+  /onboarding/:id       Y      Y      N       N
+
+================================================================================
+15. LOCALIZATION SYSTEM
+================================================================================
+
+Languages: English (en), Italian (it), Spanish (es)
+
+Implementation:
+  - LocalizationContext provides t(key, params) function
+  - Translations stored in src/utils/localization.ts
+  - Language selector in sidebar with flag icons
+  - KB articles store content in all 3 languages
+  - AI responses are language-aware
+
+Translation Examples:
+  t('save') -> "Save" | "Salva" | "Guardar"
+  t('welcome {name}', {name: 'Ciro'}) -> "Welcome Ciro" | "Benvenuto Ciro"
+  t('category hardware') -> "Hardware" | "Hardware" | "Hardware"
+
+================================================================================
+16. PWA SUPPORT
+================================================================================
+
+Service Worker: public/sw.js
+  - Cache name: it-hub-v3.1
+  - Strategy: Network-first with cache fallback
+  - Caches static assets on install
+  - Cleans old caches on activate
+  - Serves cached content when offline
+
+Manifest: public/manifest.json
+  - Name: IT Hub Center
+  - Display: standalone
+  - Theme: #5a67d8 (indigo)
+  - Icons: 192x192, 512x512 PNG + SVG
+
+Install Detection: src/contexts/PWAInstallContext.tsx
+  - Listens for beforeinstallprompt event
+  - PWAInstallBanner.tsx shows install prompt to users
+
+================================================================================
+17. REAL-TIME DATA FLOW DIAGRAM
+================================================================================
+
+  Browser (React App)
+    |
+    v
+  Components (Dashboard, TicketsList, AssetsList, etc.)
+    |  consume via hooks
+    v
+  Custom Hooks (useAuth, useData, useLocalization)
+    |  subscribe to contexts
+    v
+  Context Providers
+    |  AuthContext - user, login, logout
+    |  DataContext - tickets, assets, incidents, KB
+    |  LocalizationContext - language, translations
+    |  NotificationsContext - toasts
+    |  PWAInstallContext - install prompt
+    |
+    v
+  Services (API Calls)
+    |  auth.ts - authentication
+    |  api.ts - CRUD operations
+    |  claudeService.ts - Claude AI proxy
+    |
+    v (HTTP / WebSocket)
+    |
+    +---> Supabase PostgreSQL (tables, storage)
+    |       |
+    |       +---> Realtime Subscriptions (postgres_changes)
+    |               |
+    |               +---> DataContext updates React state
+    |
+    +---> Supabase Edge Functions
+    |       |
+    |       +---> /claude (proxies to Anthropic Claude API)
+    |
+    +---> Google Gemini API (direct, for AI features)
+
+================================================================================
+18. AUTHENTICATION FLOW DIAGRAM
+================================================================================
+
+  /login page
+    |
+    v
+  Email + Password input
+    |
+    v
+  auth.ts: login() -> supabase.auth.signInWithPassword()
+    |
+    +---> [Error] -> Show error message
+    |
+    +---> [AAL2 Error = 2FA required]
+    |       |
+    |       v
+    |     Show TOTP code input
+    |       |
+    |       v
+    |     auth.ts: verify2FA() -> supabase.auth.verifyOtp()
+    |       |
+    |       +---> [Success] -> Continue below
+    |       +---> [Error] -> "Invalid 2FA code"
+    |
+    +---> [Success]
+            |
+            v
+          auth.ts: getFullUser() -> profiles table lookup (3 retries)
+            |
+            +---> [Not found] -> Create fallback profile
+            |
+            v
+          AuthContext: setUser(fullUser)
+            |
+            v
+          Navigate to /dashboard
+            |
+            v
+          Start activity listeners (mouse, keyboard, touch)
+            |
+            v
+          After 1 hour inactivity -> auto-logout
+
+================================================================================
+19. DEPLOYMENT & CONFIGURATION
+================================================================================
+
+Environment Variables (.env.local):
+  VITE_SUPABASE_URL=https://your-project.supabase.co
+  VITE_SUPABASE_ANON_KEY=eyJhbGc...
+  VITE_GEMINI_API_KEY=AIza...  (optional, for AI features)
+
+Supabase Edge Function:
+  Secret: ANTHROPIC_API_KEY (set in Supabase dashboard)
+  Deploy: supabase functions deploy claude
+
+Build Commands:
+  npm run dev      - Development server (http://localhost:3000)
+  npm run build    - Production build
+  npm run preview  - Preview production build
+
+Supabase Setup Required:
+  - Create tables (profiles, tickets, comments, assets, licenses, etc.)
+  - Set up Row Level Security (RLS) policies
+  - Create handle_new_user trigger for automatic profile creation
+  - Create storage buckets (avatars, attachments, assets, documents)
+  - Enable Realtime on all tables
+  - Deploy edge functions
+
+================================================================================
+20. KEY ARCHITECTURAL PATTERNS
+================================================================================
+
+1. Context-based State Management
+   No Redux. React Context API for global state. Simpler for this app size.
+
+2. Real-time Subscriptions
+   DataContext subscribes to Supabase postgres_changes. No polling needed.
+
+3. Centralized Data Mapping
+   mappers.ts prevents inconsistency between initial fetch and realtime updates.
+
+4. Ref-based Subscription Callbacks
+   Uses useRef to provide latest state without re-subscribing on every render.
+
+5. Secured AI Proxy
+   Claude calls go through Supabase Edge Function. API key never on client.
+
+6. Straight-line Depreciation
+   10% salvage value. Type-based lifespans. Smart inference for 'Other'.
+
+7. Inactivity Auto-logout
+   1 hour timeout. Resets on mouse/keyboard/touch activity.
+
+8. HTML Sanitization
+   XSS prevention via whitelist-based HTML sanitizer for user content.
+
+9. Cryptographic Random IDs
+   crypto.randomUUID() for file naming instead of Math.random().
+
+10. Error Boundary
+    Top-level React ErrorBoundary prevents full-app crashes.
+
+================================================================================
+21. NOTABLE FEATURES
+================================================================================
+
+1. QR Code Integration - Asset scanning and labeling
+2. Bulk Import/Export - CSV and Excel support
+3. PDF Reports - Asset financials, warranty status, audit trails
+4. Asset Depreciation - Automatic calculation by type
+5. SLA Tracking - Response and resolution deadlines with alerts
+6. Vendor Management - Interaction threads, contracts, document storage
+7. Onboarding/Offboarding - Checklist-based employee lifecycle
+8. Geographic Mapping - Leaflet-based asset location visualization
+9. Knowledge Base - Multilingual articles with AI generation
+10. Command Palette - Keyboard-driven navigation (Cmd+K)
+11. AI Chat Assistant - Context-aware with KB/ticket/incident data
+12. PWA Support - Installable with offline caching
+13. Activity Monitoring - Per-user session tracking (Pulse)
+14. Dark/Light Theme - System preference detection
+15. Email Signatures - Customizable per-user with logo support
+16. 2FA Authentication - TOTP-based with QR code setup
+17. Real-time Collaboration - Live updates across all users
+18. Drag & Drop - File attachments on tickets
+19. Multi-language - English, Italian, Spanish
+20. Role-based Access - 4 roles with granular permissions
+
+================================================================================
+22. SECURITY IMPROVEMENTS (v3.1.0)
+================================================================================
+
+1. FIXED: XSS Vulnerability
+   - Added HTML sanitizer (whitelist-based) for ticket comments
+   - Ticket descriptions render as plain text (whitespace-pre-wrap)
+   - Sanitizer strips script tags, event handlers, javascript: URLs
+
+2. FIXED: API Key Exposure
+   - Removed Gemini API key from Vite define config
+   - Now uses VITE_ environment variables (standard Vite pattern)
+   - Key only available at build time, not baked into source maps
+
+3. FIXED: Insecure Random
+   - Replaced all Math.random() with crypto.randomUUID()
+   - Affects: avatar filenames, ticket attachments, asset images, vendor docs
+
+4. FIXED: Route Protection Bug
+   - ProtectedRoute had unreachable code when allowedRoles was set
+   - Now correctly returns children after role check passes
+
+5. FIXED: Service Worker Disabled
+   - Was being unregistered on every page load
+   - Now properly registers with network-first caching strategy
+   - Enables offline support for cached pages
+
+6. FIXED: Package.json
+   - Moved build tools (vite, @vitejs/plugin-react) to devDependencies
+   - Removed duplicate entries and unused 'path' dependency
+   - Bumped version to 3.1.0
+
+7. ADDED: Error Boundary
+   - Top-level React ErrorBoundary prevents full-app crashes
+   - Shows user-friendly error page with "Back to Dashboard" button
+
+================================================================================
+23. FILE-BY-FILE REFERENCE
+================================================================================
+
+ROOT FILES:
+  index.html              - HTML entry point, Tailwind config, importmap, SW registration
+  package.json            - Dependencies and scripts (v3.1.0)
+  vite.config.ts          - Vite config with path aliases
+  tsconfig.json           - TypeScript configuration
+  metadata.json           - AI Studio metadata
+  README.md               - Project documentation
+
+SOURCE FILES:
+  src/index.tsx            - React DOM render entry point
+  src/App.tsx              - Routes, ProtectedRoute, provider nesting
+  src/types.ts             - All TypeScript type definitions
+  src/constants.tsx         - Icons, permissions, categories, colors, asset configs
+
+COMPONENTS:
+  src/components/AIAssistant.tsx        - Floating AI chatbot
+  src/components/CommandPalette.tsx     - Cmd+K command palette
+  src/components/Dashboard.tsx          - Main dashboard with widgets
+  src/components/DummyPage.tsx          - Placeholder page
+  src/components/ErrorBoundary.tsx      - React error boundary
+  src/components/ForgotPassword.tsx     - Password reset page
+  src/components/Header.tsx             - Top navigation bar
+  src/components/ImportModal.tsx        - Bulk import dialog
+  src/components/Layout.tsx             - App shell layout
+  src/components/Login.tsx              - Login page
+  src/components/Notifications.tsx      - Toast notifications
+  src/components/PieChartCard.tsx       - Reusable pie chart
+  src/components/PWAInstallBanner.tsx   - PWA install prompt
+  src/components/QRScannerModal.tsx     - QR code scanner
+  src/components/QuickActionButton.tsx  - Floating action buttons
+  src/components/Register.tsx           - Registration page
+  src/components/Sidebar.tsx            - Navigation sidebar
+  src/components/Spinner.tsx            - Loading indicator
+  src/components/UpdatePassword.tsx     - Password update page
+
+  src/components/assets/AddAsset.tsx         - Asset create/edit form
+  src/components/assets/AssetDetail.tsx      - Asset detail view
+  src/components/assets/AssetsList.tsx       - Assets inventory table
+
+  src/components/incidents/IncidentDetail.tsx - Incident detail with timeline
+  src/components/incidents/IncidentsList.tsx  - Incidents list
+
+  src/components/kb/KBArticleDetail.tsx      - KB article reader
+  src/components/kb/KBArticleEditor.tsx      - KB article editor
+  src/components/kb/KnowledgeBase.tsx        - KB browse/search
+
+  src/components/licenses/LicenseDetail.tsx   - License detail
+  src/components/licenses/LicenseFormModal.tsx - License form
+  src/components/licenses/LicensesList.tsx    - Licenses list
+
+  src/components/locations/LocationsList.tsx  - Company locations
+
+  src/components/maps/AssetMap.tsx            - Leaflet asset map
+
+  src/components/onboarding/OnboardingDetail.tsx - Onboarding detail
+  src/components/onboarding/OnboardingList.tsx   - Onboarding list
+
+  src/components/pulse/Pulse.tsx              - Team session monitor
+
+  src/components/reports/Reports.tsx          - Reports & analytics
+
+  src/components/settings/AppearanceSettings.tsx    - Theme/language
+  src/components/settings/ApplicationSettings.tsx   - App config
+  src/components/settings/BackupSettings.tsx        - Backup/restore
+  src/components/settings/IntegrationsSettings.tsx  - API integrations
+  src/components/settings/LanguageSettings.tsx      - Language picker
+  src/components/settings/NotificationSettings.tsx  - Notification prefs
+  src/components/settings/PolicySettings.tsx        - Org policies
+  src/components/settings/ProfileSettings.tsx       - User profile
+  src/components/settings/SecuritySettings.tsx      - 2FA/passwords
+  src/components/settings/Settings.tsx              - Settings router
+  src/components/settings/SLAPolicySettings.tsx     - SLA config
+  src/components/settings/SLASettings.tsx           - SLA overview
+  src/components/settings/UsersSettings.tsx         - User management
+
+  src/components/tickets/TicketDetail.tsx     - Ticket detail with comments
+  src/components/tickets/TicketsList.tsx      - Tickets list
+
+  src/components/vendors/VendorsList.tsx      - Vendor management
+
+CONTEXTS:
+  src/contexts/AuthContext.tsx            - Authentication state
+  src/contexts/DataContext.tsx            - Application data state
+  src/contexts/LocalizationContext.tsx    - Language/translations
+  src/contexts/NotificationsContext.tsx   - Notification state
+  src/contexts/PWAInstallContext.tsx      - PWA install state
+
+HOOKS:
+  src/hooks/useAnimatedModal.ts    - Modal animation management
+  src/hooks/useAuth.ts             - Auth context accessor
+  src/hooks/useData.ts             - Data context accessor
+  src/hooks/useDebounce.ts         - Debounced values
+  src/hooks/useLocalization.ts     - Localization accessor
+  src/hooks/useNotifications.ts    - Notifications accessor
+
+SERVICES:
+  src/services/api.ts              - Main CRUD API (60+ functions)
+  src/services/auth.ts             - Authentication service
+  src/services/claudeService.ts    - Claude AI proxy client
+  src/services/db.ts               - Database utilities (placeholder)
+  src/services/locationsService.ts - Location management
+  src/services/onboardingService.ts - Onboarding workflows
+  src/services/supabaseClient.js   - Supabase client init
+  src/services/webhookSimulator.ts - Testing utilities
+
+UTILITIES:
+  src/utils/depreciation.ts        - Asset depreciation calculator
+  src/utils/eventBus.ts            - Pub/sub event system
+  src/utils/localization.ts        - Translation dictionary (1000+ keys)
+  src/utils/mappers.ts             - DB-to-TypeScript data mappers
+
+EDGE FUNCTIONS:
+  supabase/functions/claude/index.ts  - Claude API proxy (Deno)
+  supabase/functions/claude/deno.json - Deno configuration
+
+PUBLIC:
+  public/manifest.json   - PWA manifest
+  public/sw.js           - Service worker (network-first caching)
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================
