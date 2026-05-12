@@ -41,8 +41,8 @@ const AuditLogSettings: React.FC = () => {
 
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-1">Audit Log</h2>
-            <p className="text-neutral-500 dark:text-neutral-400 mb-6">Registro completo di tutte le azioni eseguite nel sistema.</p>
+            <h2 className="text-xl font-semibold mb-1">{t('audit log')}</h2>
+            <p className="text-neutral-500 dark:text-neutral-400 mb-6">{t('audit log desc')}</p>
 
             <div className="flex gap-3 mb-6">
                 <select
@@ -50,49 +50,49 @@ const AuditLogSettings: React.FC = () => {
                     onChange={e => setFilterType(e.target.value)}
                     className="px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200"
                 >
-                    <option value="">Tutti i tipi</option>
-                    <option value="ticket">Ticket</option>
-                    <option value="asset">Asset</option>
-                    <option value="license">Licenza</option>
-                    <option value="incident">Incidente</option>
-                    <option value="kb_article">Knowledge Base</option>
-                    <option value="vendor">Vendor</option>
-                    <option value="user">Utente</option>
-                    <option value="system">Sistema</option>
+                    <option value="">{t('all entity types')}</option>
+                    <option value="ticket">{t('entity ticket')}</option>
+                    <option value="asset">{t('entity asset')}</option>
+                    <option value="license">{t('entity license')}</option>
+                    <option value="incident">{t('entity incident')}</option>
+                    <option value="kb_article">{t('entity kb_article')}</option>
+                    <option value="vendor">{t('entity vendor')}</option>
+                    <option value="user">{t('entity user')}</option>
+                    <option value="system">{t('entity system')}</option>
                 </select>
                 <select
                     value={filterAction}
                     onChange={e => setFilterAction(e.target.value)}
                     className="px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200"
                 >
-                    <option value="">Tutte le azioni</option>
-                    <option value="create">Creazione</option>
-                    <option value="update">Modifica</option>
-                    <option value="delete">Eliminazione</option>
-                    <option value="assign">Assegnazione</option>
-                    <option value="checkin">Check-in</option>
-                    <option value="checkout">Check-out</option>
-                    <option value="import">Import</option>
-                    <option value="export">Export</option>
+                    <option value="">{t('all actions')}</option>
+                    <option value="create">{t('action create')}</option>
+                    <option value="update">{t('action update')}</option>
+                    <option value="delete">{t('action delete')}</option>
+                    <option value="assign">{t('action assign')}</option>
+                    <option value="checkin">{t('action checkin')}</option>
+                    <option value="checkout">{t('action checkout')}</option>
+                    <option value="import">{t('action import')}</option>
+                    <option value="export">{t('action export')}</option>
                 </select>
             </div>
 
             {entries.length === 0 ? (
                 <div className="text-center py-12 text-neutral-400">
-                    <p className="text-lg font-medium">Nessuna voce nel registro</p>
-                    <p className="text-sm mt-1">Le azioni verranno registrate automaticamente.</p>
+                    <p className="text-lg font-medium">{t('no audit entries')}</p>
+                    <p className="text-sm mt-1">{t('audit entries auto')}</p>
                 </div>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                         <thead>
                             <tr>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Data/Ora</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Utente</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Azione</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Tipo</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Elemento</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Dettagli</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('audit col datetime')}</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('audit col user')}</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('audit col action')}</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('audit col type')}</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('audit col element')}</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('audit col details')}</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-neutral-800 divide-y divide-neutral-200 dark:divide-neutral-700">

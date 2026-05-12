@@ -665,7 +665,51 @@ export const translations: Record<string, Record<Language, string>> = {
 
   // Audit Log
   'audit log': { en: 'Audit Log', it: 'Registro Attività', es: 'Registro de Auditoría' },
+  'audit log desc': { en: 'Complete record of all actions performed in the system.', it: 'Registro completo di tutte le azioni eseguite nel sistema.', es: 'Registro completo de todas las acciones realizadas en el sistema.' },
+  'all entity types': { en: 'All Types', it: 'Tutti i tipi', es: 'Todos los tipos' },
+  'all actions': { en: 'All Actions', it: 'Tutte le azioni', es: 'Todas las acciones' },
+  'no audit entries': { en: 'No entries in the log', it: 'Nessuna voce nel registro', es: 'No hay entradas en el registro' },
+  'audit entries auto': { en: 'Actions will be logged automatically.', it: 'Le azioni verranno registrate automaticamente.', es: 'Las acciones se registrarán automáticamente.' },
+  'audit col datetime': { en: 'Date/Time', it: 'Data/Ora', es: 'Fecha/Hora' },
+  'audit col user': { en: 'User', it: 'Utente', es: 'Usuario' },
+  'audit col action': { en: 'Action', it: 'Azione', es: 'Acción' },
+  'audit col type': { en: 'Type', it: 'Tipo', es: 'Tipo' },
+  'audit col element': { en: 'Element', it: 'Elemento', es: 'Elemento' },
+  'audit col details': { en: 'Details', it: 'Dettagli', es: 'Detalles' },
+  'entity ticket': { en: 'Ticket', it: 'Ticket', es: 'Ticket' },
+  'entity asset': { en: 'Asset', it: 'Asset', es: 'Activo' },
+  'entity license': { en: 'License', it: 'Licenza', es: 'Licencia' },
+  'entity incident': { en: 'Incident', it: 'Incidente', es: 'Incidente' },
+  'entity kb_article': { en: 'Knowledge Base', it: 'Knowledge Base', es: 'Base de Conocimiento' },
+  'entity vendor': { en: 'Vendor', it: 'Vendor', es: 'Proveedor' },
+  'entity user': { en: 'User', it: 'Utente', es: 'Usuario' },
+  'entity system': { en: 'System', it: 'Sistema', es: 'Sistema' },
+  'action create': { en: 'Create', it: 'Creazione', es: 'Crear' },
+  'action update': { en: 'Update', it: 'Modifica', es: 'Actualizar' },
+  'action delete': { en: 'Delete', it: 'Eliminazione', es: 'Eliminar' },
+  'action assign': { en: 'Assign', it: 'Assegnazione', es: 'Asignar' },
+  'action checkin': { en: 'Check-in', it: 'Check-in', es: 'Entrada' },
+  'action checkout': { en: 'Check-out', it: 'Check-out', es: 'Salida' },
+  'action import': { en: 'Import', it: 'Import', es: 'Importar' },
+  'action export': { en: 'Export', it: 'Export', es: 'Exportar' },
 
   // Dashboard KPI
   'warranty alerts': { en: 'Warranty Alerts', it: 'Scadenze Garanzia', es: 'Alertas de Garantía' },
+
+  // Asset Check-in / Check-out
+  'check in': { en: 'Check In', it: 'Check-in', es: 'Registro entrada' },
+  'check out': { en: 'Check Out', it: 'Check-out', es: 'Registro salida' },
+  'checked in by': { en: 'Checked in by {user}', it: 'Check-in da {user}', es: 'Entrada registrada por {user}' },
+  'checked out to': { en: 'Checked out to {user}', it: 'Check-out a {user}', es: 'Salida registrada a {user}' },
+  'last checkin': { en: 'Last Check-in', it: 'Ultimo Check-in', es: 'Último registro entrada' },
+  'last checkout': { en: 'Last Check-out', it: 'Ultimo Check-out', es: 'Último registro salida' },
+  'confirm checkin': { en: 'Check in this asset? It will be set to "Ready to Deploy".', it: 'Effettuare il check-in? L\'asset sarà impostato su "Pronto all\'uso".', es: '¿Registrar entrada? El activo se establecerá como "Listo para desplegar".' },
+  'confirm checkout': { en: 'Check out this asset to the selected user? It will be set to "In Use".', it: 'Effettuare il check-out all\'utente selezionato? L\'asset sarà impostato su "In Uso".', es: '¿Registrar salida al usuario seleccionado? El activo se establecerá como "En Uso".' },
+  'checkin success': { en: 'Asset checked in successfully.', it: 'Check-in effettuato con successo.', es: 'Entrada registrada correctamente.' },
+  'checkout success': { en: 'Asset checked out successfully.', it: 'Check-out effettuato con successo.', es: 'Salida registrada correctamente.' },
+  'select user for checkout': { en: 'Select user for check-out', it: 'Seleziona utente per il check-out', es: 'Seleccionar usuario para salida' },
+
+  // AD/Intune Integration
+  'integration entraid desc': { en: 'Sync users and groups from Microsoft Entra ID (Azure AD)', it: 'Sincronizza utenti e gruppi da Microsoft Entra ID (Azure AD)', es: 'Sincronizar usuarios y grupos desde Microsoft Entra ID (Azure AD)' },
+  'integration intune desc': { en: 'Import and sync managed devices from Microsoft Intune', it: 'Importa e sincronizza dispositivi gestiti da Microsoft Intune', es: 'Importar y sincronizar dispositivos administrados desde Microsoft Intune' },
 };

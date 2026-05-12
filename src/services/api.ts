@@ -296,9 +296,37 @@ export const updateAsset = async (id: string, updates: Partial<Asset>): Promise<
   if (updates.image) dbData.image = updates.image;
   if (updates.latitude) dbData.latitude = updates.latitude;
   if (updates.longitude) dbData.longitude = updates.longitude;
+  if (updates.lastCheckin) dbData.last_checkin = updates.lastCheckin;
+  if (updates.lastCheckout) dbData.last_checkout = updates.lastCheckout;
   const { error } = await supabase.from('assets').update(dbData).eq('id', id);
   if (error) throw error;
   return getAssetById(id) as Promise<Asset>;
+};
+
+export const checkinAsset = async (assetId: string): Promise<Asset> => {
+  const now = new Date().toISOString();
+  const { error } = await supabase.from('assets').update({
+    status: 'Ready to Deploy',
+    assigned_to_id: null,
+    last_checkin: now,
+  }).eq('id', assetId);
+  if (error) throw error;
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (authUser) logAuditEvent({ userId: authUser.id, userName: authUser.email || '', action: 'checkin', entityType: 'asset', entityId: assetId, details: 'Asset checked in' }).catch(() => {});
+  return getAssetById(assetId) as Promise<Asset>;
+};
+
+export const checkoutAsset = async (assetId: string, userId: string, userName: string): Promise<Asset> => {
+  const now = new Date().toISOString();
+  const { error } = await supabase.from('assets').update({
+    status: 'In Use',
+    assigned_to_id: userId,
+    last_checkout: now,
+  }).eq('id', assetId);
+  if (error) throw error;
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (authUser) logAuditEvent({ userId: authUser.id, userName: authUser.email || '', action: 'checkout', entityType: 'asset', entityId: assetId, details: `Checked out to ${userName}` }).catch(() => {});
+  return getAssetById(assetId) as Promise<Asset>;
 };
 
 export const deleteAsset = async (id: string): Promise<void> => {

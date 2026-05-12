@@ -23,6 +23,8 @@ const availableServices = [
     { id: 'clickup', name: 'ClickUp', logo: <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/clickup.svg" alt="ClickUp" className="w-12 h-12" referrerPolicy="no-referrer" />, descKey: 'integration clickup desc', url: 'https://clickup.com' },
     { id: 'telegram', name: 'Telegram', logo: <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/telegram.svg" alt="Telegram" className="w-12 h-12" referrerPolicy="no-referrer" />, descKey: 'integration telegram desc', url: 'https://telegram.org' },
     { id: 'whatsapp', name: 'WhatsApp', logo: <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/whatsapp.svg" alt="WhatsApp" className="w-12 h-12" referrerPolicy="no-referrer" />, descKey: 'integration whatsapp desc', url: 'https://www.whatsapp.com/business' },
+    { id: 'entraid', name: 'Microsoft Entra ID', logo: <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/azure-active-directory.svg" alt="Microsoft Entra ID" className="w-12 h-12" referrerPolicy="no-referrer" />, descKey: 'integration entraid desc', url: 'https://entra.microsoft.com' },
+    { id: 'intune', name: 'Microsoft Intune', logo: <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-intune.svg" alt="Microsoft Intune" className="w-12 h-12" referrerPolicy="no-referrer" />, descKey: 'integration intune desc', url: 'https://intune.microsoft.com' },
 ];
 
 const ManageConnectionModal: React.FC<{

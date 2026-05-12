@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Asset, User, Role } from '@/types';
-import { getAssetById, deleteAsset, updateAsset, getUsers } from '@/services/api';
+import { getAssetById, deleteAsset, updateAsset, getUsers, checkinAsset, checkoutAsset } from '@/services/api';
 import { useLocalization } from '@/hooks/useLocalization';
 import { useAuth } from '@/hooks/useAuth';
 import Spinner from '@/components/Spinner';
@@ -160,6 +160,36 @@ const AssetDetail: React.FC = () => {
         }
     };
 
+    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+    const [checkoutUserId, setCheckoutUserId] = useState('');
+
+    const handleCheckin = async () => {
+        if (!asset) return;
+        if (!window.confirm(t('confirm checkin'))) return;
+        try {
+            const updated = await checkinAsset(asset.id);
+            setAsset(updated);
+            refetchData('assets');
+        } catch (err) {
+            setError(t('unexpected error'));
+        }
+    };
+
+    const handleCheckout = async () => {
+        if (!asset || !checkoutUserId) return;
+        const selectedUser = allUsers.find(u => u.id === checkoutUserId);
+        if (!selectedUser) return;
+        try {
+            const updated = await checkoutAsset(asset.id, selectedUser.id, selectedUser.name);
+            setAsset(updated);
+            refetchData('assets');
+            setShowCheckoutModal(false);
+            setCheckoutUserId('');
+        } catch (err) {
+            setError(t('unexpected error'));
+        }
+    };
+
     const handlePrintLabel = () => {
         const printWindow = window.open('', '', 'width=600,height=600');
         if (printWindow && asset) {
@@ -253,7 +283,19 @@ const AssetDetail: React.FC = () => {
                         <p className="text-neutral-500 dark:text-neutral-400">{asset.model || t(`asset type ${asset.type.toLowerCase().replace('/','-').replace(/ /g, ' ')}`)}</p>
                     </div>
                     {canManage && (
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+                            {asset.status === 'In Use' && (
+                                <button onClick={handleCheckin} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700">
+                                    {React.cloneElement(ICONS.checkin, { className: 'h-4 w-4' })}
+                                    <span>{t('check in')}</span>
+                                </button>
+                            )}
+                            {asset.status !== 'In Use' && asset.status !== 'Archived' && (
+                                <button onClick={() => setShowCheckoutModal(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700">
+                                    {React.cloneElement(ICONS.checkout, { className: 'h-4 w-4' })}
+                                    <span>{t('check out')}</span>
+                                </button>
+                            )}
                             <button onClick={handlePrintLabel} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4h-4v-4H8m13-9l2 2m0 0l-2 2m2-2H6" /></svg>
                                 <span>{t('print qr label')}</span>
@@ -349,6 +391,12 @@ const AssetDetail: React.FC = () => {
                                 <DetailRow label={t('warranty end date')} value={asset.warrantyEndDate ? new Date(asset.warrantyEndDate).toLocaleDateString() : 'N/A'} />
                                 <DetailRow label={t('location')} value={asset.location} />
                                 <DetailRow label={t('quantity')} value={asset.quantity?.toString()} />
+                                {asset.lastCheckin && (
+                                    <DetailRow label={t('last checkin')} value={new Date(asset.lastCheckin).toLocaleString()} />
+                                )}
+                                {asset.lastCheckout && (
+                                    <DetailRow label={t('last checkout')} value={new Date(asset.lastCheckout).toLocaleString()} />
+                                )}
 
                                 {/* Smartphone specific fields */}
                                 {asset.type === 'Smartphone' && (
@@ -414,6 +462,29 @@ const AssetDetail: React.FC = () => {
                 assetName={asset.status}
                 isArchive={true}
             />
+
+            {showCheckoutModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center" onClick={() => setShowCheckoutModal(false)}>
+                    <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+                        <h2 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">{t('check out')}</h2>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-4">{t('confirm checkout')}</p>
+                        <select
+                            value={checkoutUserId}
+                            onChange={e => setCheckoutUserId(e.target.value)}
+                            className="w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md mb-4"
+                        >
+                            <option value="">{t('select user for checkout')}</option>
+                            {allUsers.map(user => (
+                                <option key={user.id} value={user.id}>{user.name}</option>
+                            ))}
+                        </select>
+                        <div className="flex justify-end gap-2">
+                            <button onClick={() => setShowCheckoutModal(false)} className="px-4 py-2 text-sm font-medium rounded-md bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-100">{t('cancel')}</button>
+                            <button onClick={handleCheckout} disabled={!checkoutUserId} className="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50">{t('check out')}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };
