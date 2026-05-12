@@ -394,14 +394,21 @@ export const AssetsList: React.FC = () => {
                 }
             }
             if (bestMatch) return bestMatch;
-            const typeLower = type.toLowerCase();
-            if (typeLower.includes('phone') || typeLower.includes('mobile')) return ASSET_IMAGE_LIBRARY.iphone?.url || null;
-            if (typeLower.includes('laptop') || typeLower.includes('pc')) return ASSET_IMAGE_LIBRARY.macbook_pro_16?.url || null;
-            if (typeLower.includes('server')) return ASSET_IMAGE_LIBRARY.server_rack?.url || null;
-            if (typeLower.includes('monitor')) return ASSET_IMAGE_LIBRARY.monitor?.url || null;
-            if (typeLower.includes('printer')) return ASSET_IMAGE_LIBRARY.printer?.url || null;
-            if (typeLower.includes('switch')) return ASSET_IMAGE_LIBRARY.switch?.url || null;
-            if (typeLower.includes('tablet')) return ASSET_IMAGE_LIBRARY.ipad_pro?.url || null;
+            const TYPE_FALLBACKS: Record<string, string> = {
+                'pc/laptop': 'generic_laptop', 'desktop': 'pc_tower', 'all-in-one': 'imac',
+                'smartphone': 'generic_phone', 'tablet': 'ipad_pro', 'server': 'server_rack',
+                'monitor': 'monitor', 'printer': 'printer', 'scanner': 'scanner', 'copier': 'copier',
+                'switch': 'switch', 'router': 'router', 'firewall': 'firewall',
+                'access point': 'access_point', 'load balancer': 'load_balancer',
+                'voip phone': 'voip_phone', 'conference phone': 'conference_phone',
+                'projector': 'projector', 'digital signage': 'digital_signage',
+                'docking station': 'docking_station', 'kvm switch': 'kvm',
+                'ups': 'ups', 'pdu': 'pdu', 'webcam': 'webcam',
+                'peripheral': 'generic_tech', 'ram': 'ram', 'virtual machine': 'server_rack',
+                'other': 'generic_tech',
+            };
+            const fallbackKey = TYPE_FALLBACKS[type.toLowerCase()];
+            if (fallbackKey && ASSET_IMAGE_LIBRARY[fallbackKey]) return ASSET_IMAGE_LIBRARY[fallbackKey].url;
             return null;
         };
 
@@ -553,17 +560,23 @@ export const AssetsList: React.FC = () => {
         }
 
         if (bestMatch) return bestMatch;
-        
-        const typeLower = asset.type.toLowerCase();
-        if (typeLower.includes('phone') || typeLower.includes('mobile')) return ASSET_IMAGE_LIBRARY.iphone.url;
-        if (typeLower.includes('laptop') || typeLower.includes('pc')) return ASSET_IMAGE_LIBRARY.macbook_pro_16.url;
-        if (typeLower.includes('server')) return ASSET_IMAGE_LIBRARY.server_rack.url;
-        if (typeLower.includes('monitor')) return ASSET_IMAGE_LIBRARY.monitor.url;
-        if (typeLower.includes('printer')) return ASSET_IMAGE_LIBRARY.printer.url;
-        if (typeLower.includes('switch')) return ASSET_IMAGE_LIBRARY.switch.url;
-        if (typeLower.includes('tablet')) return ASSET_IMAGE_LIBRARY.ipad.url;
-        
-        return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=100&q=80';
+
+        const TYPE_FALLBACKS: Record<string, string> = {
+            'pc/laptop': 'generic_laptop', 'desktop': 'pc_tower', 'all-in-one': 'imac',
+            'smartphone': 'generic_phone', 'tablet': 'ipad_pro', 'server': 'server_rack',
+            'monitor': 'monitor', 'printer': 'printer', 'scanner': 'scanner', 'copier': 'copier',
+            'switch': 'switch', 'router': 'router', 'firewall': 'firewall',
+            'access point': 'access_point', 'load balancer': 'load_balancer',
+            'voip phone': 'voip_phone', 'conference phone': 'conference_phone',
+            'projector': 'projector', 'digital signage': 'digital_signage',
+            'docking station': 'docking_station', 'kvm switch': 'kvm',
+            'ups': 'ups', 'pdu': 'pdu', 'webcam': 'webcam',
+            'peripheral': 'generic_tech', 'ram': 'ram', 'virtual machine': 'server_rack',
+            'other': 'generic_tech',
+        };
+        const fallbackKey = TYPE_FALLBACKS[asset.type.toLowerCase()];
+        if (fallbackKey && ASSET_IMAGE_LIBRARY[fallbackKey]) return ASSET_IMAGE_LIBRARY[fallbackKey].url;
+        return ASSET_IMAGE_LIBRARY.generic_tech.url;
     };
 
     if (isLoading) {
