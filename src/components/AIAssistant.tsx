@@ -1,24 +1,34 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useLocalization } from '@/hooks/useLocalization';
 import { ICONS } from '@/constants';
-import { ChatMessage, KBArticle, Ticket, Incident } from '@/types';
+import { ChatMessage } from '@/types';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
-import { getAIChatResponse, getKBArticles, getTickets, getIncidents } from '@/services/api';
+import { useData } from '@/hooks/useData';
+import { getAIChatResponse } from '@/services/api';
+import DOMPurify from 'dompurify';
+
+const formatAIMessage = (text: string): string => {
+  let html = text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-600 rounded text-xs">$1</code>')
+    .replace(/^### (.+)$/gm, '<h4 class="font-semibold mt-2 mb-1">$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3 class="font-bold mt-2 mb-1">$1</h3>')
+    .replace(/^- (.+)$/gm, '<li class="ml-3">• $1</li>')
+    .replace(/^(\d+)\. (.+)$/gm, '<li class="ml-3">$1. $2</li>')
+    .replace(/\n/g, '<br/>');
+  return DOMPurify.sanitize(html);
+};
 
 const AIAssistant: React.FC = () => {
   const { t, language } = useLocalization();
+  const { tickets, assets, incidents, articles } = useData();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { isRendered, isAnimating } = useAnimatedModal(isOpen);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // State for context data
-  const [kbArticles, setKbArticles] = useState<KBArticle[]>([]);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [incidents, setIncidents] = useState<Incident[]>([]);
-
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -26,26 +36,12 @@ const AIAssistant: React.FC = () => {
 
   useEffect(scrollToBottom, [messages]);
 
-  // Fetch context data when the assistant is opened
-  useEffect(() => {
-    const fetchContextData = async () => {
-        if (isOpen) {
-            try {
-                const [kbData, ticketsData, incidentsData] = await Promise.all([
-                    getKBArticles(),
-                    getTickets(),
-                    getIncidents()
-                ]);
-                setKbArticles(kbData);
-                setTickets(ticketsData);
-                setIncidents(incidentsData);
-            } catch (error) {
-                console.error("Failed to fetch context for AI Assistant:", error);
-            }
-        }
-    };
-    fetchContextData();
-  }, [isOpen]);
+  const context = useMemo(() => ({
+    kb: articles,
+    tickets,
+    incidents,
+    assets,
+  }), [articles, tickets, incidents, assets]);
 
   const handleSend = useCallback(async () => {
     if (!input.trim()) return;
@@ -56,7 +52,6 @@ const AIAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-        const context = { kb: kbArticles, tickets, incidents };
         const aiResponseText = await getAIChatResponse(messages, input, context, language);
         const aiMessage: ChatMessage = { id: `ai-${Date.now()}`, text: aiResponseText, sender: 'ai' };
         setMessages(prev => [...prev, aiMessage]);
@@ -67,7 +62,7 @@ const AIAssistant: React.FC = () => {
     } finally {
         setIsLoading(false);
     }
-  }, [input, messages, kbArticles, tickets, incidents, language, t]);
+  }, [input, messages, context, language, t]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !isLoading) {
@@ -104,10 +99,21 @@ const AIAssistant: React.FC = () => {
           </header>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 && (
+              <div className="text-center text-neutral-400 dark:text-neutral-500 mt-8 space-y-2">
+                {React.cloneElement(ICONS.sparkle, { className: 'w-10 h-10 mx-auto text-primary-300 dark:text-primary-600 mb-3' })}
+                <p className="text-sm font-medium">{t('ai assistant')}</p>
+                <p className="text-xs">{t('ai assistant hint')}</p>
+              </div>
+            )}
             {messages.map(msg => (
               <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] px-3 py-2 rounded-lg ${msg.sender === 'user' ? 'bg-primary-600 text-white' : 'bg-neutral-200 dark:bg-neutral-700'}`}>
-                  <p className="text-sm">{msg.text}</p>
+                <div className={`max-w-[85%] px-3 py-2 rounded-lg ${msg.sender === 'user' ? 'bg-primary-600 text-white' : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200'}`}>
+                  {msg.sender === 'ai' ? (
+                    <div className="text-sm prose-sm [&_strong]:font-bold [&_li]:list-none [&_code]:text-xs" dangerouslySetInnerHTML={{ __html: formatAIMessage(msg.text) }} />
+                  ) : (
+                    <p className="text-sm">{msg.text}</p>
+                  )}
                 </div>
               </div>
             ))}

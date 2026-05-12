@@ -788,26 +788,66 @@ Make it practical and easy to follow for IT users.`;
 export const getAIChatResponse = async (
   history: ChatMessage[],
   input: string,
-  context: { kb: KBArticle[]; tickets: Ticket[]; incidents: Incident[] },
+  context: { kb: KBArticle[]; tickets: Ticket[]; incidents: Incident[]; assets?: Asset[] },
   language: string
 ): Promise<string> => {
   if (!genAI) return "AI non disponibile. Configura GEMINI_API_KEY nel file .env.local";
 
+  const langName = language === 'it' ? 'Italian' : language === 'es' ? 'Spanish' : 'English';
+
   const historyText = history
-    .slice(-6)
+    .slice(-10)
     .map(m => `${m.sender === 'user' ? 'User' : 'Assistant'}: ${m.text}`)
     .join('\n');
 
-  const prompt = `You are a helpful IT Assistant integrated in IT Hub Center.
-You have access to the following data:
-- ${context.tickets.length} open tickets
-- ${context.kb.length} knowledge base articles
-- ${context.incidents.length} active incidents
+  const openTickets = context.tickets.filter(t => t.status !== 'Resolved' && t.status !== 'Closed');
+  const ticketsSummary = openTickets.slice(0, 30).map(t =>
+    `- [${t.priority}] "${t.subject}" (${t.status}, assigned: ${t.assignee?.name || 'unassigned'}, requester: ${t.requester?.name || 'unknown'})`
+  ).join('\n');
 
-Always respond in ${language === 'it' ? 'Italian' : language === 'es' ? 'Spanish' : 'English'}.
-Be concise, professional and helpful.
+  const activeIncidents = context.incidents.filter(i => i.status !== 'Resolved' && i.status !== 'Closed');
+  const incidentsSummary = activeIncidents.slice(0, 15).map(i =>
+    `- [${i.priority}] "${i.title}" (${i.status})`
+  ).join('\n');
 
-${historyText ? `Conversation so far:\n${historyText}\n` : ''}
+  const kbSummary = context.kb.slice(0, 20).map(a =>
+    `- "${a.title}" (category: ${a.category}, tags: ${a.tags?.join(', ') || 'none'})`
+  ).join('\n');
+
+  const assetsSummary = context.assets
+    ? `\nASSETS (${context.assets.length} total, ${context.assets.filter(a => a.status === 'In Use').length} in use, ${context.assets.filter(a => a.status === 'Ready to Deploy').length} ready to deploy)`
+    : '';
+
+  const prompt = `You are the IT Assistant of IT Hub Center, an enterprise ITSM platform. You help IT staff manage tickets, assets, incidents, and knowledge base.
+
+ROLE & CAPABILITIES:
+- You are an expert IT support assistant embedded in the company's IT management system
+- You can analyze ticket queues, suggest priorities, identify patterns
+- You can help draft responses to tickets, suggest KB articles for common issues
+- You can provide status overviews and actionable recommendations
+- You know the platform features: tickets, assets, licenses, incidents, KB, vendors, SLA policies
+
+CURRENT DATA:
+
+OPEN TICKETS (${openTickets.length} of ${context.tickets.length} total):
+${ticketsSummary || '(none)'}
+
+ACTIVE INCIDENTS (${activeIncidents.length} of ${context.incidents.length} total):
+${incidentsSummary || '(none)'}
+
+KNOWLEDGE BASE (${context.kb.length} articles):
+${kbSummary || '(none)'}
+${assetsSummary}
+
+RULES:
+- Always respond in ${langName}
+- Be concise but thorough. Use bullet points and bold for clarity
+- When referencing tickets/incidents, include their subject/title
+- If asked about something not in your data, say so honestly
+- Suggest actionable next steps when appropriate
+- For technical questions, reference relevant KB articles if they exist
+
+${historyText ? `CONVERSATION:\n${historyText}\n` : ''}
 User: ${input}
 Assistant:`;
 

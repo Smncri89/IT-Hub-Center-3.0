@@ -712,4 +712,7 @@ export const translations: Record<string, Record<Language, string>> = {
   // AD/Intune Integration
   'integration entraid desc': { en: 'Sync users and groups from Microsoft Entra ID (Azure AD)', it: 'Sincronizza utenti e gruppi da Microsoft Entra ID (Azure AD)', es: 'Sincronizar usuarios y grupos desde Microsoft Entra ID (Azure AD)' },
   'integration intune desc': { en: 'Import and sync managed devices from Microsoft Intune', it: 'Importa e sincronizza dispositivi gestiti da Microsoft Intune', es: 'Importar y sincronizar dispositivos administrados desde Microsoft Intune' },
+
+  // AI Assistant
+  'ai assistant hint': { en: 'Ask me about tickets, assets, incidents, or anything IT-related!', it: 'Chiedimi dei ticket, asset, incidenti o qualsiasi cosa IT!', es: '¡Pregúntame sobre tickets, activos, incidentes o cualquier tema de TI!' },
 };
