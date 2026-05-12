@@ -662,4 +662,10 @@ export const translations: Record<string, Record<Language, string>> = {
   'restore warning': { en: 'Restoring will overwrite current data. Continue?', it: 'Il ripristino sovrascriverà i dati attuali. Continuare?', es: 'La restauración sobrescribirá los datos actuales. ¿Continuar?' },
   'restore success': { en: 'Data restored successfully.', it: 'Dati ripristinati con successo.', es: 'Datos restaurados correctamente.' },
   'restore failed': { en: 'Restore failed. Invalid file format.', it: 'Ripristino fallito. Formato file non valido.', es: 'Restauración fallida. Formato de archivo inválido.' },
+
+  // Audit Log
+  'audit log': { en: 'Audit Log', it: 'Registro Attività', es: 'Registro de Auditoría' },
+
+  // Dashboard KPI
+  'warranty alerts': { en: 'Warranty Alerts', it: 'Scadenze Garanzia', es: 'Alertas de Garantía' },
 };

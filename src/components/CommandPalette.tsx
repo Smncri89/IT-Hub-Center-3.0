@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useLocalization } from '@/hooks/useLocalization';
 import { useAuth } from '@/hooks/useAuth';
+import { useData } from '@/hooks/useData';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import { ICONS, ROLES_PERMISSIONS } from '@/constants';
 import { Role } from '@/types';
@@ -19,6 +20,7 @@ interface Command {
 const CommandPalette: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) => void }> = ({ isOpen, setIsOpen }) => {
     const { t } = useLocalization();
     const { user, logout } = useAuth();
+    const { tickets, assets, articles } = useData();
     const navigate = useNavigate();
     const { isRendered, isAnimating } = useAnimatedModal(isOpen);
 
@@ -74,11 +76,51 @@ const CommandPalette: React.FC<{ isOpen: boolean; setIsOpen: (isOpen: boolean) =
     const filteredCommands = useMemo(() => {
         if (!searchQuery) return commands;
         const lowerCaseQuery = searchQuery.toLowerCase();
-        return commands.filter(cmd => 
+        const matchedCommands = commands.filter(cmd =>
             cmd.name.toLowerCase().includes(lowerCaseQuery) ||
             (cmd.keywords && cmd.keywords.toLowerCase().includes(lowerCaseQuery))
         );
-    }, [searchQuery, commands]);
+
+        if (lowerCaseQuery.length < 2) return matchedCommands;
+
+        const ticketResults: Command[] = (tickets || [])
+            .filter(tk => tk.subject?.toLowerCase().includes(lowerCaseQuery) || tk.id?.toLowerCase().includes(lowerCaseQuery))
+            .slice(0, 5)
+            .map(tk => ({
+                id: `ticket-${tk.id}`,
+                name: `${tk.id} — ${tk.subject}`,
+                section: 'Tickets',
+                icon: ICONS.tickets,
+                action: () => navigate(`/tickets/${tk.id}`),
+            }));
+
+        const assetResults: Command[] = (assets || [])
+            .filter(a => a.name?.toLowerCase().includes(lowerCaseQuery) || a.model?.toLowerCase().includes(lowerCaseQuery) || a.serialNumber?.toLowerCase().includes(lowerCaseQuery))
+            .slice(0, 5)
+            .map(a => ({
+                id: `asset-${a.id}`,
+                name: `${a.name}${a.model ? ` (${a.model})` : ''}`,
+                section: 'Assets',
+                icon: ICONS.assets,
+                action: () => navigate(`/assets/${a.id}`),
+            }));
+
+        const kbResults: Command[] = (articles || [])
+            .filter(a => {
+                const title = typeof a.title === 'string' ? a.title : Object.values(a.title || {}).join(' ');
+                return title.toLowerCase().includes(lowerCaseQuery);
+            })
+            .slice(0, 5)
+            .map(a => ({
+                id: `kb-${a.id}`,
+                name: typeof a.title === 'string' ? a.title : (Object.values(a.title || {})[0] || 'Article'),
+                section: 'Knowledge Base',
+                icon: ICONS.kb,
+                action: () => navigate(`/kb/${a.id}`),
+            }));
+
+        return [...matchedCommands, ...ticketResults, ...assetResults, ...kbResults];
+    }, [searchQuery, commands, tickets, assets, articles, navigate]);
 
     const groupedCommands = useMemo(() => {
         return filteredCommands.reduce((acc, cmd) => {

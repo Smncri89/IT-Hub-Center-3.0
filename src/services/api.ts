@@ -8,6 +8,7 @@ import {
   ChatMessage
 } from '@/types';
 import { GoogleGenAI } from '@google/genai';
+import { logAuditEvent } from './auditService';
 import { mapTicketData, mapAssetData, mapLicenseData, mapIncidentData, mapKBArticleData, mapProfileToUser, mapCommentData } from '@/utils/mappers';
 
 // --- AI SETUP ---
@@ -151,6 +152,7 @@ export const createTicket = async (ticketData: Partial<Ticket> & { asset_id?: st
     office: ticketData.office
   }).select().single();
   if (error) throw error;
+  logAuditEvent({ userId: requester.id, userName: requester.name, action: 'create', entityType: 'ticket', entityId: data.id, entityName: ticketData.subject, details: `Priority: ${ticketData.priority || 'Medium'}` }).catch(() => {});
   return getTicketById(data.id) as Promise<Ticket>;
 };
 
@@ -186,6 +188,9 @@ export const updateTicket = async (id: string, updates: Partial<Ticket>): Promis
   }
   const { error } = await supabase.from('tickets').update(dbUpdates).eq('id', id);
   if (error) throw error;
+  const changesDesc = Object.entries(dbUpdates).map(([k, v]) => `${k}: ${v}`).join(', ');
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (authUser) logAuditEvent({ userId: authUser.id, userName: authUser.email || '', action: 'update', entityType: 'ticket', entityId: id, details: changesDesc }).catch(() => {});
   return getTicketById(id) as Promise<Ticket>;
 };
 
@@ -262,6 +267,8 @@ export const createAsset = async (assetData: Partial<Asset>): Promise<Asset> => 
   };
   const { data, error } = await supabase.from('assets').insert(dbData).select().single();
   if (error) throw error;
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (authUser) logAuditEvent({ userId: authUser.id, userName: authUser.email || '', action: 'create', entityType: 'asset', entityId: data.id, entityName: assetData.name, details: `Type: ${assetData.type}, Model: ${assetData.model || 'N/A'}` }).catch(() => {});
   return getAssetById(data.id) as Promise<Asset>;
 };
 
@@ -295,8 +302,10 @@ export const updateAsset = async (id: string, updates: Partial<Asset>): Promise<
 };
 
 export const deleteAsset = async (id: string): Promise<void> => {
+  const { data: { user: authUser } } = await supabase.auth.getUser();
   const { error } = await supabase.from('assets').delete().eq('id', id);
   if (error) throw error;
+  if (authUser) logAuditEvent({ userId: authUser.id, userName: authUser.email || '', action: 'delete', entityType: 'asset', entityId: id }).catch(() => {});
 };
 
 export const uploadAssetImage = async (file: File): Promise<string> => {
@@ -409,6 +418,7 @@ export const createIncident = async (incidentData: Partial<Incident>, reporter: 
     tags: incidentData.tags
   }).select().single();
   if (error) throw error;
+  logAuditEvent({ userId: reporter.id, userName: reporter.name, action: 'create', entityType: 'incident', entityId: data.id, entityName: incidentData.title, details: `Severity: ${incidentData.priority}` }).catch(() => {});
   return getIncidentById(data.id) as Promise<Incident>;
 };
 

@@ -3,8 +3,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocalization } from '@/hooks/useLocalization';
 import PieChartCard from './PieChartCard';
-import { Ticket, License, Incident, TicketStatus, Role, User, TicketPriority } from '@/types';
+import { Ticket, License, Incident, Asset, TicketStatus, Role, User, TicketPriority } from '@/types';
 import { ICONS, STATUS_COLORS, INCIDENT_STATUS_COLORS } from '@/constants';
+import { getSLAPolicies } from '@/services/api';
 import Spinner from './Spinner';
 import { useAuth } from '@/hooks/useAuth';
 import { useData } from '@/hooks/useData';
@@ -16,6 +17,8 @@ interface DashboardConfig {
     showStatusSummary: boolean;
     showSlaStatus: boolean;
     showQuickActions: boolean;
+    showMttr: boolean;
+    showWarrantyAlerts: boolean;
     showTicketsChart: boolean;
     showIncidentsChart: boolean;
     showMyTickets: boolean;
@@ -27,6 +30,8 @@ const DEFAULT_DASHBOARD_CONFIG: DashboardConfig = {
     showStatusSummary: true,
     showSlaStatus: true,
     showQuickActions: true,
+    showMttr: true,
+    showWarrantyAlerts: true,
     showTicketsChart: true,
     showIncidentsChart: true,
     showMyTickets: true,
@@ -114,6 +119,8 @@ const CustomizeDashboardModal: React.FC<{
                     <ToggleItem label={t('status summary')} id="showStatusSummary" />
                     <ToggleItem label={t('sla status')} id="showSlaStatus" />
                     <ToggleItem label={t('quick actions')} id="showQuickActions" />
+                    <ToggleItem label="MTTR" id="showMttr" />
+                    <ToggleItem label={t('warranty alerts') || 'Warranty Alerts'} id="showWarrantyAlerts" />
                     <ToggleItem label={t('tickets by status')} id="showTicketsChart" />
                     <ToggleItem label={t('incidents by category')} id="showIncidentsChart" />
                     <ToggleItem label={t('my assigned tickets')} id="showMyTickets" />
@@ -169,23 +176,45 @@ const StatusSummaryWidget: React.FC<{ tickets: Ticket[], t: Function }> = ({ tic
   );
 };
 
-const SlaWidget: React.FC<{ t: Function }> = ({ t }) => (
-    <Link to="/tickets" className="block h-full bg-neutral-900 dark:bg-black rounded-3xl p-6 relative overflow-hidden group border border-neutral-800 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        <div className="flex flex-col items-center justify-center text-center h-full relative z-10">
-            <div className="relative mb-4">
-                <div className="w-24 h-24 rounded-full border-8 border-neutral-800 dark:border-neutral-900 flex items-center justify-center shadow-2xl bg-neutral-800 dark:bg-neutral-900">
-                    <span className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-300">98%</span>
+const SlaWidget: React.FC<{ tickets: Ticket[], t: Function }> = ({ tickets, t }) => {
+    const slaData = useMemo(() => {
+        const ticketsWithSla = tickets.filter(tk => tk.slaDueAt);
+        if (ticketsWithSla.length === 0) return { percent: 100, label: 'N/A', color: 'emerald' };
+        const breached = ticketsWithSla.filter(tk => {
+            const due = new Date(tk.slaDueAt!).getTime();
+            const resolved = tk.resolvedAt ? new Date(tk.resolvedAt).getTime() : Date.now();
+            return resolved > due;
+        }).length;
+        const percent = Math.round(((ticketsWithSla.length - breached) / ticketsWithSla.length) * 100);
+        const color = percent >= 90 ? 'emerald' : percent >= 70 ? 'amber' : 'rose';
+        const label = percent >= 90 ? 'Excellent' : percent >= 70 ? 'Warning' : 'Critical';
+        return { percent, label, color };
+    }, [tickets]);
+
+    const offset = Math.round(289 - (289 * slaData.percent / 100));
+    const colorMap: Record<string, string> = { emerald: 'text-emerald-500', amber: 'text-amber-500', rose: 'text-rose-500' };
+    const gradMap: Record<string, string> = { emerald: 'from-emerald-400 to-teal-300', amber: 'from-amber-400 to-yellow-300', rose: 'from-rose-400 to-red-300' };
+    const bgMap: Record<string, string> = { emerald: 'bg-emerald-900/30 text-emerald-400', amber: 'bg-amber-900/30 text-amber-400', rose: 'bg-rose-900/30 text-rose-400' };
+
+    return (
+        <Link to="/tickets" className="block h-full bg-neutral-900 dark:bg-black rounded-3xl p-6 relative overflow-hidden group border border-neutral-800 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="flex flex-col items-center justify-center text-center h-full relative z-10">
+                <div className="relative mb-4">
+                    <div className="w-24 h-24 rounded-full border-8 border-neutral-800 dark:border-neutral-900 flex items-center justify-center shadow-2xl bg-neutral-800 dark:bg-neutral-900">
+                        <span className={`text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r ${gradMap[slaData.color]}`}>{slaData.percent}%</span>
+                    </div>
+                    <svg className="absolute top-0 left-0 w-24 h-24 -rotate-90 drop-shadow-lg" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="46" stroke="currentColor" strokeWidth="8" fill="none" className="text-neutral-700" strokeDasharray="289" strokeDashoffset="0" />
+                        <circle cx="50" cy="50" r="46" stroke="currentColor" strokeWidth="8" fill="none" className={colorMap[slaData.color]} strokeDasharray="289" strokeDashoffset={offset} strokeLinecap="round" />
+                    </svg>
                 </div>
-                <svg className="absolute top-0 left-0 w-24 h-24 -rotate-90 drop-shadow-lg" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="46" stroke="currentColor" strokeWidth="8" fill="none" className="text-emerald-500" strokeDasharray="289" strokeDashoffset="10" strokeLinecap="round" />
-                </svg>
+                <p className="text-lg font-bold text-white">{t('sla status')}</p>
+                <p className={`text-xs font-bold uppercase tracking-wider mt-1 px-2 py-0.5 rounded-full ${bgMap[slaData.color]}`}>{slaData.label}</p>
             </div>
-            <p className="text-lg font-bold text-white">{t('sla status')}</p>
-            <p className="text-xs text-emerald-400 font-bold uppercase tracking-wider mt-1 bg-emerald-900/30 px-2 py-0.5 rounded-full">Excellent</p>
-        </div>
-    </Link>
-);
+        </Link>
+    );
+};
 
 const QuickActionsWidget: React.FC<{ t: Function }> = ({ t }) => (
   <div className="grid grid-cols-2 gap-4 h-full">
@@ -447,7 +476,7 @@ const EndUserDashboard: React.FC = () => {
 const AdminAgentDashboard: React.FC = () => {
     const { t } = useLocalization();
     const { user } = useAuth();
-    const { tickets, licenses, incidents, isLoading } = useData();
+    const { tickets, licenses, incidents, assets, isLoading } = useData();
     const navigate = useNavigate();
     
     // Configuration State
@@ -515,7 +544,7 @@ const AdminAgentDashboard: React.FC = () => {
                 )}
                 {dashboardConfig.showSlaStatus && (
                     <div className="col-span-12 md:col-span-6 lg:col-span-3 xl:col-span-3 min-h-[180px]">
-                        <SlaWidget t={t} />
+                        <SlaWidget tickets={tickets} t={t} />
                     </div>
                 )}
                 {dashboardConfig.showQuickActions && (
@@ -523,6 +552,54 @@ const AdminAgentDashboard: React.FC = () => {
                         <QuickActionsWidget t={t} />
                     </div>
                 )}
+
+                {/* MTTR & Warranty Row */}
+                {dashboardConfig.showMttr && (() => {
+                    const resolved = tickets.filter(tk => (tk.status === TicketStatus.Resolved || tk.status === TicketStatus.Closed) && tk.resolvedAt);
+                    const totalHours = resolved.reduce((acc, tk) => acc + Math.abs((new Date(tk.resolvedAt!).getTime() - new Date(tk.createdAt).getTime()) / 3600000), 0);
+                    const mttr = resolved.length > 0 ? Math.round(totalHours / resolved.length) : 0;
+                    const mttrColor = mttr <= 24 ? 'emerald' : mttr <= 72 ? 'amber' : 'rose';
+                    const colors: Record<string, string> = { emerald: 'from-emerald-500 to-teal-600', amber: 'from-amber-500 to-orange-600', rose: 'from-rose-500 to-red-600' };
+                    return (
+                        <div className="col-span-12 md:col-span-6 lg:col-span-3 min-h-[130px]">
+                            <div className={`bg-gradient-to-br ${colors[mttrColor]} rounded-3xl p-6 h-full flex flex-col justify-center text-white shadow-lg`}>
+                                <p className="text-xs font-bold uppercase tracking-wider opacity-80">Mean Time to Resolve</p>
+                                <p className="text-4xl font-black mt-1">{mttr}<span className="text-lg font-bold opacity-70 ml-1">h</span></p>
+                                <p className="text-xs opacity-70 mt-1">{resolved.length} ticket risolti</p>
+                            </div>
+                        </div>
+                    );
+                })()}
+
+                {dashboardConfig.showWarrantyAlerts && (() => {
+                    const now = Date.now();
+                    const d30 = 30 * 86400000;
+                    const d90 = 90 * 86400000;
+                    const expiring30 = assets.filter(a => a.warrantyEndDate && new Date(a.warrantyEndDate).getTime() - now > 0 && new Date(a.warrantyEndDate).getTime() - now <= d30);
+                    const expiring90 = assets.filter(a => a.warrantyEndDate && new Date(a.warrantyEndDate).getTime() - now > d30 && new Date(a.warrantyEndDate).getTime() - now <= d90);
+                    const expired = assets.filter(a => a.warrantyEndDate && new Date(a.warrantyEndDate).getTime() < now);
+                    return (
+                        <div className="col-span-12 md:col-span-6 lg:col-span-3 min-h-[130px]">
+                            <Link to="/assets" className="block h-full bg-white dark:bg-neutral-800 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-lg transition-all">
+                                <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-3">{t('warranty alerts') || 'Warranty Alerts'}</p>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs font-medium text-rose-600 dark:text-rose-400">Scadute</span>
+                                        <span className="text-sm font-black text-rose-600">{expired.length}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs font-medium text-amber-600 dark:text-amber-400">&lt; 30 giorni</span>
+                                        <span className="text-sm font-black text-amber-600">{expiring30.length}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">&lt; 90 giorni</span>
+                                        <span className="text-sm font-black text-blue-600">{expiring90.length}</span>
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                    );
+                })()}
 
                 {/* Middle Row: Charts */}
                 {dashboardConfig.showTicketsChart && (
