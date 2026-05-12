@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, X, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ICONS } from '@/constants';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { useLocalization } from '@/hooks/useLocalization';
@@ -136,21 +136,21 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onImport, ti
                 <div className="flex justify-between items-center p-6 border-b border-neutral-200 dark:border-neutral-800">
                     <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">{title}</h2>
                     <button onClick={resetAndClose} className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300">
-                        <X className="w-6 h-6" />
+                        {React.cloneElement(ICONS.close, { className: 'w-6 h-6' })}
                     </button>
                 </div>
 
                 <div className="p-6 overflow-y-auto flex-1">
                     {error && (
                         <div className="mb-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-xl flex items-start gap-3">
-                            <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                            {React.cloneElement(ICONS.alert_circle, { className: 'w-5 h-5 mt-0.5 flex-shrink-0' })}
                             <p className="text-sm">{error}</p>
                         </div>
                     )}
 
                     {success && (
                         <div className="mb-6 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 p-4 rounded-xl flex items-center gap-3">
-                            <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+                            {React.cloneElement(ICONS.check, { className: 'w-5 h-5 flex-shrink-0' })}
                             <p className="text-sm font-medium">{t('Import successful!')}</p>
                         </div>
                     )}
@@ -169,7 +169,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onImport, ti
                                 accept=".csv,.xlsx,.xls" 
                                 onChange={handleFileChange}
                             />
-                            <UploadCloud className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
+                            {React.cloneElement(ICONS.upload, { className: 'w-12 h-12 text-neutral-400 mx-auto mb-4' })}
                             <p className="text-neutral-900 dark:text-white font-medium mb-1">{t('Click to upload or drag and drop')}</p>
                             <p className="text-sm text-neutral-500 dark:text-neutral-400">CSV, XLS, XLSX</p>
                             
@@ -189,7 +189,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onImport, ti
                             <div className="flex items-center justify-between bg-neutral-50 dark:bg-neutral-800 p-4 rounded-xl border border-neutral-200 dark:border-neutral-700">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center">
-                                        <UploadCloud className="w-5 h-5" />
+                                        {React.cloneElement(ICONS.upload, { className: 'w-5 h-5' })}
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-neutral-900 dark:text-white">{file.name}</p>

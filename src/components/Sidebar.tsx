@@ -32,44 +32,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isCollapsed, t
     { id: 'kb', labelKey: 'kb', icon: ICONS.kb, path: '/kb' },
   ];
 
-  // Icona Edificio per Sedi
-  const BuildingIcon = (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-    </svg>
-  );
-
-  // Icona Partner/Vendors
-  const VendorIcon = (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-    </svg>
-  );
-
-  // Icona Onboarding — user con freccia/check
-  const OnboardingIcon = (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-    </svg>
-  );
-
   const extraItems = isAdminOrAgent ? [
     {
       id: 'onboarding',
       labelKey: 'On/Offboarding',
-      icon: OnboardingIcon,
+      icon: ICONS.onboarding,
       path: '/onboarding'
     },
     {
       id: 'locations',
       labelKey: 'Sedi',
-      icon: BuildingIcon,
+      icon: ICONS.building,
       path: '/locations'
     },
     {
       id: 'vendors',
       labelKey: 'Vendors',
-      icon: VendorIcon,
+      icon: ICONS.vendor,
       path: '/vendors'
     },
   ] : [];

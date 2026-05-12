@@ -26,9 +26,9 @@ const Settings: React.FC = () => {
         { id: 'integrations', labelKey: 'settings integrations', icon: ICONS.integrations, component: <IntegrationsSettings />, allowedRoles: [Role.Admin] },
         { id: 'policies', labelKey: 'policies', icon: ICONS.kb, component: <PolicySettings />, allowedRoles: [Role.Admin, Role.Agent] },
         { id: 'sla', labelKey: 'sla policies', icon: ICONS.sla, component: <SLAPolicySettings />, allowedRoles: [Role.Admin] },
-        { id: 'audit', labelKey: 'audit log', icon: ICONS.file, component: <AuditLogSettings />, allowedRoles: [Role.Admin] },
+        { id: 'audit', labelKey: 'audit log', icon: ICONS.audit, component: <AuditLogSettings />, allowedRoles: [Role.Admin] },
         { id: 'backup', labelKey: 'settings backup', icon: ICONS.database, component: <BackupSettings />, allowedRoles: [Role.Admin] },
-        { id: 'application', labelKey: 'settings application', icon: ICONS.download, component: <ApplicationSettings />, allowedRoles: [Role.Admin, Role.Agent, Role.Member, Role.EndUser] },
+        { id: 'application', labelKey: 'settings application', icon: ICONS.app, component: <ApplicationSettings />, allowedRoles: [Role.Admin, Role.Agent, Role.Member, Role.EndUser] },
     ], []);
 
     const accessibleTabs = useMemo(() => {
