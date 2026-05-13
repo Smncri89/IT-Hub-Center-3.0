@@ -20,10 +20,8 @@ const PWAInstallBanner: React.FC = () => {
     installPrompt.prompt();
     const { outcome } = await installPrompt.userChoice;
     if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
       handleDismiss();
     } else {
-      console.log('User dismissed the install prompt');
     }
   };
 

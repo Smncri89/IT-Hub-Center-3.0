@@ -33,7 +33,6 @@ const ApplicationSettings: React.FC = () => {
     if (!installPrompt) return;
     installPrompt.prompt();
     const { outcome } = await installPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
   };
 
   const handleBannerSave = () => {

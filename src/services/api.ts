@@ -68,7 +68,6 @@ export const updateUser = async (userId: string, updates: Partial<User>): Promis
 };
 
 export const createUser = async (userData: { name: string; email: string; role: Role; company?: string }): Promise<void> => {
-  console.log("Invite user:", userData);
 };
 
 export const importOrUpdateUser = async (userData: any): Promise<{ status: 'invited' | 'updated' | 'error', message?: string }> => {
@@ -454,7 +453,6 @@ export const unassignUserFromLicense = async (assignmentId: string): Promise<voi
 };
 
 export const checkLicenseExpirationsAndCreateTickets = async (adminUser: User): Promise<void> => {
-  console.log("Checking license expirations...");
 };
 
 // --- INCIDENTS ---
@@ -575,7 +573,6 @@ export const deleteIntegration = async (userId: string, serviceName: string): Pr
 };
 
 export const submitIntegrationSuggestion = async (name: string, reason: string): Promise<void> => {
-  console.log("Suggestion:", name, reason);
 };
 
 // --- VENDORS ---
@@ -731,7 +728,6 @@ export const createBackup = async (): Promise<Blob> => {
 };
 
 export const restoreBackup = async (file: File): Promise<void> => {
-  console.log("Restoring from", file.name);
 };
 
 // --- AI FUNCTIONS ---

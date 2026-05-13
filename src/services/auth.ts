@@ -35,7 +35,6 @@ export const getFullUser = async (authUser: any): Promise<User | null> => {
     }
 
     if (!profile) {
-        console.warn('Profile not found after retries. This might happen if the automatic profile creation trigger is missing or failed. Attempting to create a profile as a fallback...');
         const { data: newProfile, error: insertError } = await supabase
             .from('profiles')
             .insert({
@@ -53,7 +52,6 @@ export const getFullUser = async (authUser: any): Promise<User | null> => {
             return null;
         }
 
-        console.log('Fallback profile created successfully.');
         profile = newProfile;
     }
 

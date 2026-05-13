@@ -77,7 +77,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // 1. Force Loading Stop Safety Valve
     const safetyTimeout = setTimeout(() => {
         if (mounted && !initComplete) {
-            console.warn("Auth initialization timed out. Forcing app load.");
             setLoading(false);
             initComplete = true;
         }

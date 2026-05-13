@@ -13,30 +13,30 @@ import Login from '@/components/Login';
 import Register from '@/components/Register';
 import ForgotPassword from '@/components/ForgotPassword';
 import UpdatePassword from '@/components/UpdatePassword';
-import Dashboard from '@/components/Dashboard';
-import DummyPage from '@/components/DummyPage';
-import TicketsList from '@/components/tickets/TicketsList';
-import { TicketDetail } from '@/components/tickets/TicketDetail';
-import { AssetsList } from '@/components/assets/AssetsList';
-import AssetDetail from '@/components/assets/AssetDetail';
-import AddAsset from '@/components/assets/AddAsset';
-import LicensesList from '@/components/licenses/LicensesList';
-import LicenseDetail from '@/components/licenses/LicenseDetail';
-import { IncidentsList } from '@/components/incidents/IncidentsList';
-import IncidentDetail from '@/components/incidents/IncidentDetail';
-import Reports from '@/components/reports/Reports';
 import { ROLES_PERMISSIONS } from '@/constants';
 import { Role } from '@/types';
-import KnowledgeBase from '@/components/kb/KnowledgeBase';
-import KBArticleDetail from '@/components/kb/KBArticleDetail';
-import KBArticleEditor from '@/components/kb/KBArticleEditor';
-import Settings from '@/components/settings/Settings';
-import Session from '@/components/pulse/Pulse';
-import VendorsList from '@/components/vendors/VendorsList';
-import AssetMap from '@/components/maps/AssetMap';
-import LocationsList from '@/components/locations/LocationsList';
-import OnboardingList from '@/components/onboarding/OnboardingList';
-import OnboardingDetail from '@/components/onboarding/OnboardingDetail';
+
+const Dashboard = lazy(() => import('@/components/Dashboard'));
+const Session = lazy(() => import('@/components/pulse/Pulse'));
+const TicketsList = lazy(() => import('@/components/tickets/TicketsList'));
+const TicketDetail = lazy(() => import('@/components/tickets/TicketDetail').then(m => ({ default: m.TicketDetail })));
+const AssetsList = lazy(() => import('@/components/assets/AssetsList').then(m => ({ default: m.AssetsList })));
+const AssetDetail = lazy(() => import('@/components/assets/AssetDetail'));
+const AddAsset = lazy(() => import('@/components/assets/AddAsset'));
+const LicensesList = lazy(() => import('@/components/licenses/LicensesList'));
+const LicenseDetail = lazy(() => import('@/components/licenses/LicenseDetail'));
+const IncidentsList = lazy(() => import('@/components/incidents/IncidentsList').then(m => ({ default: m.IncidentsList })));
+const IncidentDetail = lazy(() => import('@/components/incidents/IncidentDetail'));
+const Reports = lazy(() => import('@/components/reports/Reports'));
+const KnowledgeBase = lazy(() => import('@/components/kb/KnowledgeBase'));
+const KBArticleDetail = lazy(() => import('@/components/kb/KBArticleDetail'));
+const KBArticleEditor = lazy(() => import('@/components/kb/KBArticleEditor'));
+const Settings = lazy(() => import('@/components/settings/Settings'));
+const VendorsList = lazy(() => import('@/components/vendors/VendorsList'));
+const AssetMap = lazy(() => import('@/components/maps/AssetMap'));
+const LocationsList = lazy(() => import('@/components/locations/LocationsList'));
+const OnboardingList = lazy(() => import('@/components/onboarding/OnboardingList'));
+const OnboardingDetail = lazy(() => import('@/components/onboarding/OnboardingDetail'));
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -90,6 +90,7 @@ const AppRoutes = () => {
   return (
     <DataProvider>
       <NotificationsProvider>
+        <Suspense fallback={<div className="flex items-center justify-center h-screen"><Spinner /></div>}>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
@@ -130,6 +131,7 @@ const AppRoutes = () => {
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/register" element={<Navigate to="/" replace />} />
         </Routes>
+        </Suspense>
       </NotificationsProvider>
     </DataProvider>
   );
