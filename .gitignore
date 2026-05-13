@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Supabase temp files
+supabase/.temp/
+
+# Cleanup scripts
+cleanup-secrets.txt
+cleanup-history.sh
