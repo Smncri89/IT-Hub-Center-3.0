@@ -12,7 +12,8 @@ import { ICONS } from '@/constants';
 import { useData } from '@/hooks/useData';
 
 // Initialize Gemini AI
-const ai = (typeof process !== 'undefined' && process.env?.API_KEY) ? new GoogleGenAI({ apiKey: process.env.API_KEY }) : null;
+const AI_KEY = import.meta.env.VITE_GEMINI_API_KEY || null;
+const ai = AI_KEY ? new GoogleGenAI({ apiKey: AI_KEY }) : null;
 
 // --- AI HOOK ---
 const useGemini = () => {
