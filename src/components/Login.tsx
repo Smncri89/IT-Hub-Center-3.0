@@ -191,7 +191,7 @@ const Login: React.FC = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-neutral-50 dark:bg-neutral-950 relative overflow-hidden font-sans selection:bg-primary-500/30">
+    <div className="flex min-h-screen min-h-[100dvh] bg-neutral-50 dark:bg-neutral-950 relative overflow-hidden font-sans selection:bg-primary-500/30">
         {/* Advanced Dynamic Background */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-primary-400/20 to-purple-400/20 blur-[120px] animate-pulse-slow"></div>

@@ -33,7 +33,7 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans selection:bg-primary-500/30 overflow-hidden relative">
+    <div className="flex h-screen h-[100dvh] bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans selection:bg-primary-500/30 overflow-hidden relative">
       
       {/* Premium Ambient Background */}
       <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary-100/40 via-neutral-50/20 to-transparent dark:from-primary-900/20 dark:via-neutral-950/40 dark:to-transparent pointer-events-none z-0"></div>
