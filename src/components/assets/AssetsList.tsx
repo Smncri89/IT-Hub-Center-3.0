@@ -12,6 +12,7 @@ import { createAsset, updateAsset, findImageForModel } from '@/services/api';
 import AssetMap from '@/components/maps/AssetMap';
 import ImportModal from '@/components/ImportModal';
 import { getLocations, Location } from '@/services/locationsService';
+import MobileFilterToggle from '@/components/MobileFilterToggle';
 
 // --- HELPER: CSV PARSER ---
 const parseCsvRow = (row: string): string[] => {
@@ -686,6 +687,7 @@ export const AssetsList: React.FC = () => {
             </div>
             )}
 
+            <MobileFilterToggle>
             <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div className="lg:col-span-1">
@@ -731,6 +733,7 @@ export const AssetsList: React.FC = () => {
                     </FilterSelectWrapper>
                 </div>
             </div>
+            </MobileFilterToggle>
 
             {viewMode === 'map' ? (
                  <AssetMap assets={filteredAssets} />

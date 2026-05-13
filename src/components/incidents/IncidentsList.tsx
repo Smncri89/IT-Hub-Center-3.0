@@ -9,6 +9,7 @@ import { ICONS, INCIDENT_STATUS_COLORS, INCIDENT_CATEGORY_COLORS } from '@/const
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import * as api from '@/services/api';
+import MobileFilterToggle from '@/components/MobileFilterToggle';
 
 const INCIDENT_CATEGORIES = [
     'Service Outage',
@@ -459,6 +460,7 @@ export const IncidentsList: React.FC = () => {
                 )}
             </div>
 
+             <MobileFilterToggle>
              <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
                     <div className="lg:col-span-2">
@@ -488,6 +490,7 @@ export const IncidentsList: React.FC = () => {
                     </FilterSelect>
                 </div>
             </div>
+            </MobileFilterToggle>
 
             <div className="space-y-4">
                 {filteredIncidents.map(incident => (

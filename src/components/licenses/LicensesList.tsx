@@ -13,6 +13,7 @@ import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import { createLicense } from '@/services/api';
 import LicenseDetail from './LicenseDetail';
 import ImportModal from '@/components/ImportModal';
+import MobileFilterToggle from '@/components/MobileFilterToggle';
 
 const parseCsvRow = (row: string): string[] => {
     const values = [];
@@ -323,6 +324,7 @@ const LicensesList: React.FC = () => {
                 </div>
             )}
 
+            <MobileFilterToggle>
             <div className="glass-panel p-5 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2">
@@ -356,6 +358,7 @@ const LicensesList: React.FC = () => {
                     </div>
                 </div>
             </div>
+            </MobileFilterToggle>
 
             {/* Desktop Table View */}
             <div className="hidden lg:block bg-white dark:bg-neutral-800 rounded-3xl shadow-soft border border-neutral-100 dark:border-neutral-800 overflow-hidden">

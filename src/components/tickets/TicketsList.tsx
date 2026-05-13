@@ -11,6 +11,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import * as api from '@/services/api';
 import ImportModal from '@/components/ImportModal';
+import MobileFilterToggle from '@/components/MobileFilterToggle';
 
 // Helper for CSV parsing (copied from other lists)
 const parseCsvRow = (row: string): string[] => {
@@ -505,16 +506,17 @@ export const TicketsList: React.FC = () => {
                 </div>
             </div>
 
+            <MobileFilterToggle>
             <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{t('search')}</label>
                         <div className="relative">
-                            <input 
-                                type="search" 
-                                placeholder={t('ticket search placeholder')} 
-                                value={searchQuery} 
-                                onChange={e => setSearchQuery(e.target.value)} 
+                            <input
+                                type="search"
+                                placeholder={t('ticket search placeholder')}
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-neutral-900 dark:text-neutral-100"
                             />
                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
@@ -532,6 +534,7 @@ export const TicketsList: React.FC = () => {
                     </FilterSelect>
                 </div>
             </div>
+            </MobileFilterToggle>
 
             {viewMode === 'list' ? (
                 <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-md overflow-hidden">
