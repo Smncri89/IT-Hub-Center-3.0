@@ -26,6 +26,14 @@ async function callGemini(prompt: string): Promise<string> {
   return result.text ?? "";
 }
 
+const getMyOrgId = async (): Promise<string> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const { data } = await supabase.from('profiles').select('organization_id').eq('id', user.id).single();
+  if (!data?.organization_id) throw new Error('No organization found');
+  return data.organization_id;
+};
+
 // --- USERS ---
 
 export const getUsers = async (): Promise<User[]> => {
@@ -134,6 +142,7 @@ export const createTicket = async (ticketData: Partial<Ticket> & { asset_id?: st
       attachmentUrls.push(data.publicUrl);
     }
   }
+  const orgId = await getMyOrgId();
   const { data, error } = await supabase.from('tickets').insert({
     subject: ticketData.subject,
     description: ticketData.description,
@@ -149,7 +158,8 @@ export const createTicket = async (ticketData: Partial<Ticket> & { asset_id?: st
     department: ticketData.department,
     site: ticketData.site,
     floor: ticketData.floor,
-    office: ticketData.office
+    office: ticketData.office,
+    organization_id: orgId
   }).select().single();
   if (error) throw error;
   logAuditEvent({ userId: requester.id, userName: requester.name, action: 'create', entityType: 'ticket', entityId: data.id, entityName: ticketData.subject, details: `Priority: ${ticketData.priority || 'Medium'}` }).catch(() => {});
@@ -157,6 +167,7 @@ export const createTicket = async (ticketData: Partial<Ticket> & { asset_id?: st
 };
 
 export const bulkCreateTickets = async (ticketsData: Partial<Ticket>[], requesterId: string): Promise<void> => {
+  const orgId = await getMyOrgId();
   const dbData = ticketsData.map(t => ({
     subject: t.subject,
     description: t.description,
@@ -171,7 +182,8 @@ export const bulkCreateTickets = async (ticketsData: Partial<Ticket>[], requeste
     department: t.department,
     site: t.site,
     floor: t.floor,
-    office: t.office
+    office: t.office,
+    organization_id: orgId
   }));
   const { error } = await supabase.from('tickets').insert(dbData);
   if (error) throw error;
@@ -244,6 +256,7 @@ export const getAssetById = async (id: string): Promise<Asset | null> => {
 };
 
 export const createAsset = async (assetData: Partial<Asset>): Promise<Asset> => {
+  const orgId = await getMyOrgId();
   const dbData: any = {
     name: assetData.name,
     asset_tag: assetData.assetTag,
@@ -263,7 +276,8 @@ export const createAsset = async (assetData: Partial<Asset>): Promise<Asset> => 
     carrier: assetData.carrier,
     sim_serial: assetData.simSerial,
     esim_serial: assetData.esimSerial,
-    image: assetData.image
+    image: assetData.image,
+    organization_id: orgId
   };
   const { data, error } = await supabase.from('assets').insert(dbData).select().single();
   if (error) throw error;
@@ -273,6 +287,7 @@ export const createAsset = async (assetData: Partial<Asset>): Promise<Asset> => 
 };
 
 export const bulkCreateAssets = async (assetsData: Partial<Asset>[]): Promise<void> => {
+  const orgId = await getMyOrgId();
   const dbData = assetsData.map(a => ({
     name: a.name, asset_tag: a.assetTag, type: a.type, model: a.model,
     status: a.status, serial_number: a.serialNumber, purchase_date: a.purchaseDate,
@@ -280,7 +295,8 @@ export const bulkCreateAssets = async (assetsData: Partial<Asset>[]): Promise<vo
     warranty_end_date: a.warrantyEndDate, location: a.location,
     quantity: a.quantity, notes: a.notes, assigned_to_id: a.assignedTo?.id || null,
     phone_number: a.phoneNumber, carrier: a.carrier,
-    sim_serial: a.simSerial, esim_serial: a.esimSerial, image: a.image
+    sim_serial: a.simSerial, esim_serial: a.esimSerial, image: a.image,
+    organization_id: orgId
   }));
   const { error } = await supabase.from('assets').insert(dbData);
   if (error) throw error;
@@ -384,6 +400,7 @@ export const getLicenses = async (): Promise<License[]> => {
 };
 
 export const createLicense = async (licenseData: Partial<License>): Promise<License> => {
+  const orgId = await getMyOrgId();
   const { data, error } = await supabase.from('licenses').insert({
     name: licenseData.name,
     software: licenseData.software,
@@ -391,17 +408,20 @@ export const createLicense = async (licenseData: Partial<License>): Promise<Lice
     purchase_date: licenseData.purchaseDate,
     expiration_date: licenseData.expirationDate,
     total_cost: licenseData.totalCost,
-    cost_per_seat: licenseData.costPerSeat
+    cost_per_seat: licenseData.costPerSeat,
+    organization_id: orgId
   }).select().single();
   if (error) throw error;
   return getLicenses().then(ls => ls.find(l => l.id === data.id)!);
 };
 
 export const bulkCreateLicenses = async (licensesData: Partial<License>[]): Promise<void> => {
+  const orgId = await getMyOrgId();
   const dbData = licensesData.map(l => ({
     name: l.name, software: l.software, total_seats: l.totalSeats,
     purchase_date: l.purchaseDate, expiration_date: l.expirationDate,
-    total_cost: l.totalCost, cost_per_seat: l.costPerSeat
+    total_cost: l.totalCost, cost_per_seat: l.costPerSeat,
+    organization_id: orgId
   }));
   const { error } = await supabase.from('licenses').insert(dbData);
   if (error) throw error;
@@ -421,8 +441,9 @@ export const deleteLicense = async (id: string): Promise<void> => {
 };
 
 export const assignUserToLicense = async (licenseId: string, userId: string): Promise<void> => {
+  const orgId = await getMyOrgId();
   const { error } = await supabase.from('license_assignments').insert({
-    license_id: licenseId, user_id: userId, assigned_date: new Date().toISOString()
+    license_id: licenseId, user_id: userId, assigned_date: new Date().toISOString(), organization_id: orgId
   });
   if (error) throw error;
 };
@@ -455,6 +476,7 @@ export const getIncidentById = async (id: string): Promise<Incident | null> => {
 };
 
 export const createIncident = async (incidentData: Partial<Incident>, reporter: User): Promise<Incident> => {
+  const orgId = await getMyOrgId();
   const { data, error } = await supabase.from('incidents').insert({
     title: incidentData.title,
     description: incidentData.description,
@@ -463,7 +485,8 @@ export const createIncident = async (incidentData: Partial<Incident>, reporter: 
     category: incidentData.category,
     reporter_id: reporter.id,
     assignee_id: incidentData.assignee?.id || null,
-    tags: incidentData.tags
+    tags: incidentData.tags,
+    organization_id: orgId
   }).select().single();
   if (error) throw error;
   logAuditEvent({ userId: reporter.id, userName: reporter.name, action: 'create', entityType: 'incident', entityId: data.id, entityName: incidentData.title, details: `Severity: ${incidentData.priority}` }).catch(() => {});
@@ -505,13 +528,15 @@ export const getKBArticleById = async (id: string): Promise<KBArticle | null> =>
 };
 
 export const createKBArticle = async (articleData: Partial<KBArticle>, author: User): Promise<KBArticle> => {
+  const orgId = await getMyOrgId();
   const { data, error } = await supabase.from('kb_articles').insert({
     title: articleData.title,
     content: articleData.content,
     category: articleData.category,
     author_id: author.id,
     tags: articleData.tags,
-    audience: articleData.audience
+    audience: articleData.audience,
+    organization_id: orgId
   }).select().single();
   if (error) throw error;
   return getKBArticleById(data.id) as Promise<KBArticle>;
@@ -568,13 +593,15 @@ export const getVendors = async (): Promise<Vendor[]> => {
 };
 
 export const createVendor = async (vendor: Partial<Vendor>): Promise<void> => {
+  const orgId = await getMyOrgId();
   const { error } = await supabase.from('vendors').insert({
     name: vendor.name, contact_name: vendor.contactName, email: vendor.email,
     phone: vendor.phone, website: vendor.website, address: vendor.address,
     notes: vendor.notes, tags: vendor.tags,
     contract_start_date: vendor.contractStartDate,
     contract_end_date: vendor.contractEndDate,
-    service_count: vendor.serviceCount, avg_response_time: vendor.avgResponseTime
+    service_count: vendor.serviceCount, avg_response_time: vendor.avgResponseTime,
+    organization_id: orgId
   });
   if (error) throw error;
 };
@@ -693,7 +720,9 @@ export const getSLAPolicies = async (): Promise<SLAPolicy[]> => {
 };
 
 export const updateSLAPolicies = async (policies: SLAPolicy[]): Promise<void> => {
-  const { error } = await supabase.from('sla_policies').upsert(policies);
+  const orgId = await getMyOrgId();
+  const withOrg = policies.map(p => ({ ...p, organization_id: orgId }));
+  const { error } = await supabase.from('sla_policies').upsert(withOrg);
   if (error) throw error;
 };
 
