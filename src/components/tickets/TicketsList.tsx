@@ -232,19 +232,20 @@ const TicketBoard: React.FC<{ tickets: Ticket[], navigate: any, t: any }> = ({ t
     const columns = Object.values(TicketStatus);
     
     return (
-        <div className="flex gap-4 md:gap-6 overflow-x-auto pb-6 snap-x snap-mandatory -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 touch-pan-x" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="overflow-x-auto pb-4 -mb-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="flex gap-4 md:gap-6" style={{ minWidth: 'max-content' }}>
             {columns.map(status => {
                 const columnTickets = tickets.filter(t => t.status === status);
                 return (
-                    <div key={status} className="flex-shrink-0 w-[75vw] sm:w-72 md:w-80 snap-center">
-                        <div className="flex items-center justify-between mb-4 sticky left-0">
+                    <div key={status} className="w-[72vw] sm:w-72 md:w-80 flex-shrink-0">
+                        <div className="flex items-center justify-between mb-4">
                             <h3 className="font-bold text-neutral-700 dark:text-neutral-200 uppercase text-xs tracking-wider flex items-center gap-2">
                                 <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[status].split(' ')[0]}`}></span>
                                 {t(`ticket status ${status.toLowerCase().replace(/ /g, ' ')}`)}
                             </h3>
                             <span className="text-xs font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 px-2 py-0.5 rounded-full">{columnTickets.length}</span>
                         </div>
-                        <div className="space-y-3 overflow-y-auto max-h-[60vh] md:max-h-[65vh] custom-scrollbar touch-pan-y">
+                        <div className="space-y-3 overflow-y-auto max-h-[55vh] md:max-h-[65vh] custom-scrollbar">
                             {columnTickets.map(ticket => (
                                 <div 
                                     key={ticket.id} 
@@ -281,6 +282,7 @@ const TicketBoard: React.FC<{ tickets: Ticket[], navigate: any, t: any }> = ({ t
                     </div>
                 )
             })}
+        </div>
         </div>
     );
 };

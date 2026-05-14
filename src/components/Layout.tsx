@@ -54,9 +54,8 @@ const Layout: React.FC = () => {
           toggleSidebarCollapse={toggleSidebarCollapse}
           openCommandPalette={() => setIsCommandPaletteOpen(true)}
         />
-        <div className="flex-1 flex flex-col overflow-hidden relative">
-          {/* FIX: Removed overflow-x-hidden to allow tables to scroll horizontally if needed, improving responsiveness on smaller screens */}
-          <main key={location.pathname} className="flex-1 flex flex-col overflow-y-auto scroll-smooth custom-scrollbar">
+        <div className="flex-1 flex flex-col min-h-0 relative">
+          <main key={location.pathname} className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth custom-scrollbar">
             <div className="w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 flex-grow animate-fade-in flex flex-col">
               <PWAInstallBanner />
               <Outlet />
