@@ -192,11 +192,9 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isCollapsed, toggleSideb
             style={{ height: isMobile ? 56 : 80, padding: isMobile ? '0 8px' : '0 24px', maxWidth: '100%', overflow: 'visible' }}
         >
             <div style={{ flexShrink: 0 }}>
-                {isMobile && (
-                    <button onClick={toggleSidebar} className="p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 active:scale-95">
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-                    </button>
-                )}
+                <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 active:scale-95">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 2 : 16, flexShrink: 0 }}>
