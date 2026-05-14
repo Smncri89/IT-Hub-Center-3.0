@@ -68,10 +68,29 @@ export const updateUser = async (userId: string, updates: Partial<User>): Promis
 };
 
 export const createUser = async (userData: { name: string; email: string; role: Role; company?: string }): Promise<void> => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Not authenticated');
+
+  const response = await supabase.functions.invoke('invite-user', {
+    body: { email: userData.email, name: userData.name, role: userData.role },
+  });
+
+  if (response.error) throw new Error(response.error.message || 'Failed to invite user');
+  if (response.data?.error) throw new Error(response.data.error);
 };
 
 export const importOrUpdateUser = async (userData: any): Promise<{ status: 'invited' | 'updated' | 'error', message?: string }> => {
-  return { status: 'invited' };
+  try {
+    const { data: existing } = await supabase.from('profiles').select('id').eq('email', userData.email).single();
+    if (existing) {
+      await supabase.from('profiles').update({ name: userData.name, role: userData.role || 'End User' }).eq('id', existing.id);
+      return { status: 'updated', message: 'Profile updated' };
+    }
+    await createUser({ name: userData.name, email: userData.email, role: userData.role || Role.EndUser });
+    return { status: 'invited', message: 'User invited' };
+  } catch (err: any) {
+    return { status: 'error', message: err.message };
+  }
 };
 
 export const bulkCreateUsers = async (usersData: Partial<User>[]): Promise<void> => {

@@ -7,6 +7,7 @@ import { useLocalization } from '@/hooks/useLocalization';
 import CommandPalette from './CommandPalette';
 import AIAssistant from './AIAssistant';
 import PWAInstallBanner from './PWAInstallBanner';
+import TrialBanner from './TrialBanner';
 
 const Footer: React.FC = () => {
   const { t } = useLocalization();
@@ -46,6 +47,7 @@ const Layout: React.FC = () => {
         toggleSidebarCollapse={toggleSidebarCollapse}
       />
       <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out z-10 ${isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'}`}>
+        <TrialBanner />
         <Header 
           toggleSidebar={toggleSidebar}
           isCollapsed={isSidebarCollapsed}
