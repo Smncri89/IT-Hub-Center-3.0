@@ -188,33 +188,33 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isCollapsed, toggleSideb
 
     return (
         <header
-            className="sticky top-0 z-30 glass-header flex items-center justify-between flex-shrink-0 shadow-sm"
-            style={{ height: isMobile ? 56 : 80, padding: isMobile ? '0 12px' : '0 24px', maxWidth: '100%', overflow: 'visible' }}
+            className="sticky top-0 z-30 flex items-center justify-between flex-shrink-0 shadow-sm bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-b border-neutral-200/50 dark:border-neutral-800/50"
+            style={{ height: isMobile ? 56 : 80, padding: isMobile ? '0 8px' : '0 24px', maxWidth: '100%', overflow: 'visible' }}
         >
-            <div className="flex items-center flex-shrink-0">
-                <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 active:scale-95">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-                </button>
+            <div style={{ flexShrink: 0 }}>
+                {isMobile && (
+                    <button onClick={toggleSidebar} className="p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 active:scale-95">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                )}
             </div>
 
-            <div className="flex items-center gap-1 flex-shrink-0" style={{ gap: isMobile ? 4 : 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 2 : 16, flexShrink: 0 }}>
                 <button
                     onClick={openCommandPalette}
-                    className="p-2 rounded-full bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-500 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 active:scale-95 transition-all"
-                    style={isMobile ? {} : { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', width: 260 }}
+                    className="rounded-full bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-500 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 active:scale-95 transition-all"
+                    style={isMobile
+                        ? { padding: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }
+                        : { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', width: 260 }
+                    }
                 >
-                    <div className="flex items-center gap-2">
-                        {React.cloneElement(ICONS.search, { className: "h-4 w-4" })}
-                        {!isMobile && <span className="text-sm">{t('search or jump to')}</span>}
-                    </div>
+                    {React.cloneElement(ICONS.search, { className: "h-4 w-4" })}
+                    {!isMobile && <span className="text-sm">{t('search or jump to')}</span>}
                     {!isMobile && <kbd className="ml-auto font-sans text-[10px] font-bold bg-white dark:bg-neutral-700 px-1.5 py-0.5 rounded shadow-sm border border-neutral-200 dark:border-neutral-600 text-neutral-400">⌘K</kbd>}
                 </button>
 
-                <div className="flex items-center">
-                    <ThemeToggle />
-                    <Notifications />
-                </div>
-
+                <ThemeToggle />
+                <Notifications />
                 <UserMenu />
             </div>
         </header>

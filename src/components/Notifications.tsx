@@ -9,28 +9,25 @@ const Notifications: React.FC = () => {
     const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
     const { t } = useLocalization();
     const navigate = useNavigate();
+    const isMobile = window.innerWidth < 768;
 
     useEffect(() => {
         let timer: number | undefined;
-
         if (isOpen) {
-            timer = window.setTimeout(() => {
-                setIsOpen(false);
-            }, 10000); // 10 seconds
+            timer = window.setTimeout(() => setIsOpen(false), 10000);
+            if (isMobile) document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
         }
-
         return () => {
-            if (timer) {
-                clearTimeout(timer);
-            }
+            if (timer) clearTimeout(timer);
+            document.body.style.overflow = '';
         };
     }, [isOpen]);
 
     const handleNotificationClick = (notification: Notification) => {
         markAsRead(notification.id);
-        if (notification.link) {
-            navigate(notification.link);
-        }
+        if (notification.link) navigate(notification.link);
         setIsOpen(false);
     };
 
@@ -46,14 +43,43 @@ const Notifications: React.FC = () => {
         error: { bg: 'bg-red-500', text: 'text-red-800 dark:text-red-200', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg> },
     };
 
+    const notificationList = (
+        <>
+            <div className="p-3 flex justify-between items-center border-b dark:border-neutral-700">
+                <h3 className="font-semibold">{t('notifications')}</h3>
+                {unreadCount > 0 && (
+                    <button onClick={handleMarkAllRead} className="text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                        {t('mark_all_as_read')}
+                    </button>
+                )}
+            </div>
+            <div style={{ maxHeight: isMobile ? '60vh' : 384, overflowY: 'auto' }}>
+                {notifications.length > 0 ? (
+                    notifications.map(n => (
+                        <div key={n.id} onClick={() => handleNotificationClick(n)} className={`flex items-start p-3 gap-3 border-b dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700/50 cursor-pointer ${n.read ? 'opacity-60' : ''}`}>
+                            <div className={`flex-shrink-0 mt-0.5 ${typeClasses[n.type].text}`}>{typeClasses[n.type].icon}</div>
+                            <div className="flex-1">
+                                <p className="text-sm">{n.message}</p>
+                                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{new Date(n.timestamp).toLocaleString()}</p>
+                            </div>
+                            {!n.read && <div className={`flex-shrink-0 h-2 w-2 rounded-full mt-1.5 ${typeClasses[n.type].bg}`}></div>}
+                        </div>
+                    ))
+                ) : (
+                    <p className="p-4 text-sm text-neutral-500 text-center">{t('no_notifications')}</p>
+                )}
+            </div>
+        </>
+    );
+
     return (
-        <div className="relative">
+        <div style={{ position: 'relative' }}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300"
                 title={t('notifications')}
             >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                 {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 flex h-4 w-4">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -62,32 +88,30 @@ const Notifications: React.FC = () => {
                 )}
             </button>
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-neutral-800 rounded-md shadow-lg z-50 border dark:border-neutral-700">
-                    <div className="p-3 flex justify-between items-center border-b dark:border-neutral-700">
-                      <h3 className="font-semibold">{t('notifications')}</h3>
-                      {unreadCount > 0 && (
-                        <button onClick={handleMarkAllRead} className="text-xs text-primary-600 dark:text-primary-400 hover:underline">
-                          {t('mark_all_as_read')}
-                        </button>
-                      )}
+                isMobile ? (
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 100 }} onClick={() => setIsOpen(false)}>
+                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} />
+                        <div
+                            onClick={e => e.stopPropagation()}
+                            className="bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700"
+                            style={{
+                                position: 'absolute', bottom: 0, left: 0, right: 0,
+                                borderRadius: '16px 16px 0 0',
+                                animation: 'sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                                paddingBottom: 'env(safe-area-inset-bottom, 8px)',
+                            }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12, paddingBottom: 4 }}>
+                                <div style={{ width: 40, height: 4, borderRadius: 2, background: '#94a3b8' }}></div>
+                            </div>
+                            {notificationList}
+                        </div>
                     </div>
-                    <div className="max-h-96 overflow-y-auto">
-                        {notifications.length > 0 ? (
-                            notifications.map(n => (
-                                <div key={n.id} onClick={() => handleNotificationClick(n)} className={`flex items-start p-3 gap-3 border-b dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700/50 cursor-pointer ${n.read ? 'opacity-60' : ''}`}>
-                                    <div className={`flex-shrink-0 mt-0.5 ${typeClasses[n.type].text}`}>{typeClasses[n.type].icon}</div>
-                                    <div className="flex-1">
-                                        <p className="text-sm">{n.message}</p>
-                                        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{new Date(n.timestamp).toLocaleString()}</p>
-                                    </div>
-                                    {!n.read && <div className={`flex-shrink-0 h-2 w-2 rounded-full mt-1.5 ${typeClasses[n.type].bg}`}></div>}
-                                </div>
-                            ))
-                        ) : (
-                            <p className="p-4 text-sm text-neutral-500 text-center">{t('no_notifications')}</p>
-                        )}
+                ) : (
+                    <div className="absolute right-0 mt-2 bg-white dark:bg-neutral-800 rounded-md shadow-lg z-50 border dark:border-neutral-700" style={{ width: 384 }}>
+                        {notificationList}
                     </div>
-                </div>
+                )
             )}
         </div>
     );

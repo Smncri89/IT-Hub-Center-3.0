@@ -46,7 +46,7 @@ const Layout: React.FC = () => {
         isCollapsed={isSidebarCollapsed}
         toggleSidebarCollapse={toggleSidebarCollapse}
       />
-      <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out z-10 ${isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'}`}>
+      <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out z-10 min-w-0 ${isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'}`}>
         <TrialBanner />
         <Header 
           toggleSidebar={toggleSidebar}
@@ -55,8 +55,8 @@ const Layout: React.FC = () => {
           openCommandPalette={() => setIsCommandPaletteOpen(true)}
         />
         <div className="flex-1 flex flex-col min-h-0 min-w-0 relative">
-          <main key={location.pathname} className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth custom-scrollbar min-w-0">
-            <div className="w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 flex-grow animate-fade-in flex flex-col min-w-0 overflow-x-hidden">
+          <main key={location.pathname} className="flex-1 flex flex-col overflow-y-auto scroll-smooth min-w-0">
+            <div className="w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 flex-grow animate-fade-in flex flex-col min-w-0">
               <PWAInstallBanner />
               <Outlet />
             </div>
