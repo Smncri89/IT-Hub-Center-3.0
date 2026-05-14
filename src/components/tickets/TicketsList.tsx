@@ -471,39 +471,39 @@ export const TicketsList: React.FC = () => {
     if (isLoading) return <Spinner />;
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{t('tickets')}</h1>
-                <div className="flex items-center gap-2">
+        <div className="space-y-4 md:space-y-6 min-w-0">
+            <div className="flex flex-wrap justify-between items-center gap-3">
+                <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100">{t('tickets')}</h1>
+                <div className="flex flex-wrap items-center gap-2">
                     {canManage && (
                         <>
-                            <button onClick={handleImportClick} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700">
+                            <button onClick={handleImportClick} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700">
                                 {React.cloneElement(ICONS.upload as React.ReactElement<{ className?: string }>, { className: "h-4 w-4"})}
-                                <span className="hidden sm:inline">{t('import')}</span>
+                                <span className="hidden md:inline">{t('import')}</span>
                             </button>
-                            <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700">
+                            <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700">
                                 {React.cloneElement(ICONS.download as React.ReactElement<{ className?: string }>, { className: "h-4 w-4"})}
-                                <span className="hidden sm:inline">{t('export')}</span>
+                                <span className="hidden md:inline">{t('export')}</span>
                             </button>
                         </>
                     )}
-                    <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg flex text-sm font-medium">
-                        <button 
-                            onClick={() => setViewMode('list')} 
-                            className={`px-3 py-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'}`}
+                    <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg flex text-xs md:text-sm font-medium">
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`px-2 md:px-3 py-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'}`}
                         >
                             {t('switch to list view')}
                         </button>
-                        <button 
-                            onClick={() => setViewMode('board')} 
-                            className={`px-3 py-1.5 rounded-md transition-all ${viewMode === 'board' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'}`}
+                        <button
+                            onClick={() => setViewMode('board')}
+                            className={`px-2 md:px-3 py-1.5 rounded-md transition-all ${viewMode === 'board' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'}`}
                         >
                             {t('switch to board view')}
                         </button>
                     </div>
-                    <button onClick={() => { setModalDefaults(null); setIsModalOpen(true); }} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">
+                    <button onClick={() => { setModalDefaults(null); setIsModalOpen(true); }} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">
                         {React.cloneElement(ICONS.plus, { className: "h-4 w-4"})}
-                        <span>{t('new ticket')}</span>
+                        <span className="hidden md:inline">{t('new ticket')}</span>
                     </button>
                 </div>
             </div>

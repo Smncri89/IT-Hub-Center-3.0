@@ -165,33 +165,29 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ toggleSidebar, isCollapsed, toggleSidebarCollapse, openCommandPalette }) => {
     const { t } = useLocalization();
     return (
-        <header className="sticky top-0 z-30 h-14 sm:h-16 md:h-20 glass-header flex items-center justify-between px-2 sm:px-4 md:px-6 lg:px-10 flex-shrink-0 transition-all duration-300 shadow-sm">
-            <div className="flex items-center gap-1 flex-shrink-0">
+        <header className="sticky top-0 z-30 h-14 md:h-20 glass-header flex items-center justify-between px-3 md:px-6 lg:px-10 flex-shrink-0 transition-all duration-300 shadow-sm min-w-0">
+            <div className="flex items-center flex-shrink-0">
                 <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 active:scale-95">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
             </div>
 
-            <div className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
+            <div className="flex items-center gap-1 md:gap-4 flex-shrink-0">
                 <button
                     onClick={openCommandPalette}
-                    className="p-2 sm:p-0 sm:flex sm:items-center sm:gap-2 sm:text-sm sm:py-2 sm:px-4 rounded-full bg-neutral-100/80 dark:bg-neutral-800/80 border border-transparent hover:border-primary-300 dark:hover:border-primary-700 text-neutral-500 dark:text-neutral-400 md:w-64 lg:w-72 sm:justify-between transition-all group hover:shadow-sm hover:bg-white dark:hover:bg-neutral-800 active:scale-95"
+                    className="p-2 md:flex md:items-center md:gap-2 md:text-sm md:py-2 md:px-4 rounded-full bg-neutral-100/80 dark:bg-neutral-800/80 border border-transparent hover:border-primary-300 dark:hover:border-primary-700 text-neutral-500 dark:text-neutral-400 md:w-64 lg:w-72 md:justify-between transition-all group hover:shadow-sm hover:bg-white dark:hover:bg-neutral-800 active:scale-95"
                 >
                     <div className="flex items-center gap-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                         {React.cloneElement(ICONS.search, { className: "h-4 w-4" })}
-                        <span className="hidden sm:inline text-sm">{t('search or jump to')}</span>
+                        <span className="hidden md:inline text-sm">{t('search or jump to')}</span>
                     </div>
-                    <kbd className="hidden md:inline font-sans text-[10px] font-bold bg-white dark:bg-neutral-700 px-1.5 py-0.5 rounded shadow-sm border border-neutral-200 dark:border-neutral-600 text-neutral-400 dark:text-neutral-500">⌘K</kbd>
+                    <kbd className="hidden lg:inline font-sans text-[10px] font-bold bg-white dark:bg-neutral-700 px-1.5 py-0.5 rounded shadow-sm border border-neutral-200 dark:border-neutral-600 text-neutral-400 dark:text-neutral-500">⌘K</kbd>
                 </button>
-
-                <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-800 hidden md:block"></div>
 
                 <div className="flex items-center">
                     <ThemeToggle />
                     <Notifications />
                 </div>
-
-                <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-800 hidden md:block"></div>
 
                 <UserMenu />
             </div>

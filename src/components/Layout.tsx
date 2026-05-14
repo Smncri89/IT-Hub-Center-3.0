@@ -54,9 +54,9 @@ const Layout: React.FC = () => {
           toggleSidebarCollapse={toggleSidebarCollapse}
           openCommandPalette={() => setIsCommandPaletteOpen(true)}
         />
-        <div className="flex-1 flex flex-col min-h-0 relative">
-          <main key={location.pathname} className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth custom-scrollbar">
-            <div className="w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 flex-grow animate-fade-in flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0 min-w-0 relative">
+          <main key={location.pathname} className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth custom-scrollbar min-w-0">
+            <div className="w-full max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 flex-grow animate-fade-in flex flex-col min-w-0 overflow-x-hidden">
               <PWAInstallBanner />
               <Outlet />
             </div>
