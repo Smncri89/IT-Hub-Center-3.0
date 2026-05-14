@@ -70,6 +70,8 @@ const UserFormModal: React.FC<{
         setFormData(prev => ({ ...prev, [name]: value }));
     };
     
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
     const handleSave = async () => {
         if (!formData.name || !formData.email) {
             setError(t('fill required fields'));
@@ -82,9 +84,10 @@ const UserFormModal: React.FC<{
                 await updateUser(userToEdit.id, formData);
             } else {
                 await createUser(formData);
+                setSuccessMessage(`${t('invite sent to')} ${formData.email}`);
             }
             refetchData('users');
-            onClose();
+            if (isEditMode) onClose();
         } catch (error: any) {
             console.error("Failed to save user:", error);
             setError(t(error.message || 'unexpected error'));
@@ -92,53 +95,82 @@ const UserFormModal: React.FC<{
             setIsSaving(false);
         }
     };
-    
+
     if (!isRendered) return null;
-    
+
     const isEditingSelf = isEditMode && currentUser?.id === userToEdit?.id;
 
     const labelStyle = "block text-sm font-medium text-neutral-600 dark:text-neutral-300";
     const inputStyle = "mt-1 block w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md shadow-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition";
 
+    const handleCloseSuccess = () => {
+        setSuccessMessage(null);
+        onClose();
+    };
+
     return (
-        <div className={`fixed inset-0 bg-black z-40 flex justify-center items-center transition-opacity duration-200 ${isAnimating ? 'bg-opacity-50' : 'bg-opacity-0'}`} onClick={onClose}>
+        <div className={`fixed inset-0 bg-black z-40 flex justify-center items-center transition-opacity duration-200 ${isAnimating ? 'bg-opacity-50' : 'bg-opacity-0'}`} onClick={successMessage ? handleCloseSuccess : onClose}>
             <div className={`bg-white dark:bg-neutral-800 rounded-lg shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] transition-all duration-300 ${isAnimating ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-10 scale-95'}`} onClick={e => e.stopPropagation()}>
-                <header className="p-5 border-b border-neutral-200 dark:border-neutral-700 flex-shrink-0">
-                    <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">{isEditMode ? t('edit user') : t('invite user')}</h2>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">{!isEditMode && t('invite user desc')}</p>
-                </header>
-                <main className="p-6 space-y-6 overflow-y-auto">
-                    {error && <div className="p-3 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 rounded-md text-sm">{error}</div>}
-                    <div>
-                        <label htmlFor="name" className={labelStyle}>{t('full name')}</label>
-                        <input type="text" name="name" id="name" value={formData.name} onChange={handleChange} className={inputStyle} />
-                    </div>
-                    <div>
-                        <label htmlFor="email" className={labelStyle}>{t('email address')}</label>
-                        <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} disabled={isEditMode} className={`${inputStyle} disabled:bg-neutral-100 dark:disabled:bg-neutral-700/50 disabled:cursor-not-allowed`} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-6">
-                        <div>
-                            <label htmlFor="role" className={labelStyle}>{t('user role')}</label>
-                            <select name="role" id="role" value={formData.role} onChange={handleChange} disabled={isEditingSelf} className={`${inputStyle} disabled:opacity-50 disabled:cursor-not-allowed`}>
-                                {Object.values(Role).map((role: string) => (
-                                    <option key={role} value={role}>{t(`role ${role.toLowerCase().replace(/ /g, '-')}`)}</option>
-                                ))}
-                            </select>
-                            {isEditingSelf && <p className="text-xs text-neutral-500 mt-1">{t('cannot change own role')}</p>}
-                        </div>
-                        <div>
-                            <label htmlFor="company" className={labelStyle}>{t('company')}</label>
-                            <input type="text" name="company" id="company" value={formData.company} onChange={handleChange} className={inputStyle} />
-                        </div>
-                    </div>
-                </main>
-                <footer className="p-4 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 flex justify-end gap-3 flex-shrink-0">
-                    <button onClick={onClose} className="px-4 py-2 text-sm font-medium rounded-md bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-200">{t('cancel')}</button>
-                    <button onClick={handleSave} disabled={isSaving} className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 disabled:opacity-50">
-                        {isSaving ? <Spinner size="sm" /> : (isEditMode ? t('save changes') : t('invite'))}
-                    </button>
-                </footer>
+                {successMessage ? (
+                    <>
+                        <header className="p-5 border-b border-neutral-200 dark:border-neutral-700 flex-shrink-0">
+                            <h2 className="text-xl font-semibold text-green-600 dark:text-green-400">{t('user invited')}</h2>
+                        </header>
+                        <main className="p-6 space-y-4">
+                            <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                                <svg className="w-6 h-6 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <p className="text-sm text-green-700 dark:text-green-300">{successMessage}</p>
+                            </div>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                {t('invite email info')}
+                            </p>
+                        </main>
+                        <footer className="p-4 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 flex justify-end flex-shrink-0">
+                            <button onClick={handleCloseSuccess} className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">
+                                {t('close')}
+                            </button>
+                        </footer>
+                    </>
+                ) : (
+                    <>
+                        <header className="p-5 border-b border-neutral-200 dark:border-neutral-700 flex-shrink-0">
+                            <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">{isEditMode ? t('edit user') : t('invite user')}</h2>
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">{!isEditMode && t('invite user desc')}</p>
+                        </header>
+                        <main className="p-6 space-y-6 overflow-y-auto">
+                            {error && <div className="p-3 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 rounded-md text-sm">{error}</div>}
+                            <div>
+                                <label htmlFor="name" className={labelStyle}>{t('full name')}</label>
+                                <input type="text" name="name" id="name" value={formData.name} onChange={handleChange} className={inputStyle} />
+                            </div>
+                            <div>
+                                <label htmlFor="email" className={labelStyle}>{t('email address')}</label>
+                                <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} disabled={isEditMode} className={`${inputStyle} disabled:bg-neutral-100 dark:disabled:bg-neutral-700/50 disabled:cursor-not-allowed`} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label htmlFor="role" className={labelStyle}>{t('user role')}</label>
+                                    <select name="role" id="role" value={formData.role} onChange={handleChange} disabled={isEditingSelf} className={`${inputStyle} disabled:opacity-50 disabled:cursor-not-allowed`}>
+                                        {Object.values(Role).map((role: string) => (
+                                            <option key={role} value={role}>{t(`role ${role.toLowerCase().replace(/ /g, '-')}`)}</option>
+                                        ))}
+                                    </select>
+                                    {isEditingSelf && <p className="text-xs text-neutral-500 mt-1">{t('cannot change own role')}</p>}
+                                </div>
+                                <div>
+                                    <label htmlFor="company" className={labelStyle}>{t('company')}</label>
+                                    <input type="text" name="company" id="company" value={formData.company} onChange={handleChange} className={inputStyle} />
+                                </div>
+                            </div>
+                        </main>
+                        <footer className="p-4 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 flex justify-end gap-3 flex-shrink-0">
+                            <button onClick={onClose} className="px-4 py-2 text-sm font-medium rounded-md bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-200">{t('cancel')}</button>
+                            <button onClick={handleSave} disabled={isSaving} className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 disabled:opacity-50">
+                                {isSaving ? <Spinner size="sm" /> : (isEditMode ? t('save changes') : t('invite'))}
+                            </button>
+                        </footer>
+                    </>
+                )}
             </div>
         </div>
     );
