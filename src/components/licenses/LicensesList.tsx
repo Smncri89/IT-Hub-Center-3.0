@@ -294,7 +294,7 @@ const LicensesList: React.FC = () => {
 
             {isAdmin && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="glass-panel p-5 rounded-2xl shadow-sm flex items-center gap-4 border border-neutral-200/50 dark:border-neutral-700/50">
+                    <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-5 rounded-2xl shadow-sm flex items-center gap-4 border border-neutral-200/50 dark:border-neutral-700/50">
                         <div className="p-3 bg-primary-100 dark:bg-primary-900/50 rounded-xl text-primary-600 dark:text-primary-400">
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.002 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.002 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
                         </div>
@@ -303,7 +303,7 @@ const LicensesList: React.FC = () => {
                             <p className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">{formatCurrency(totalCompanyCost)}</p>
                         </div>
                     </div>
-                    <div className="glass-panel p-5 rounded-2xl shadow-sm flex items-center gap-4 border border-neutral-200/50 dark:border-neutral-700/50">
+                    <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-5 rounded-2xl shadow-sm flex items-center gap-4 border border-neutral-200/50 dark:border-neutral-700/50">
                          <div className="p-3 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl text-emerald-600 dark:text-emerald-400">
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                         </div>
@@ -312,7 +312,7 @@ const LicensesList: React.FC = () => {
                             <p className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">{formatCurrency(averageCostPerUser)}</p>
                         </div>
                     </div>
-                     <div className="glass-panel p-5 rounded-2xl shadow-sm flex items-center gap-4 border border-neutral-200/50 dark:border-neutral-700/50">
+                     <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-5 rounded-2xl shadow-sm flex items-center gap-4 border border-neutral-200/50 dark:border-neutral-700/50">
                          <div className="p-3 bg-amber-100 dark:bg-amber-900/50 rounded-xl text-amber-600 dark:text-amber-400">
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                         </div>
@@ -325,7 +325,7 @@ const LicensesList: React.FC = () => {
             )}
 
             <MobileFilterToggle>
-            <div className="glass-panel p-5 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50">
+            <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2">
                         <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-1.5 uppercase tracking-wider block">{t('search')}</label>

@@ -74,20 +74,22 @@ const AIAssistant: React.FC = () => {
     return (
         <button
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 bg-primary-600 text-white p-4 rounded-full shadow-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 z-40 transform hover:scale-110 transition-transform"
+            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-primary-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 z-40 transform hover:scale-110 transition-transform"
+            style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
             aria-label={t('ai assistant')}
         >
-            {React.cloneElement(ICONS.sparkle_chat, { className: 'w-8 h-8' })}
+            {React.cloneElement(ICONS.sparkle_chat, { className: 'w-6 h-6 sm:w-8 sm:h-8' })}
         </button>
     );
   }
 
   return (
     <>
-      <div 
-        className={`fixed bottom-6 right-6 z-40 transition-all duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}
+      <div
+        className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 transition-all duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}
+        style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-80 h-[28rem] flex flex-col border dark:border-neutral-700">
+        <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-[calc(100vw-2rem)] sm:w-80 max-h-[70vh] sm:h-[28rem] flex flex-col border dark:border-neutral-700">
           <header className="flex items-center justify-between p-3 border-b dark:border-neutral-700 flex-shrink-0">
             <div className="flex items-center gap-2">
               {React.cloneElement(ICONS.sparkle, { className: 'w-5 h-5 text-primary-500' })}

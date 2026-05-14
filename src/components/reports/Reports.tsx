@@ -59,7 +59,7 @@ const CurrencyUtils = {
 
 // --- COMPONENTS ---
 const ChartWrapper: React.FC<{ title: string; children: React.ReactNode; hasData: boolean; height?: number; subtitle?: string }> = ({ title, children, hasData, height = 350, subtitle }) => (
-  <div className="glass-panel p-6 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50 flex flex-col bg-white dark:bg-neutral-900/50 backdrop-blur-sm transition-all hover:border-primary-500/30">
+  <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50 flex flex-col bg-white dark:bg-neutral-900/50 backdrop-blur-sm transition-all hover:border-primary-500/30">
     <div className="mb-6 flex-shrink-0">
         <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">{title}</h3>
         {subtitle && <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{subtitle}</p>}
@@ -75,7 +75,7 @@ const ChartWrapper: React.FC<{ title: string; children: React.ReactNode; hasData
 );
 
 const StatCard = ({ title, value, subtext, icon, trend, trendValue, colorClass }: any) => (
-  <div className="glass-panel p-5 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50 bg-white dark:bg-neutral-900/50">
+  <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50 bg-white dark:bg-neutral-900/50">
     <div className="flex justify-between items-start mb-4">
       <span className="text-xs font-bold uppercase text-neutral-500 dark:text-neutral-400 tracking-wider truncate pr-2">{title}</span>
       <div className={`p-2 rounded-lg ${colorClass} bg-opacity-10 dark:bg-opacity-20 flex-shrink-0`}>
@@ -853,7 +853,7 @@ const Reports: React.FC = () => {
                             </ResponsiveContainer>
                         </ChartWrapper>
 
-                        <div className="glass-panel p-6 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50 flex flex-col bg-white dark:bg-neutral-900/50 backdrop-blur-sm h-[350px] min-h-[350px]">
+                        <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50 flex flex-col bg-white dark:bg-neutral-900/50 backdrop-blur-sm h-[350px] min-h-[350px]">
                             <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2 mb-4">{t('report expiring warranties')}</h3>
                             {assetReportMetrics.expiringAssets.length > 0 ? (
                                 <ul className="space-y-3 overflow-y-auto flex-1 custom-scrollbar pr-2">
@@ -916,7 +916,7 @@ const Reports: React.FC = () => {
                     </ChartWrapper>
                     
                     <div className="grid grid-cols-1 gap-4">
-                        <div className="glass-panel p-6 rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between bg-white dark:bg-neutral-900/50 h-[165px]">
+                        <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-6 rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between bg-white dark:bg-neutral-900/50 h-[165px]">
                              <div>
                                  <p className="text-xs font-bold uppercase text-neutral-500">MVP Agent</p>
                                  <p className="text-xl font-black">{userStats.topAgent.name}</p>
@@ -927,7 +927,7 @@ const Reports: React.FC = () => {
                                  <span className="text-[10px] font-bold text-white bg-emerald-500 px-2 py-1 rounded-full inline-block mt-1">TOP SOLVER</span>
                              </div>
                         </div>
-                        <div className="glass-panel p-6 rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between bg-white dark:bg-neutral-900/50 h-[165px]">
+                        <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-6 rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between bg-white dark:bg-neutral-900/50 h-[165px]">
                              <div>
                                  <p className="text-xs font-bold uppercase text-neutral-500">Top Requester</p>
                                  <p className="text-xl font-black">{userStats.topRequester.name}</p>
@@ -943,7 +943,7 @@ const Reports: React.FC = () => {
             )}
 
             {activeTab === 'audit' && (
-                <div className="glass-panel rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 overflow-hidden bg-white dark:bg-neutral-900/50">
+                <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 overflow-hidden bg-white dark:bg-neutral-900/50">
                     <div className="p-6 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-800/20">
                         <div>
                             <h3 className="font-bold text-lg text-neutral-900 dark:text-white">Audit Trail</h3>

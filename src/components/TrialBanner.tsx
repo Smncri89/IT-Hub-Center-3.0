@@ -31,7 +31,7 @@ const TrialBanner: React.FC = () => {
 
   if (daysLeft <= 0) {
     return (
-      <div className="bg-red-600 text-white text-center py-2 px-4 text-sm font-medium">
+      <div className="bg-red-600 text-white text-center py-1.5 sm:py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium">
         Your trial has expired. Please upgrade to continue using IT Hub Center.
       </div>
     );
@@ -40,11 +40,11 @@ const TrialBanner: React.FC = () => {
   if (daysLeft > 7) return null;
 
   return (
-    <div className="bg-amber-500 text-white text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-2">
+    <div className="bg-amber-500 text-white text-center py-1.5 sm:py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 flex-wrap">
       <span>{daysLeft} day{daysLeft !== 1 ? 's' : ''} left in your trial.</span>
       <button
         onClick={() => setDismissed(true)}
-        className="ml-2 text-white/80 hover:text-white"
+        className="ml-1 text-white/80 hover:text-white text-lg leading-none"
       >
         &times;
       </button>

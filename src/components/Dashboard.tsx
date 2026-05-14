@@ -42,9 +42,9 @@ const DEFAULT_DASHBOARD_CONFIG: DashboardConfig = {
 // --- HELPER COMPONENTS ---
 
 const DashboardWidget: React.FC<{ title: string; children: React.ReactNode; className?: string; action?: React.ReactNode }> = ({ title, children, className = "", action }) => (
-    <div className={`glass-panel rounded-3xl p-6 flex flex-col transition-all duration-300 hover:shadow-soft border-white/40 dark:border-white/5 ${className}`}>
-        <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2">
+    <div className={`bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col transition-all duration-300 hover:shadow-soft border border-neutral-200/50 dark:border-neutral-700/50 ${className}`}>
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-bold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2">
                 {title}
             </h3>
             {action}
@@ -56,21 +56,21 @@ const DashboardWidget: React.FC<{ title: string; children: React.ReactNode; clas
 );
 
 const StatCard: React.FC<{ value: string | number; label: string; colorClass: string; to: string; icon?: React.ReactNode }> = ({ value, label, colorClass, to, icon }) => (
-    <Link to={to} className={`relative overflow-hidden group p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-xl shadow-lg h-full border border-white/10 ${colorClass}`}>
+    <Link to={to} className={`relative overflow-hidden group p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-xl shadow-lg h-full border border-white/10 ${colorClass}`}>
         <div className="relative z-10">
-            <span className="text-5xl font-extrabold tracking-tight block mb-1 drop-shadow-sm">{value}</span>
-            <span className="text-xs font-bold uppercase tracking-widest opacity-90">{label}</span>
+            <span className="text-3xl sm:text-5xl font-extrabold tracking-tight block mb-1 drop-shadow-sm">{value}</span>
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest opacity-90">{label}</span>
         </div>
         {icon && <div className="absolute -bottom-6 -right-6 opacity-10 group-hover:opacity-20 transition-opacity scale-[2.5] rotate-12">{icon}</div>}
     </Link>
 );
 
 const ActionButton: React.FC<{ label: string; to: string; state?: object; icon: React.ReactElement<{ className?: string }>; color: string }> = ({ label, to, state, icon, color }) => (
-    <Link to={to} state={state} className={`relative overflow-hidden rounded-2xl p-4 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group border border-transparent hover:border-white/20 shadow-md ${color}`}>
-        <div className="p-3 bg-white/20 rounded-full mb-3 backdrop-blur-md shadow-inner">
-            {React.cloneElement(icon, { className: 'w-6 h-6 text-white' })}
+    <Link to={to} state={state} className={`relative overflow-hidden rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group border border-transparent hover:border-white/20 shadow-md ${color}`}>
+        <div className="p-2 sm:p-3 bg-white/20 rounded-full mb-2 sm:mb-3 backdrop-blur-md shadow-inner">
+            {React.cloneElement(icon, { className: 'w-5 h-5 sm:w-6 sm:h-6 text-white' })}
         </div>
-        <span className="text-xs font-bold uppercase tracking-wide text-white">{label}</span>
+        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-white">{label}</span>
     </Link>
 );
 
@@ -197,7 +197,7 @@ const SlaWidget: React.FC<{ tickets: Ticket[], t: Function }> = ({ tickets, t })
     const bgMap: Record<string, string> = { emerald: 'bg-emerald-900/30 text-emerald-400', amber: 'bg-amber-900/30 text-amber-400', rose: 'bg-rose-900/30 text-rose-400' };
 
     return (
-        <Link to="/tickets" className="block h-full bg-neutral-900 dark:bg-black rounded-3xl p-6 relative overflow-hidden group border border-neutral-800 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+        <Link to="/tickets" className="block h-full bg-neutral-900 dark:bg-black rounded-2xl sm:rounded-3xl p-4 sm:p-6 relative overflow-hidden group border border-neutral-800 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
             <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="flex flex-col items-center justify-center text-center h-full relative z-10">
                 <div className="relative mb-4">
@@ -384,13 +384,11 @@ const EndUserDashboard: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-fade-in pb-12">
-            <div className="flex flex-col md:flex-row justify-between items-end gap-4">
-                <div>
-                    <h1 className="text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
-                        {t('greeting user', { name: user?.name.split(' ')[0] || '' })}
-                    </h1>
-                    <p className="text-neutral-500 dark:text-neutral-400 mt-1">How can we help you today?</p>
-                </div>
+            <div>
+                <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
+                    {t('greeting user', { name: user?.name.split(' ')[0] || '' })}
+                </h1>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">How can we help you today?</p>
             </div>
             
             {/* Global Announcement - Visible to Everyone */}
@@ -409,8 +407,8 @@ const EndUserDashboard: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Recent Tickets List */}
-                <div className="lg:col-span-2 glass-panel rounded-3xl overflow-hidden border border-white/50 dark:border-neutral-700 shadow-soft flex flex-col h-full">
-                    <div className="p-6 border-b border-neutral-100 dark:border-neutral-700/50 flex justify-between items-center bg-white/50 dark:bg-neutral-800/50">
+                <div className="lg:col-span-2 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-200/50 dark:border-neutral-700 shadow-soft flex flex-col h-full">
+                    <div className="p-4 sm:p-6 border-b border-neutral-100 dark:border-neutral-700/50 flex justify-between items-center bg-white/50 dark:bg-neutral-800/50">
                         <h3 className="text-lg font-bold text-neutral-900 dark:text-white tracking-tight">{t('your recent tickets')}</h3>
                         <Link to="/tickets" className="text-xs font-bold text-primary-600 dark:text-primary-400 hover:underline uppercase tracking-wide">{t('view all tickets')}</Link>
                     </div>
@@ -521,17 +519,17 @@ const AdminAgentDashboard: React.FC = () => {
             {/* Global Announcement - Visible to Admins too */}
             <AnnouncementBanner t={t} />
 
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-black text-neutral-900 dark:text-white tracking-tight">{t('dashboard')}</h1>
-                    <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-1">Overview of IT operations</p>
+            <div className="flex justify-between items-start sm:items-center gap-3">
+                <div className="min-w-0">
+                    <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">{t('dashboard')}</h1>
+                    <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-1">Overview of IT operations</p>
                 </div>
-                <button 
+                <button
                     onClick={() => setIsConfigModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all shadow-sm hover:shadow-md text-neutral-700 dark:text-neutral-200"
+                    className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all shadow-sm hover:shadow-md text-neutral-700 dark:text-neutral-200 flex-shrink-0"
                 >
                     {React.cloneElement(ICONS.settings as React.ReactElement<{ className?: string }>, { className: "w-4 h-4" })}
-                    {t('customize')}
+                    <span className="hidden sm:inline">{t('customize')}</span>
                 </button>
             </div>
 

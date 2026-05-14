@@ -213,7 +213,7 @@ const Login: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="glass-panel rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/50 dark:border-neutral-700/50">
+                <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/50 dark:border-neutral-700/50">
                     {requires2FA ? (
                         render2FAForm()
                     ) : (
