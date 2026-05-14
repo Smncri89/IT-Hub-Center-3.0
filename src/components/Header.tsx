@@ -25,10 +25,10 @@ const UserMenu: React.FC = () => {
         <div className="relative">
             <button 
                 onClick={() => setIsOpen(!isOpen)} 
-                className="flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800/50 transition-all border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 group active:scale-95"
+                className="flex items-center gap-2 sm:gap-3 pl-1.5 sm:pl-2 pr-2 sm:pr-4 py-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800/50 transition-all border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 group active:scale-95"
             >
                 <div className="relative">
-                    <img className="h-9 w-9 rounded-full object-cover ring-2 ring-white dark:ring-neutral-800 shadow-sm" src={user.avatarUrl} alt={user.name} />
+                    <img className="h-8 w-8 sm:h-9 sm:w-9 rounded-full object-cover ring-2 ring-white dark:ring-neutral-800 shadow-sm" src={user.avatarUrl} alt={user.name} />
                     <span className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white dark:ring-neutral-900 ${statusClasses[status]}`}></span>
                 </div>
                 <div className="hidden md:block text-left">
@@ -119,24 +119,23 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ toggleSidebar, isCollapsed, toggleSidebarCollapse, openCommandPalette }) => {
     const { t } = useLocalization();
     return (
-        <header className="sticky top-0 z-30 h-20 glass-header flex items-center justify-between px-6 lg:px-10 flex-shrink-0 transition-all duration-300 shadow-sm">
-            <div className="flex items-center gap-4">
-                {/* Desktop toggle removed from here */}
+        <header className="sticky top-0 z-30 h-16 md:h-20 glass-header flex items-center justify-between px-3 sm:px-6 lg:px-10 flex-shrink-0 transition-all duration-300 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2 flex-shrink-0">
                 <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    <svg className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
             </div>
-            
-            <div className="flex items-center gap-3 md:gap-6">
+
+            <div className="flex items-center gap-1 sm:gap-3 md:gap-6 flex-shrink-0">
                 <button
                     onClick={openCommandPalette}
-                    className="hidden md:flex items-center gap-3 text-sm py-2.5 px-5 rounded-full bg-neutral-100/80 dark:bg-neutral-800/80 border border-transparent hover:border-primary-300 dark:hover:border-primary-700 text-neutral-500 dark:text-neutral-400 w-72 justify-between transition-all group hover:shadow-sm hover:bg-white dark:hover:bg-neutral-800"
+                    className="flex items-center gap-2 text-sm py-2 px-3 sm:px-5 rounded-full bg-neutral-100/80 dark:bg-neutral-800/80 border border-transparent hover:border-primary-300 dark:hover:border-primary-700 text-neutral-500 dark:text-neutral-400 md:w-72 justify-between transition-all group hover:shadow-sm hover:bg-white dark:hover:bg-neutral-800"
                 >
                     <div className="flex items-center gap-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                         {React.cloneElement(ICONS.search, { className: "h-4 w-4"})}
-                        <span>{t('search or jump to')}</span>
+                        <span className="hidden md:inline">{t('search or jump to')}</span>
                     </div>
-                    <kbd className="font-sans text-[10px] font-bold bg-white dark:bg-neutral-700 px-2 py-0.5 rounded shadow-sm border border-neutral-200 dark:border-neutral-600 text-neutral-400 dark:text-neutral-500 group-hover:text-primary-600 dark:group-hover:text-primary-400">⌘K</kbd>
+                    <kbd className="hidden md:inline font-sans text-[10px] font-bold bg-white dark:bg-neutral-700 px-2 py-0.5 rounded shadow-sm border border-neutral-200 dark:border-neutral-600 text-neutral-400 dark:text-neutral-500 group-hover:text-primary-600 dark:group-hover:text-primary-400">⌘K</kbd>
                 </button>
                 
                 <div className="h-8 w-px bg-neutral-200 dark:bg-neutral-800 mx-1 hidden md:block"></div>
