@@ -13,6 +13,7 @@ import PolicySettings from './PolicySettings';
 import SLAPolicySettings from './SLAPolicySettings'; 
 import BackupSettings from './BackupSettings';
 import AuditLogSettings from './AuditLogSettings';
+import BillingSettings from './BillingSettings';
 import Spinner from '@/components/Spinner';
 
 const Settings: React.FC = () => {
@@ -28,6 +29,7 @@ const Settings: React.FC = () => {
         { id: 'sla', labelKey: 'sla policies', icon: ICONS.sla, component: <SLAPolicySettings />, allowedRoles: [Role.Admin] },
         { id: 'audit', labelKey: 'audit log', icon: ICONS.audit, component: <AuditLogSettings />, allowedRoles: [Role.Admin] },
         { id: 'backup', labelKey: 'settings backup', icon: ICONS.database, component: <BackupSettings />, allowedRoles: [Role.Admin] },
+        { id: 'billing', labelKey: 'settings billing', icon: ICONS.billing, component: <BillingSettings />, allowedRoles: [Role.Admin] },
         { id: 'application', labelKey: 'settings application', icon: ICONS.app, component: <ApplicationSettings />, allowedRoles: [Role.Admin, Role.Agent, Role.Member, Role.EndUser] },
     ], []);
 

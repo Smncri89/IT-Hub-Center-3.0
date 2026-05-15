@@ -14,7 +14,6 @@ const Footer: React.FC = () => {
   return (
     <footer className="py-6 px-8 text-center text-xs font-medium text-neutral-400 dark:text-neutral-600 space-y-1 mt-auto">
       <p>{t('copyright notice')}</p>
-      <p className="opacity-75">{t('developed by')}</p>
     </footer>
   );
 };

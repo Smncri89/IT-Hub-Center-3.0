@@ -55,6 +55,9 @@ const AssetMap = lazyRetry(() => import('@/components/maps/AssetMap'));
 const LocationsList = lazyRetry(() => import('@/components/locations/LocationsList'));
 const OnboardingList = lazyRetry(() => import('@/components/onboarding/OnboardingList'));
 const OnboardingDetail = lazyRetry(() => import('@/components/onboarding/OnboardingDetail'));
+const LandingPage = lazyRetry(() => import('@/components/LandingPage'));
+const PrivacyPolicy = lazyRetry(() => import('@/components/legal/PrivacyPolicy'));
+const TermsOfService = lazyRetry(() => import('@/components/legal/TermsOfService'));
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -95,13 +98,18 @@ const AppRoutes = () => {
   
   if (!isAuthenticated) {
     return (
+      <Suspense fallback={<div className="flex items-center justify-center h-screen"><Spinner /></div>}>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/update-password" element={<UpdatePassword />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     );
   }
 
@@ -148,6 +156,8 @@ const AppRoutes = () => {
           </Route>
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/register" element={<Navigate to="/" replace />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
         </Routes>
         </Suspense>
       </NotificationsProvider>

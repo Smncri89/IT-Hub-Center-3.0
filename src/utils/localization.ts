@@ -218,6 +218,7 @@ export const translations: Record<string, Record<Language, string>> = {
   'settings users': { en: 'Users', it: 'Utenti', es: 'Usuarios' },
   'settings integrations': { en: 'Integrations', it: 'Integrazioni', es: 'Integraciones' },
   'settings backup': { en: 'Backup & Restore', it: 'Backup & Ripristino', es: 'Copia de Seguridad y Restauración' },
+  'settings billing': { en: 'Billing', it: 'Fatturazione', es: 'Facturación' },
   'policies': { en: 'Policies', it: 'Policy', es: 'Políticas' },
   'sla policies': { en: 'SLA Policies', it: 'Policy SLA', es: 'Políticas de SLA' },
   'settings application': { en: 'Application', it: 'Applicazione', es: 'Aplicación' },

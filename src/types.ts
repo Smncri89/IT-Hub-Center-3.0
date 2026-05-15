@@ -267,3 +267,22 @@ export interface Integration {
   api_key: string;
   created_at: string;
 }
+
+export type PlanTier = 'free' | 'pro' | 'enterprise';
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url?: string;
+  plan: PlanTier;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
+  billing_email?: string;
+  max_users: number;
+  max_assets: number;
+  trial_starts_at: string;
+  trial_ends_at: string;
+  is_active: boolean;
+  created_at: string;
+}
