@@ -16,27 +16,45 @@ import UpdatePassword from '@/components/UpdatePassword';
 import { ROLES_PERMISSIONS } from '@/constants';
 import { Role } from '@/types';
 
-const Dashboard = lazy(() => import('@/components/Dashboard'));
-const Session = lazy(() => import('@/components/pulse/Pulse'));
-const TicketsList = lazy(() => import('@/components/tickets/TicketsList'));
-const TicketDetail = lazy(() => import('@/components/tickets/TicketDetail').then(m => ({ default: m.TicketDetail })));
-const AssetsList = lazy(() => import('@/components/assets/AssetsList').then(m => ({ default: m.AssetsList })));
-const AssetDetail = lazy(() => import('@/components/assets/AssetDetail'));
-const AddAsset = lazy(() => import('@/components/assets/AddAsset'));
-const LicensesList = lazy(() => import('@/components/licenses/LicensesList'));
-const LicenseDetail = lazy(() => import('@/components/licenses/LicenseDetail'));
-const IncidentsList = lazy(() => import('@/components/incidents/IncidentsList').then(m => ({ default: m.IncidentsList })));
-const IncidentDetail = lazy(() => import('@/components/incidents/IncidentDetail'));
-const Reports = lazy(() => import('@/components/reports/Reports'));
-const KnowledgeBase = lazy(() => import('@/components/kb/KnowledgeBase'));
-const KBArticleDetail = lazy(() => import('@/components/kb/KBArticleDetail'));
-const KBArticleEditor = lazy(() => import('@/components/kb/KBArticleEditor'));
-const Settings = lazy(() => import('@/components/settings/Settings'));
-const VendorsList = lazy(() => import('@/components/vendors/VendorsList'));
-const AssetMap = lazy(() => import('@/components/maps/AssetMap'));
-const LocationsList = lazy(() => import('@/components/locations/LocationsList'));
-const OnboardingList = lazy(() => import('@/components/onboarding/OnboardingList'));
-const OnboardingDetail = lazy(() => import('@/components/onboarding/OnboardingDetail'));
+function lazyRetry(factory: () => Promise<any>) {
+  return lazy(() =>
+    factory().catch((err: any) => {
+      if (err?.message?.includes('Failed to fetch dynamically imported module') ||
+          err?.message?.includes('Importing a module script failed')) {
+        const key = 'chunk_retry_' + window.location.href;
+        if (!sessionStorage.getItem(key)) {
+          sessionStorage.setItem(key, '1');
+          window.location.reload();
+          return new Promise(() => {});
+        }
+        sessionStorage.removeItem(key);
+      }
+      throw err;
+    })
+  );
+}
+
+const Dashboard = lazyRetry(() => import('@/components/Dashboard'));
+const Session = lazyRetry(() => import('@/components/pulse/Pulse'));
+const TicketsList = lazyRetry(() => import('@/components/tickets/TicketsList'));
+const TicketDetail = lazyRetry(() => import('@/components/tickets/TicketDetail').then(m => ({ default: m.TicketDetail })));
+const AssetsList = lazyRetry(() => import('@/components/assets/AssetsList').then(m => ({ default: m.AssetsList })));
+const AssetDetail = lazyRetry(() => import('@/components/assets/AssetDetail'));
+const AddAsset = lazyRetry(() => import('@/components/assets/AddAsset'));
+const LicensesList = lazyRetry(() => import('@/components/licenses/LicensesList'));
+const LicenseDetail = lazyRetry(() => import('@/components/licenses/LicenseDetail'));
+const IncidentsList = lazyRetry(() => import('@/components/incidents/IncidentsList').then(m => ({ default: m.IncidentsList })));
+const IncidentDetail = lazyRetry(() => import('@/components/incidents/IncidentDetail'));
+const Reports = lazyRetry(() => import('@/components/reports/Reports'));
+const KnowledgeBase = lazyRetry(() => import('@/components/kb/KnowledgeBase'));
+const KBArticleDetail = lazyRetry(() => import('@/components/kb/KBArticleDetail'));
+const KBArticleEditor = lazyRetry(() => import('@/components/kb/KBArticleEditor'));
+const Settings = lazyRetry(() => import('@/components/settings/Settings'));
+const VendorsList = lazyRetry(() => import('@/components/vendors/VendorsList'));
+const AssetMap = lazyRetry(() => import('@/components/maps/AssetMap'));
+const LocationsList = lazyRetry(() => import('@/components/locations/LocationsList'));
+const OnboardingList = lazyRetry(() => import('@/components/onboarding/OnboardingList'));
+const OnboardingDetail = lazyRetry(() => import('@/components/onboarding/OnboardingDetail'));
 
 interface ProtectedRouteProps {
     children: React.ReactNode;

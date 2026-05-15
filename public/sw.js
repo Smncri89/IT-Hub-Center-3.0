@@ -1,4 +1,4 @@
-const CACHE_NAME = 'it-hub-v3.7';
+const CACHE_NAME = 'it-hub-v3.8';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

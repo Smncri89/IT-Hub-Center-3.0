@@ -14,10 +14,24 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error('ErrorBoundary caught:', error, info.componentStack);
+
+    if (error.message?.includes('Failed to fetch dynamically imported module') ||
+        error.message?.includes('Importing a module script failed')) {
+      const reloadKey = 'chunk_reload_' + window.location.href;
+      if (!sessionStorage.getItem(reloadKey)) {
+        sessionStorage.setItem(reloadKey, '1');
+        window.location.reload();
+        return;
+      }
+      sessionStorage.removeItem(reloadKey);
+    }
   }
 
   render() {
     if (this.state.hasError) {
+      const isChunkError = this.state.error?.message?.includes('Failed to fetch dynamically imported module') ||
+                           this.state.error?.message?.includes('Importing a module script failed');
+
       return (
         <div className="flex items-center justify-center min-h-screen bg-neutral-50 dark:bg-neutral-950">
           <div className="text-center p-8 max-w-md">
@@ -26,13 +40,26 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Something went wrong</h2>
-            <p className="text-neutral-600 dark:text-neutral-400 mb-4 text-sm">{this.state.error?.message}</p>
+            <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+              {isChunkError ? 'New version available' : 'Something went wrong'}
+            </h2>
+            <p className="text-neutral-600 dark:text-neutral-400 mb-4 text-sm">
+              {isChunkError
+                ? 'A new version of the app has been deployed. Please reload to update.'
+                : this.state.error?.message}
+            </p>
             <button
-              onClick={() => { this.setState({ hasError: false, error: null }); window.location.hash = '/dashboard'; }}
+              onClick={() => {
+                if (isChunkError) {
+                  window.location.reload();
+                } else {
+                  this.setState({ hasError: false, error: null });
+                  window.location.hash = '/dashboard';
+                }
+              }}
               className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
-              Back to Dashboard
+              {isChunkError ? 'Reload App' : 'Back to Dashboard'}
             </button>
           </div>
         </div>
