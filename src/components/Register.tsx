@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalization } from '@/hooks/useLocalization';
 import { Role } from '@/types';
+
+const passwordChecks = (pw: string) => [
+  { label: '12+ characters', met: pw.length >= 12 },
+  { label: 'Lowercase letter', met: /[a-z]/.test(pw) },
+  { label: 'Uppercase letter', met: /[A-Z]/.test(pw) },
+  { label: 'Number', met: /\d/.test(pw) },
+  { label: 'Special character (!@#$...)', met: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw) },
+];
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -15,9 +23,17 @@ const Register: React.FC = () => {
   const { register } = useAuth();
   const { t } = useLocalization();
 
+  const checks = useMemo(() => passwordChecks(password), [password]);
+  const allChecksMet = checks.every(c => c.met);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!allChecksMet) {
+      setError(t('password_policy_not_met'));
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError(t('passwords do not match'));
@@ -97,7 +113,22 @@ const Register: React.FC = () => {
                 </div>
                 <div>
                     <label htmlFor="password" className={labelStyles}>{t('password')}<span className="text-red-500">*</span></label>
-                    <input id="password" type="password" autoComplete="new-password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputStyles} placeholder="••••••••"/>
+                    <input id="password" type="password" autoComplete="new-password" required value={password} onChange={(e) => setPassword(e.target.value)} className={inputStyles} placeholder="••••••••" minLength={12}/>
+                    {password.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {checks.map((c, i) => (
+                          <div key={i} className={`flex items-center gap-1.5 text-xs ${c.met ? 'text-emerald-500' : 'text-neutral-500'}`}>
+                            <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              {c.met
+                                ? <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                : <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                              }
+                            </svg>
+                            {c.label}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                 </div>
                 <div>
                     <label htmlFor="confirm-password" className={labelStyles}>{t('confirm password')}<span className="text-red-500">*</span></label>

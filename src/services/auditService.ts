@@ -101,3 +101,30 @@ export const getAuditLog = async (filters?: {
 export const clearAuditLog = () => {
     localStorage.removeItem(STORAGE_KEY);
 };
+
+// Log retention policy: remove entries older than 12 months
+const LOG_RETENTION_DAYS = 365;
+
+export const enforceLogRetention = async (): Promise<number> => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - LOG_RETENTION_DAYS);
+    const cutoffISO = cutoff.toISOString();
+    let purged = 0;
+
+    // Purge from localStorage
+    const local = getLocalLog();
+    const filtered = local.filter(e => e.timestamp >= cutoffISO);
+    purged = local.length - filtered.length;
+    if (purged > 0) saveLocalLog(filtered);
+
+    // Purge from Supabase
+    try {
+        const { count } = await supabase
+            .from('audit_logs')
+            .delete({ count: 'exact' })
+            .lt('timestamp', cutoffISO);
+        purged += count || 0;
+    } catch { /* DB table may not exist */ }
+
+    return purged;
+};

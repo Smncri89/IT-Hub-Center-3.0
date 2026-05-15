@@ -111,8 +111,12 @@ const ChangePasswordForm: React.FC = () => {
         setSuccess('');
 
         // Validation checks
-        if (newPassword.length > 0 && newPassword.length < 8) {
-            setErrors({ newPassword: t('password too short') });
+        if (newPassword.length > 0 && newPassword.length < 12) {
+            setErrors({ newPassword: t('password_min_12') });
+            return;
+        }
+        if (!/[a-z]/.test(newPassword) || !/[A-Z]/.test(newPassword) || !/\d/.test(newPassword) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword)) {
+            setErrors({ newPassword: t('password_policy_not_met') });
             return;
         }
 

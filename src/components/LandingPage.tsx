@@ -58,7 +58,7 @@ const LandingPage: React.FC = () => {
     { icon: Zap, title: 'Deploy in minutes', desc: 'No infrastructure to manage. Sign up, invite your team, start working.' },
     { icon: Clock, title: 'Save 10+ hours/week', desc: 'AI triage, automated SLAs, and self-service KB reduce manual work dramatically.' },
     { icon: TrendingDown, title: 'Cut tool costs by 80%', desc: 'Replace six separate subscriptions with one platform at a fraction of the price.' },
-    { icon: Shield, title: 'Enterprise-grade security', desc: 'AES-256 encryption, row-level security, EU hosting. GDPR and NIS2 compliant by design.' },
+    { icon: Shield, title: 'Enterprise-grade security', desc: 'AES-256 encryption, row-level security, EU hosting. GDPR compliant by design.' },
   ];
 
   const extras = [
@@ -86,7 +86,7 @@ const LandingPage: React.FC = () => {
 
   const faqs = [
     { q: 'How does the free trial work?', a: 'Sign up and get full access for 30 days. No credit card required. At the end, choose a plan or your account goes read-only.' },
-    { q: 'Where is my data stored?', a: 'EU data centers via Supabase. Encrypted at rest (AES-256) and in transit (TLS 1.3). Row-level security on every table. Fully GDPR and NIS2 compliant.' },
+    { q: 'Where is my data stored?', a: 'EU data centers via Supabase. Encrypted at rest (AES-256) and in transit (TLS 1.3). Row-level security on every table. Fully GDPR compliant.' },
     { q: 'Can I import existing data?', a: 'Yes. Bulk import via CSV and Excel for assets, users, and licenses. Enterprise plans include assisted migration from ServiceNow, Jira SM, Freshservice, and Zendesk.' },
     { q: 'Does it work on mobile?', a: 'IT Hub Center is a Progressive Web App. Install from your browser on any device. Supports offline mode and push notifications.' },
     { q: 'Is there annual billing?', a: 'Yes, with 20% off. Contact us for volume pricing on 50+ seats.' },
@@ -218,7 +218,7 @@ const LandingPage: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.55 }}
             className="mt-5 text-xs text-neutral-400 dark:text-neutral-500"
           >
-            Free for 30 days &middot; No credit card &middot; GDPR compliant &middot; NIS2 ready &middot; EU hosted
+            Free for 30 days &middot; No credit card &middot; GDPR compliant &middot; EU hosted
           </motion.p>
         </motion.div>
 
@@ -554,8 +554,6 @@ const LandingPage: React.FC = () => {
               </p>
               <div className="mt-4 flex items-center gap-3 text-xs text-neutral-400 dark:text-neutral-500">
                 <span>GDPR</span>
-                <span>&middot;</span>
-                <span>NIS2</span>
                 <span>&middot;</span>
                 <span>AES-256</span>
                 <span>&middot;</span>

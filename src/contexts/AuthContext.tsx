@@ -4,6 +4,7 @@ import { User, Role, UserStatus } from '@/types';
 import * as authService from '@/services/auth';
 import * as api from '@/services/api';
 import { supabase } from '@/services/supabaseClient';
+import { enforceLogRetention } from '@/services/auditService';
 import Spinner from '@/components/Spinner';
 
 type LoginResult = { user?: User; error?: string; requires2FA?: boolean };
@@ -114,6 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     initializeAuth();
+    enforceLogRetention().catch(() => {});
 
     // 3. Real-time Auth Listener
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {

@@ -1,6 +1,53 @@
 
 import { User, Role } from '@/types';
 import { supabase } from './supabaseClient';
+import { logAuditEvent } from './auditService';
+
+// --- Password Policy ---
+const PASSWORD_MIN_LENGTH = 12;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{12,}$/;
+
+export const validatePassword = (password: string): string | null => {
+    if (password.length < PASSWORD_MIN_LENGTH) return 'password_min_12';
+    if (!/[a-z]/.test(password)) return 'password_needs_lowercase';
+    if (!/[A-Z]/.test(password)) return 'password_needs_uppercase';
+    if (!/\d/.test(password)) return 'password_needs_number';
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return 'password_needs_special';
+    return null;
+};
+
+// --- Account Lockout ---
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+const LOCKOUT_STORAGE_KEY = 'it_hub_login_attempts';
+
+interface LockoutEntry { attempts: number; lockedUntil: number | null; }
+
+const getLockoutEntry = (email: string): LockoutEntry => {
+    try {
+        const raw = localStorage.getItem(LOCKOUT_STORAGE_KEY);
+        const data = raw ? JSON.parse(raw) : {};
+        return data[email] || { attempts: 0, lockedUntil: null };
+    } catch { return { attempts: 0, lockedUntil: null }; }
+};
+
+const setLockoutEntry = (email: string, entry: LockoutEntry) => {
+    try {
+        const raw = localStorage.getItem(LOCKOUT_STORAGE_KEY);
+        const data = raw ? JSON.parse(raw) : {};
+        data[email] = entry;
+        localStorage.setItem(LOCKOUT_STORAGE_KEY, JSON.stringify(data));
+    } catch { /* storage full, ignore */ }
+};
+
+const clearLockout = (email: string) => {
+    try {
+        const raw = localStorage.getItem(LOCKOUT_STORAGE_KEY);
+        const data = raw ? JSON.parse(raw) : {};
+        delete data[email];
+        localStorage.setItem(LOCKOUT_STORAGE_KEY, JSON.stringify(data));
+    } catch { /* ignore */ }
+};
 
 // Helper to get user profile and merge with auth data
 export const getFullUser = async (authUser: any): Promise<User | null> => {
@@ -92,23 +139,45 @@ export const getCurrentUser = async (): Promise<User | null> => {
 
 export const login = async (email: string, pass: string): Promise<{ user?: User; error?: string; requires2FA?: boolean }> => {
     try {
-        // Add a 10 second timeout to prevent infinite hanging
+        // Account lockout check
+        const lockout = getLockoutEntry(email);
+        if (lockout.lockedUntil && Date.now() < lockout.lockedUntil) {
+            const minutesLeft = Math.ceil((lockout.lockedUntil - Date.now()) / 60000);
+            return { error: `account_locked:${minutesLeft}` };
+        }
+        if (lockout.lockedUntil && Date.now() >= lockout.lockedUntil) {
+            clearLockout(email);
+        }
+
         const loginPromise = supabase.auth.signInWithPassword({ email, password: pass });
         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Login request timed out after 10 seconds. Please check your network connection or try again later.')), 10000));
-        
+
         const { data, error } = await Promise.race([loginPromise, timeoutPromise]) as any;
 
         if (error) {
             if (error.message.includes('AAL2')) {
+                clearLockout(email);
                 return { requires2FA: true };
             }
-            if (error.message.includes('Invalid login credentials')) {
-                return { error: 'invalid credentials' };
+
+            // Track failed attempt
+            const current = getLockoutEntry(email);
+            const newAttempts = current.attempts + 1;
+            if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
+                setLockoutEntry(email, { attempts: newAttempts, lockedUntil: Date.now() + LOCKOUT_DURATION_MS });
+                logFailedLogin(email, `Account locked after ${newAttempts} failed attempts`);
+                return { error: `account_locked:15` };
+            } else {
+                setLockoutEntry(email, { attempts: newAttempts, lockedUntil: null });
+                logFailedLogin(email, `Failed login attempt ${newAttempts}/${MAX_LOGIN_ATTEMPTS}`);
             }
-            console.error("Login error:", error);
+
             return { error: 'invalid credentials' };
         }
         if (!data.user) return { error: 'login failed' };
+
+        // Successful login — clear lockout
+        clearLockout(email);
 
         const fullUser = await getFullUser(data.user);
         if (!fullUser) return { error: 'profile fetch failed' };
@@ -118,6 +187,17 @@ export const login = async (email: string, pass: string): Promise<{ user?: User;
         console.error('Login exception:', err);
         return { error: err.message || 'An unexpected error occurred during login' };
     }
+};
+
+const logFailedLogin = (email: string, details: string) => {
+    logAuditEvent({
+        userId: 'anonymous',
+        userName: email,
+        action: 'login' as const,
+        entityType: 'system' as const,
+        entityName: 'Failed Login',
+        details,
+    }).catch(() => {});
 };
 
 export const verify2FA = async (token: string): Promise<{ user?: User; error?: string }> => {
@@ -150,6 +230,9 @@ export const verify2FA = async (token: string): Promise<{ user?: User; error?: s
 
 
 export const register = async (name: string, email: string, pass: string, role: Role): Promise<{ user: any | null; error?: string }> => {
+    const passwordError = validatePassword(pass);
+    if (passwordError) return { user: null, error: passwordError };
+
     const { data, error } = await supabase.auth.signUp({
         email,
         password: pass,

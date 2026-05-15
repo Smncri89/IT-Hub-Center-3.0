@@ -43,7 +43,12 @@ const Login: React.FC = () => {
         const { user, error: apiError, requires2FA: needs2FA } = await login(email, password);
         setIsLoading(false);
         if (apiError) {
-          setLoginError(t(apiError));
+          if (apiError.startsWith('account_locked:')) {
+            const mins = apiError.split(':')[1];
+            setLoginError(t('account_locked').replace('{minutes}', mins));
+          } else {
+            setLoginError(t(apiError));
+          }
           setPassword('');
         } else if (needs2FA) {
           setRequires2FA(true);
