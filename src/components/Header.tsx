@@ -67,18 +67,15 @@ const UserMenu: React.FC = () => {
 
                     <div
                         onClick={e => e.stopPropagation()}
-                        className="bg-white dark:bg-neutral-800 shadow-2xl border border-neutral-200 dark:border-neutral-700"
-                        style={isMobile ? {
-                            position: 'absolute', bottom: 0, left: 0, right: 0,
-                            borderRadius: '16px 16px 0 0',
-                            animation: 'sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                            paddingBottom: 'env(safe-area-inset-bottom, 8px)',
-                        } : {
-                            position: 'absolute', top: 64, right: 24,
-                            width: 288, borderRadius: 16,
-                            animation: 'scaleIn 0.2s ease-out',
-                            transformOrigin: 'top right',
-                        }}
+                        className={`bg-white dark:bg-neutral-800 shadow-2xl border border-neutral-200 dark:border-neutral-700 z-[100] ${
+                            isMobile
+                                ? 'absolute bottom-0 left-0 right-0 rounded-t-2xl'
+                                : 'absolute top-16 right-6 w-72 rounded-2xl'
+                        }`}
+                        style={isMobile
+                            ? { animation: 'sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)', paddingBottom: 'env(safe-area-inset-bottom, 8px)' }
+                            : { animation: 'scaleIn 0.2s ease-out', transformOrigin: 'top right' }
+                        }
                     >
                         {isMobile && (
                             <div className="flex justify-center pt-3 pb-1">
@@ -187,24 +184,22 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isCollapsed, toggleSideb
     const isMobile = useIsMobile();
 
     return (
-        <header
-            className="sticky top-0 z-30 flex items-center justify-between flex-shrink-0 shadow-sm bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-b border-neutral-200/50 dark:border-neutral-800/50"
-            style={{ height: isMobile ? 56 : 80, padding: isMobile ? '0 8px' : '0 24px', maxWidth: '100%', overflow: 'visible' }}
-        >
-            <div style={{ flexShrink: 0 }}>
-                <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 active:scale-95">
+        <header className={`sticky top-0 z-30 flex items-center justify-between flex-shrink-0 shadow-sm bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-b border-neutral-200/50 dark:border-neutral-800/50 overflow-visible max-w-full ${isMobile ? 'h-14 px-2' : 'h-20 px-6'}`}>
+            <div className="flex-shrink-0">
+                <button
+                    onClick={toggleSidebar}
+                    className="lg:hidden p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-300 active:scale-95"
+                    aria-label={t('open sidebar')}
+                >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 2 : 16, flexShrink: 0 }}>
+            <div className={`flex items-center flex-shrink-0 ${isMobile ? 'gap-0.5' : 'gap-4'}`}>
                 <button
                     onClick={openCommandPalette}
-                    className="rounded-full bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-500 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 active:scale-95 transition-all"
-                    style={isMobile
-                        ? { padding: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }
-                        : { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', width: 260 }
-                    }
+                    aria-label={t('search or jump to')}
+                    className={`flex items-center rounded-full bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-500 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 active:scale-95 transition-all ${isMobile ? 'p-2 justify-center' : 'gap-2 px-4 py-2 w-64'}`}
                 >
                     {React.cloneElement(ICONS.search, { className: "h-4 w-4" })}
                     {!isMobile && <span className="text-sm">{t('search or jump to')}</span>}

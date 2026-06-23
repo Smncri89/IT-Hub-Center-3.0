@@ -706,6 +706,16 @@ export const translations: Record<string, Record<Language, string>> = {
 
   // Dashboard KPI
   'warranty alerts': { en: 'Warranty Alerts', it: 'Scadenze Garanzia', es: 'Alertas de Garantía' },
+  'warranty expired label': { en: 'Expired', it: 'Scadute', es: 'Vencidas' },
+  'warranty expiring 30 days': { en: '< 30 days', it: '< 30 giorni', es: '< 30 días' },
+  'warranty expiring 90 days': { en: '< 90 days', it: '< 90 giorni', es: '< 90 días' },
+  'mttr resolved tickets': { en: '{count} tickets resolved', it: '{count} ticket risolti', es: '{count} tickets resueltos' },
+  'active tickets': { en: 'Active Tickets', it: 'Ticket Attivi', es: 'Tickets Activos' },
+  'resolved all time': { en: 'Resolved (All Time)', it: 'Risolti (Totale)', es: 'Resueltos (Total)' },
+  'how can we help today': { en: 'How can we help you today?', it: 'Come possiamo aiutarti oggi?', es: '¿Cómo podemos ayudarte hoy?' },
+  'service catalog': { en: 'Service Catalog', it: 'Catalogo Servizi', es: 'Catálogo de Servicios' },
+  'system announcement': { en: 'System Announcement', it: 'Comunicazione di Sistema', es: 'Comunicado del Sistema' },
+  'overview it operations': { en: 'Overview of IT operations', it: 'Panoramica delle operazioni IT', es: 'Resumen de operaciones de TI' },
 
   // Asset Check-in / Check-out
   'check in': { en: 'Check In', it: 'Check-in', es: 'Registro entrada' },

@@ -10,7 +10,7 @@ const Spinner: React.FC<{ size?: 'sm' | 'md' | 'lg' }> = ({ size = 'md' }) => {
   };
 
   return (
-    <div className={`flex justify-center items-center p-8`}>
+    <div className={`flex justify-center items-center ${size !== 'sm' ? 'p-8' : ''}`}>
       <div
         className={`animate-spin rounded-full border-t-2 border-b-2 border-primary-600 ${sizeClasses[size]}`}
         role="status"

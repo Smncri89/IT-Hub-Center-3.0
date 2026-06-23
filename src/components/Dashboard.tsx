@@ -276,7 +276,7 @@ const AnnouncementBanner: React.FC<{ t: Function }> = ({ t }) => {
                 {icon}
             </div>
             <div className="flex-1 pr-6">
-                <h3 className="font-bold text-sm uppercase tracking-wider mb-0.5 opacity-90">System Announcement</h3>
+                <h3 className="font-bold text-sm uppercase tracking-wider mb-0.5 opacity-90">{t('system announcement')}</h3>
                 <p className="font-medium text-sm sm:text-base whitespace-pre-wrap">{bannerConfig.message}</p>
             </div>
             <button 
@@ -388,7 +388,7 @@ const EndUserDashboard: React.FC = () => {
                 <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
                     {t('greeting user', { name: user?.name.split(' ')[0] || '' })}
                 </h1>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">How can we help you today?</p>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">{t('how can we help today')}</p>
             </div>
             
             {/* Global Announcement - Visible to Everyone */}
@@ -400,7 +400,7 @@ const EndUserDashboard: React.FC = () => {
                     <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 p-1.5 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     </span>
-                    Service Catalog
+                    {t('service catalog')}
                 </h2>
                 <ServiceCatalog t={t} navigate={navigate} />
             </div>
@@ -447,7 +447,7 @@ const EndUserDashboard: React.FC = () => {
                 <div className="space-y-4">
                      <div className="bg-white dark:bg-neutral-800 p-5 rounded-2xl border border-neutral-100 dark:border-neutral-700 shadow-sm flex items-center justify-between">
                         <div>
-                            <p className="text-xs font-bold uppercase text-neutral-500 mb-1">Active Tickets</p>
+                            <p className="text-xs font-bold uppercase text-neutral-500 mb-1">{t('active tickets')}</p>
                             <p className="text-3xl font-black text-neutral-900 dark:text-white">{userTickets.filter(t => t.status === TicketStatus.Open || t.status === TicketStatus.InProgress).length}</p>
                         </div>
                         <div className="p-3 bg-primary-50 dark:bg-primary-900/30 text-primary-600 rounded-xl">
@@ -456,7 +456,7 @@ const EndUserDashboard: React.FC = () => {
                     </div>
                      <div className="bg-white dark:bg-neutral-800 p-5 rounded-2xl border border-neutral-100 dark:border-neutral-700 shadow-sm flex items-center justify-between">
                         <div>
-                            <p className="text-xs font-bold uppercase text-neutral-500 mb-1">Resolved (All Time)</p>
+                            <p className="text-xs font-bold uppercase text-neutral-500 mb-1">{t('resolved all time')}</p>
                             <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{userTickets.filter(t => t.status === TicketStatus.Resolved || t.status === TicketStatus.Closed).length}</p>
                         </div>
                         <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 rounded-xl">
@@ -522,7 +522,7 @@ const AdminAgentDashboard: React.FC = () => {
             <div className="flex justify-between items-start sm:items-center gap-3">
                 <div className="min-w-0">
                     <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">{t('dashboard')}</h1>
-                    <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-1">Overview of IT operations</p>
+                    <p className="text-xs sm:text-sm font-medium text-neutral-500 dark:text-neutral-400 mt-1">{t('overview it operations')}</p>
                 </div>
                 <button
                     onClick={() => setIsConfigModalOpen(true)}
@@ -563,7 +563,7 @@ const AdminAgentDashboard: React.FC = () => {
                             <div className={`bg-gradient-to-br ${colors[mttrColor]} rounded-3xl p-6 h-full flex flex-col justify-center text-white shadow-lg`}>
                                 <p className="text-xs font-bold uppercase tracking-wider opacity-80">Mean Time to Resolve</p>
                                 <p className="text-4xl font-black mt-1">{mttr}<span className="text-lg font-bold opacity-70 ml-1">h</span></p>
-                                <p className="text-xs opacity-70 mt-1">{resolved.length} ticket risolti</p>
+                                <p className="text-xs opacity-70 mt-1">{t('mttr resolved tickets', { count: resolved.length })}</p>
                             </div>
                         </div>
                     );
@@ -582,15 +582,15 @@ const AdminAgentDashboard: React.FC = () => {
                                 <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-3">{t('warranty alerts') || 'Warranty Alerts'}</p>
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-xs font-medium text-rose-600 dark:text-rose-400">Scadute</span>
+                                        <span className="text-xs font-medium text-rose-600 dark:text-rose-400">{t('warranty expired label')}</span>
                                         <span className="text-sm font-black text-rose-600">{expired.length}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-xs font-medium text-amber-600 dark:text-amber-400">&lt; 30 giorni</span>
+                                        <span className="text-xs font-medium text-amber-600 dark:text-amber-400">{t('warranty expiring 30 days')}</span>
                                         <span className="text-sm font-black text-amber-600">{expiring30.length}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">&lt; 90 giorni</span>
+                                        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{t('warranty expiring 90 days')}</span>
                                         <span className="text-sm font-black text-blue-600">{expiring90.length}</span>
                                     </div>
                                 </div>

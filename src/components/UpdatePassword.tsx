@@ -55,11 +55,11 @@ const UpdatePassword = () => {
         }
     };
 
-    const inputStyles = "w-full px-4 py-3 text-neutral-200 bg-neutral-700/50 border-2 border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent";
+    const inputStyles = "w-full px-4 py-3 text-neutral-900 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-700/50 border-2 border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent";
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-900 text-neutral-300">
-            <div className="w-full max-w-md p-8 space-y-6 bg-neutral-800 rounded-xl shadow-lg">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300">
+            <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-neutral-800 rounded-xl shadow-lg">
                 <div className="text-center">
                     <h2 className="text-3xl font-bold text-white">{t('update your password')}</h2>
                 </div>
@@ -110,7 +110,7 @@ const UpdatePassword = () => {
                                 disabled={isLoading || !isRecoverySession}
                                 className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 disabled:bg-primary-800"
                             >
-                                {isLoading ? '...' : t('update password')}
+                                {isLoading ? t('loading') : t('update password')}
                             </button>
                         </div>
                     </form>
