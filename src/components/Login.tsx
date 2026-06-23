@@ -59,7 +59,7 @@ const Login: React.FC = () => {
     }
   };
   
-  const inputStyles = `w-full px-4 py-3.5 text-neutral-900 dark:text-neutral-100 bg-neutral-50/50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all placeholder-neutral-400 dark:placeholder-neutral-600 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-neutral-800/80`;
+  const inputStyles = `w-full px-4 py-3.5 text-neutral-900 dark:text-neutral-100 bg-neutral-50/50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-400 transition-all duration-200 placeholder-neutral-400 dark:placeholder-neutral-600 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-neutral-800/80`;
   const labelStyles = "block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5 ml-1";
 
   const renderLoginForm = () => (
@@ -135,7 +135,7 @@ const Login: React.FC = () => {
         <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg shadow-primary-500/25 transform hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+            className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
         >
             {isLoading ? <Spinner size="sm" /> : t('sign in')}
         </button>
@@ -180,7 +180,7 @@ const Login: React.FC = () => {
              <button
                 type="submit"
                 disabled={isLoading || verificationCode.length !== 6}
-                className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg shadow-primary-500/25 transform hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
             >
                 {isLoading ? <Spinner size="sm" /> : t('verify code')}
             </button>
@@ -199,15 +199,15 @@ const Login: React.FC = () => {
     <div className="flex min-h-screen min-h-[100dvh] bg-neutral-50 dark:bg-neutral-950 relative overflow-hidden font-sans selection:bg-primary-500/30">
         {/* Advanced Dynamic Background */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-primary-400/20 to-purple-400/20 blur-[120px] animate-pulse-slow"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-gradient-to-tl from-blue-400/20 to-indigo-400/20 blur-[120px] animate-pulse-slow" style={{ animationDelay: '3s' }}></div>
+            <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-gradient-to-br from-primary-400/20 to-purple-400/20 blur-[120px] animate-pulse" style={{ animationDelay: '0s' }}></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-tl from-blue-400/20 to-indigo-400/20 blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
         </div>
 
         <div className="flex flex-col justify-center items-center w-full relative z-10 px-4 sm:px-6 lg:px-8">
             <div className="w-full max-w-[420px] space-y-8 animate-slide-up">
                 <div className="text-center">
-                    <div className="inline-flex items-center justify-center p-4 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl shadow-primary-900/5 mb-6 ring-1 ring-neutral-200 dark:ring-neutral-800">
+                    <div className="inline-flex items-center justify-center p-4 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl shadow-primary-500/10 mb-6 ring-1 ring-neutral-100 dark:ring-neutral-800">
                         <Logo className="h-12 w-12 text-primary-600" />
                     </div>
                     <h1 className="text-4xl font-black tracking-tight text-neutral-900 dark:text-white">
@@ -218,7 +218,7 @@ const Login: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/50 dark:border-neutral-700/50">
+                <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm rounded-3xl shadow-2xl shadow-neutral-200/50 dark:shadow-black/30 p-8 sm:p-10 border border-white/50 dark:border-neutral-700/50 ring-1 ring-neutral-200/50 dark:ring-neutral-700/50">
                     {requires2FA ? (
                         render2FAForm()
                     ) : (

@@ -291,7 +291,7 @@ const TicketBoard: React.FC<{ tickets: Ticket[], navigate: any, t: any }> = ({ t
 const FilterSelect: React.FC<{name: string, value: string, children: React.ReactNode, label: string, onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void}> = ({name, value, children, label, onChange}) => (
     <div>
         <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{label}</label>
-        <select name={name} value={value} onChange={onChange} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-sm text-sm focus:ring-primary-500 focus:border-primary-500 w-full p-2.5 appearance-none text-neutral-900 dark:text-neutral-100">
+        <select name={name} value={value} onChange={onChange} className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 w-full p-2.5 appearance-none text-neutral-900 dark:text-neutral-100">
             {children}
         </select>
     </div>
@@ -501,7 +501,7 @@ export const TicketsList: React.FC = () => {
                             {t('switch to board view')}
                         </button>
                     </div>
-                    <button onClick={() => { setModalDefaults(null); setIsModalOpen(true); }} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">
+                    <button onClick={() => { setModalDefaults(null); setIsModalOpen(true); }} className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 rounded-lg shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200">
                         {React.cloneElement(ICONS.plus, { className: "h-4 w-4"})}
                         <span className="hidden md:inline">{t('new ticket')}</span>
                     </button>
@@ -509,7 +509,7 @@ export const TicketsList: React.FC = () => {
             </div>
 
             <MobileFilterToggle>
-            <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md">
+            <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{t('search')}</label>
@@ -519,7 +519,7 @@ export const TicketsList: React.FC = () => {
                                 placeholder={t('ticket search placeholder')}
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-neutral-900 dark:text-neutral-100"
+                                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 text-neutral-900 dark:text-neutral-100"
                             />
                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
                                 {React.cloneElement(ICONS.search, { className: 'w-5 h-5' })}
@@ -542,18 +542,18 @@ export const TicketsList: React.FC = () => {
                 <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-md overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
-                            <thead className="bg-neutral-50 dark:bg-neutral-900/50">
+                            <thead className="bg-neutral-50 dark:bg-neutral-800/80 border-b-2 border-neutral-100 dark:border-neutral-700">
                                 <tr>
-                                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('subject')}</th>
-                                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('requester')}</th>
-                                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('status')}</th>
-                                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('priority')}</th>
-                                    <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('actions')}</th>
+                                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('subject')}</th>
+                                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('requester')}</th>
+                                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('status')}</th>
+                                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('priority')}</th>
+                                    <th className="px-3 sm:px-6 py-3 text-right text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('actions')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
+                            <tbody className="divide-y divide-neutral-100/70 dark:divide-neutral-700/50">
                                 {filteredTickets.map(ticket => (
-                                    <tr key={ticket.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-700/50">
+                                    <tr key={ticket.id} className="hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors duration-150 cursor-pointer border-b border-neutral-100/70 dark:border-neutral-700/50">
                                         <td className="px-3 sm:px-6 py-3 sm:py-4">
                                             <div className="text-sm font-medium text-neutral-900 dark:text-white">{ticket.subject}</div>
                                             <div className="text-xs text-neutral-500">{ticket.id}</div>
@@ -568,12 +568,14 @@ export const TicketsList: React.FC = () => {
                                             </div>
                                         </td>
                                         <td className="px-3 sm:px-6 py-3 sm:py-4">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${STATUS_COLORS[ticket.status]}`}>
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[ticket.status]}`}>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
                                                 {t(`ticket status ${ticket.status.toLowerCase().replace(/ /g, ' ')}`)}
                                             </span>
                                         </td>
                                         <td className="px-3 sm:px-6 py-3 sm:py-4">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${PRIORITY_COLORS[ticket.priority]}`}>
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${PRIORITY_COLORS[ticket.priority]}`}>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
                                                 {t(ticket.priority.toLowerCase())}
                                             </span>
                                         </td>
@@ -586,7 +588,12 @@ export const TicketsList: React.FC = () => {
                         </table>
                     </div>
                     {filteredTickets.length === 0 && (
-                        <div className="p-8 text-center text-neutral-500 dark:text-neutral-400">{t('no tickets found filter')}</div>
+                        <div className="py-16 flex flex-col items-center gap-3">
+                            <div className="p-4 rounded-full bg-neutral-100 dark:bg-neutral-800">
+                                {React.cloneElement(ICONS.tickets as React.ReactElement<{ className?: string }>, { className: "w-8 h-8 text-neutral-400 dark:text-neutral-500" })}
+                            </div>
+                            <p className="text-neutral-500 text-sm font-medium">{t('no tickets found filter')}</p>
+                        </div>
                     )}
                 </div>
             ) : (

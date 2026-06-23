@@ -42,9 +42,9 @@ const DEFAULT_DASHBOARD_CONFIG: DashboardConfig = {
 // --- HELPER COMPONENTS ---
 
 const DashboardWidget: React.FC<{ title: string; children: React.ReactNode; className?: string; action?: React.ReactNode }> = ({ title, children, className = "", action }) => (
-    <div className={`bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col transition-all duration-300 hover:shadow-soft border border-neutral-200/50 dark:border-neutral-700/50 ${className}`}>
+    <div className={`bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl p-4 sm:p-6 flex flex-col transition-all duration-300 shadow-sm hover:shadow-md border border-neutral-100 dark:border-neutral-700/50 ${className}`}>
         <div className="flex justify-between items-center mb-4 sm:mb-6">
-            <h3 className="text-base sm:text-lg font-bold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2 border-l-4 border-primary-500 pl-3">
                 {title}
             </h3>
             {action}
@@ -56,12 +56,17 @@ const DashboardWidget: React.FC<{ title: string; children: React.ReactNode; clas
 );
 
 const StatCard: React.FC<{ value: string | number; label: string; colorClass: string; to: string; icon?: React.ReactNode }> = ({ value, label, colorClass, to, icon }) => (
-    <Link to={to} className={`relative overflow-hidden group p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-xl shadow-lg h-full border border-white/10 ${colorClass}`}>
+    <Link to={to} className={`relative overflow-hidden group p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-xl shadow-sm hover:shadow-md h-full border border-white/20 ${colorClass}`}>
+        {icon && (
+            <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm mb-3 shadow-inner">
+                <div className="opacity-90">{icon}</div>
+            </div>
+        )}
         <div className="relative z-10">
-            <span className="text-3xl sm:text-5xl font-extrabold tracking-tight block mb-1 drop-shadow-sm">{value}</span>
+            <span className="text-4xl sm:text-5xl font-black tracking-tight block mb-1 drop-shadow-sm">{value}</span>
             <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest opacity-90">{label}</span>
         </div>
-        {icon && <div className="absolute -bottom-6 -right-6 opacity-10 group-hover:opacity-20 transition-opacity scale-[2.5] rotate-12">{icon}</div>}
+        <div className="absolute -bottom-6 -right-6 opacity-5 group-hover:opacity-10 transition-opacity scale-[3] rotate-12 pointer-events-none">{icon}</div>
     </Link>
 );
 
@@ -345,10 +350,10 @@ const ServiceCatalog: React.FC<{ t: Function, navigate: any }> = ({ t, navigate 
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {services.map(service => (
-                <div 
+                <div
                     key={service.id}
                     onClick={() => navigate('/tickets', { state: { openModal: true, ticketDefaults: service.defaults } })}
-                    className="bg-white dark:bg-neutral-800 rounded-2xl p-4 shadow-sm hover:shadow-lg border border-neutral-200 dark:border-neutral-700 cursor-pointer group transition-all duration-300 hover:-translate-y-1"
+                    className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 rounded-2xl p-4 shadow-sm hover:shadow-md border border-neutral-100 dark:border-neutral-700/50 cursor-pointer group transition-all duration-300 hover:-translate-y-1"
                 >
                     <div className={`w-12 h-12 rounded-xl ${service.color} text-white flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform`}>
                         {React.cloneElement(service.icon as React.ReactElement<{ className?: string }>, { className: 'w-6 h-6' })}
@@ -396,7 +401,7 @@ const EndUserDashboard: React.FC = () => {
             
             {/* Service Catalog */}
             <div>
-                <h2 className="text-lg font-bold text-neutral-800 dark:text-white mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-bold text-neutral-800 dark:text-white mb-4 flex items-center gap-3 border-l-4 border-primary-500 pl-3">
                     <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 p-1.5 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     </span>
@@ -407,9 +412,9 @@ const EndUserDashboard: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Recent Tickets List */}
-                <div className="lg:col-span-2 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-200/50 dark:border-neutral-700 shadow-soft flex flex-col h-full">
-                    <div className="p-4 sm:p-6 border-b border-neutral-100 dark:border-neutral-700/50 flex justify-between items-center bg-white/50 dark:bg-neutral-800/50">
-                        <h3 className="text-lg font-bold text-neutral-900 dark:text-white tracking-tight">{t('your recent tickets')}</h3>
+                <div className="lg:col-span-2 bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-neutral-100 dark:border-neutral-700/50 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col h-full">
+                    <div className="p-4 sm:p-6 border-b border-neutral-100 dark:border-neutral-700/50 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-800/50">
+                        <h3 className="text-lg font-bold text-neutral-900 dark:text-white tracking-tight border-l-4 border-primary-500 pl-3">{t('your recent tickets')}</h3>
                         <Link to="/tickets" className="text-xs font-bold text-primary-600 dark:text-primary-400 hover:underline uppercase tracking-wide">{t('view all tickets')}</Link>
                     </div>
                     <div className="flex-1 overflow-auto">
@@ -435,9 +440,11 @@ const EndUserDashboard: React.FC = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className="p-12 text-center flex flex-col items-center justify-center h-full">
-                                <div className="text-4xl mb-3 opacity-30">🎫</div>
-                                <p className="text-neutral-500 dark:text-neutral-400 font-medium text-sm">{t('no tickets prompt')}</p>
+                            <div className="py-12 text-center flex flex-col items-center justify-center h-full">
+                                <div className="p-4 rounded-2xl bg-neutral-100 dark:bg-neutral-700/50 mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-neutral-300 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                </div>
+                                <p className="text-neutral-400 font-medium text-sm">{t('no tickets prompt')}</p>
                             </div>
                         )}
                     </div>
@@ -445,7 +452,7 @@ const EndUserDashboard: React.FC = () => {
 
                 {/* Stats Column */}
                 <div className="space-y-4">
-                     <div className="bg-white dark:bg-neutral-800 p-5 rounded-2xl border border-neutral-100 dark:border-neutral-700 shadow-sm flex items-center justify-between">
+                     <div className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 p-5 rounded-2xl border-l-4 border-primary-500 border border-neutral-100 dark:border-neutral-700/50 shadow-sm hover:shadow-md transition-shadow duration-200 flex items-center justify-between">
                         <div>
                             <p className="text-xs font-bold uppercase text-neutral-500 mb-1">{t('active tickets')}</p>
                             <p className="text-3xl font-black text-neutral-900 dark:text-white">{userTickets.filter(t => t.status === TicketStatus.Open || t.status === TicketStatus.InProgress).length}</p>
@@ -454,7 +461,7 @@ const EndUserDashboard: React.FC = () => {
                              {React.cloneElement(ICONS.tickets as React.ReactElement<{ className?: string }>, { className: 'w-6 h-6' })}
                         </div>
                     </div>
-                     <div className="bg-white dark:bg-neutral-800 p-5 rounded-2xl border border-neutral-100 dark:border-neutral-700 shadow-sm flex items-center justify-between">
+                     <div className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 p-5 rounded-2xl border-l-4 border-emerald-500 border border-neutral-100 dark:border-neutral-700/50 shadow-sm hover:shadow-md transition-shadow duration-200 flex items-center justify-between">
                         <div>
                             <p className="text-xs font-bold uppercase text-neutral-500 mb-1">{t('resolved all time')}</p>
                             <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{userTickets.filter(t => t.status === TicketStatus.Resolved || t.status === TicketStatus.Closed).length}</p>
@@ -578,7 +585,7 @@ const AdminAgentDashboard: React.FC = () => {
                     const expired = assets.filter(a => a.warrantyEndDate && new Date(a.warrantyEndDate).getTime() < now);
                     return (
                         <div className="col-span-12 md:col-span-6 lg:col-span-3 min-h-[130px]">
-                            <Link to="/assets" className="block h-full bg-white dark:bg-neutral-800 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-lg transition-all">
+                            <Link to="/assets" className="block h-full bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 rounded-2xl p-6 border border-neutral-100 dark:border-neutral-700/50 shadow-sm hover:shadow-md transition-all duration-200">
                                 <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-3">{t('warranty alerts') || 'Warranty Alerts'}</p>
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center">
@@ -632,9 +639,11 @@ const AdminAgentDashboard: React.FC = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-neutral-400">
-                                    <div className="text-4xl mb-3 opacity-50">👍</div>
-                                    <p className="text-sm font-medium">{t('all caught up')}</p>
+                                <div className="py-12 flex flex-col items-center justify-center text-neutral-400">
+                                    <div className="p-4 rounded-2xl bg-neutral-100 dark:bg-neutral-700/50 mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-neutral-300 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <p className="text-sm font-medium text-neutral-400">{t('all caught up')}</p>
                                 </div>
                             )}
                         </DashboardWidget>
@@ -660,9 +669,11 @@ const AdminAgentDashboard: React.FC = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-neutral-400">
-                                    <div className="text-3xl mb-3 opacity-50">✅</div>
-                                    <p className="text-sm font-medium">{t('no low licenses')}</p>
+                                <div className="py-12 flex flex-col items-center justify-center text-neutral-400">
+                                    <div className="p-4 rounded-2xl bg-neutral-100 dark:bg-neutral-700/50 mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-neutral-300 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <p className="text-sm font-medium text-neutral-400">{t('no low licenses')}</p>
                                 </div>
                             )}
                         </DashboardWidget>
@@ -690,9 +701,11 @@ const AdminAgentDashboard: React.FC = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-neutral-400">
-                                    <div className="text-3xl mb-3 opacity-50">🛡️</div>
-                                    <p className="text-sm font-medium">{t('no active incidents')}</p>
+                                <div className="py-12 flex flex-col items-center justify-center text-neutral-400">
+                                    <div className="p-4 rounded-2xl bg-neutral-100 dark:bg-neutral-700/50 mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-neutral-300 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                    </div>
+                                    <p className="text-sm font-medium text-neutral-400">{t('no active incidents')}</p>
                                 </div>
                             )}
                         </DashboardWidget>

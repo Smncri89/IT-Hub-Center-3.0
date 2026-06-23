@@ -187,7 +187,7 @@ const BulkEditModal: React.FC<{
 const FilterSelectWrapper: React.FC<{name: string, value: string, children: React.ReactNode, label: string, onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void}> = ({name, value, children, label, onChange}) => (
     <div>
         <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{label}</label>
-        <select name={name} value={value} onChange={onChange} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-sm text-sm focus:ring-primary-500 focus:border-primary-500 w-full p-2.5 appearance-none text-neutral-900 dark:text-neutral-100">
+        <select name={name} value={value} onChange={onChange} className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 w-full p-2.5 appearance-none text-neutral-900 dark:text-neutral-100">
             {children}
         </select>
     </div>
@@ -611,9 +611,9 @@ export const AssetsList: React.FC = () => {
                             </div>
 
                             {selectedAssetIds.length > 0 && (
-                                <button 
+                                <button
                                     onClick={() => setIsBulkEditModalOpen(true)}
-                                    className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-primary-600 rounded-lg hover:bg-primary-700 shadow-md transition-all active:scale-95"
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 rounded-lg shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 active:scale-95"
                                 >
                                     {React.cloneElement(ICONS.edit, { className: "h-4 w-4"})}
                                     <span>Bulk Edit ({selectedAssetIds.length})</span>
@@ -628,7 +628,7 @@ export const AssetsList: React.FC = () => {
                                 {React.cloneElement(ICONS.download as React.ReactElement<{ className?: string }>, { className: "h-4 w-4"})}
                                 <span>{t('export')}</span>
                             </button>
-                            <Link to="/assets/new" className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-sm transition-all hover:-translate-y-0.5 active:scale-95">
+                            <Link to="/assets/new" className="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 active:scale-95">
                                 {React.cloneElement(ICONS.plus as React.ReactElement<{ className?: string }>, { className: "h-5 w-5"})}
                                 <span className="hidden sm:inline">{t('add asset')}</span>
                             </Link>
@@ -688,7 +688,7 @@ export const AssetsList: React.FC = () => {
             )}
 
             <MobileFilterToggle>
-            <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md">
+            <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-sm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div className="lg:col-span-1">
                         <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{t('search')}</label>
@@ -698,7 +698,7 @@ export const AssetsList: React.FC = () => {
                                 placeholder={t('asset search placeholder')}
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-neutral-900 dark:text-neutral-100"
+                                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 text-neutral-900 dark:text-neutral-100"
                             />
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
                                 {React.cloneElement(ICONS.search as React.ReactElement<{ className?: string }>, { className: 'w-5 h-5' })}
@@ -741,23 +741,23 @@ export const AssetsList: React.FC = () => {
                 <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-md overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
-                            <thead className="bg-neutral-50 dark:bg-neutral-900/50">
+                            <thead className="bg-neutral-50 dark:bg-neutral-800/80 border-b-2 border-neutral-100 dark:border-neutral-700">
                                 <tr>
                                     <th scope="col" className="px-6 py-3 text-left">
                                         <input type="checkbox" onChange={handleSelectAll} checked={selectedAssetIds.length === filteredAssets.length && filteredAssets.length > 0} className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500 bg-neutral-100 dark:bg-neutral-800 dark:border-neutral-700" />
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider"></th>
-                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('asset name')}</th>
-                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('asset type')}</th>
-                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('status')}</th>
-                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('assigned to')}</th>
-                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('purchase date')}</th>
-                                    <th className="px-6 py-3 text-right text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('actions')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider"></th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('asset name')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('asset type')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('status')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('assigned to')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('purchase date')}</th>
+                                    <th className="px-6 py-3 text-right text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('actions')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
+                            <tbody className="divide-y divide-neutral-100/70 dark:divide-neutral-700/50">
                                 {filteredAssets.map(asset => (
-                                    <tr key={asset.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors group">
+                                    <tr key={asset.id} className="hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors duration-150 cursor-pointer border-b border-neutral-100/70 dark:border-neutral-700/50 group">
                                         <td className="px-6 py-4">
                                             <input 
                                                 type="checkbox" 
@@ -779,7 +779,8 @@ export const AssetsList: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4 text-sm text-neutral-600 dark:text-neutral-300">{t(`asset type ${asset.type.toLowerCase().replace('/','-').replace(/ /g, ' ')}`)}</td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${STATUS_COLORS[asset.status] || 'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300'}`}>
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[asset.status] || 'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300'}`}>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
                                                 {t(getStatusTranslationKey(asset.status))}
                                             </span>
                                         </td>
@@ -818,8 +819,11 @@ export const AssetsList: React.FC = () => {
                         </table>
                     </div>
                     {filteredAssets.length === 0 && (
-                        <div className="p-12 text-center text-neutral-500 dark:text-neutral-400 font-medium">
-                            {t('no results found')}
+                        <div className="py-16 flex flex-col items-center gap-3">
+                            <div className="p-4 rounded-full bg-neutral-100 dark:bg-neutral-800">
+                                {React.cloneElement(ICONS.assets as React.ReactElement<{ className?: string }>, { className: "w-8 h-8 text-neutral-400 dark:text-neutral-500" })}
+                            </div>
+                            <p className="text-neutral-500 text-sm font-medium">{t('no results found')}</p>
                         </div>
                     )}
                 </div>

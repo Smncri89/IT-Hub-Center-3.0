@@ -49,7 +49,7 @@ const UserMenu: React.FC = () => {
                 className="flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800/50 transition-all border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 active:scale-95"
             >
                 <div className="relative">
-                    <img className="h-8 w-8 rounded-full object-cover ring-2 ring-white dark:ring-neutral-800 shadow-sm" src={user.avatarUrl} alt={user.name} />
+                    <img className="h-8 w-8 rounded-full object-cover ring-2 ring-primary-500/30 shadow-sm" src={user.avatarUrl} alt={user.name} />
                     <span className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white dark:ring-neutral-900 ${currentStatus.color} ${currentStatus.glow}`}></span>
                 </div>
                 {!isMobile && (
@@ -162,7 +162,7 @@ const ThemeToggle: React.FC = () => {
     return (
         <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 dark:text-neutral-400 transition-all active:scale-95 hover:text-primary-600 dark:hover:text-primary-400"
+            className="p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 dark:text-neutral-400 transition-colors active:scale-95 hover:text-primary-600 dark:hover:text-primary-400"
             title={isDark ? t('switch to light mode') : t('switch to dark mode')}
         >
             {isDark ?
@@ -199,7 +199,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isCollapsed, toggleSideb
                 <button
                     onClick={openCommandPalette}
                     aria-label={t('search or jump to')}
-                    className={`flex items-center rounded-full bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-500 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 active:scale-95 transition-all ${isMobile ? 'p-2 justify-center' : 'gap-2 px-4 py-2 w-64'}`}
+                    className={`flex items-center rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 active:scale-95 transition-colors ${isMobile ? 'p-2 justify-center' : 'gap-2 px-4 py-2 w-64 text-sm'}`}
                 >
                     {React.cloneElement(ICONS.search, { className: "h-4 w-4" })}
                     {!isMobile && <span className="text-sm">{t('search or jump to')}</span>}

@@ -182,7 +182,7 @@ const LandingPage: React.FC = () => {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08]"
           >
-            <span className="text-neutral-900 dark:text-white">One platform for your</span>
+            <span className="bg-gradient-to-r from-neutral-900 via-primary-800 to-primary-700 dark:from-white dark:via-primary-200 dark:to-primary-100 bg-clip-text text-transparent">One platform for your</span>
             <br />
             <span className="text-primary-600 dark:text-primary-400">entire IT operations</span>
           </motion.h1>
@@ -203,7 +203,7 @@ const LandingPage: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3"
           >
-            <a href="/#/register" className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-xl shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all duration-300 active:scale-95">
+            <a href="/#/register" className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-xl shadow-xl shadow-primary-500/30 hover:shadow-2xl hover:shadow-primary-500/40 transform hover:-translate-y-1 transition-all duration-300 active:scale-95">
               Start free trial
               <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
             </a>
@@ -329,7 +329,7 @@ const LandingPage: React.FC = () => {
                 key={i}
                 variants={fade}
                 custom={i}
-                className="group p-6 rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                className="group p-6 rounded-2xl border border-neutral-200/60 dark:border-neutral-700/40 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm hover:shadow-lg hover:shadow-primary-500/10 hover:-translate-y-1 transition-all duration-300"
               >
                 <div className={`w-10 h-10 rounded-xl ${mod.bg} flex items-center justify-center mb-4`}>
                   <mod.icon size={20} className={mod.accent} strokeWidth={1.5} />
@@ -461,7 +461,7 @@ const LandingPage: React.FC = () => {
                 )}
                 <p className="text-xs font-medium uppercase tracking-wider text-neutral-400 dark:text-neutral-500">{tier.name}</p>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">{tier.price}</span>
+                  <span className="text-4xl font-black tracking-tight bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">{tier.price}</span>
                   {tier.period && <span className="text-sm text-neutral-400 dark:text-neutral-500">{tier.period}</span>}
                 </div>
                 <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">{tier.desc}</p>

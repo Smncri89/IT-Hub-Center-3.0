@@ -87,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isCollapsed, t
             </svg>
         </button>
 
-        <div className={`flex items-center h-20 px-6 flex-shrink-0 ${isCollapsed ? 'justify-center px-0' : 'justify-start'}`}>
+        <div className={`flex items-center h-20 px-6 flex-shrink-0 border-b border-neutral-200/60 dark:border-neutral-700/60 ${isCollapsed ? 'justify-center px-0' : 'justify-start'}`}>
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
                 <div className="absolute inset-0 bg-primary-500 blur-lg opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
@@ -95,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isCollapsed, t
                     <Logo className="h-6 w-6 text-white" />
                 </div>
             </div>
-            <span className={`font-bold text-xl tracking-tight text-neutral-900 dark:text-white transition-all duration-200 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
+            <span className={`font-black text-lg tracking-tight text-neutral-900 dark:text-white transition-all duration-200 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
                 IT Hub Center
             </span>
           </Link>
@@ -109,10 +109,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isCollapsed, t
                 <NavLink
                   to={item.path}
                   className={({ isActive }) => `
-                    flex items-center px-3.5 py-3 min-h-[44px] rounded-xl text-sm font-medium transition-all duration-300 group relative overflow-hidden
+                    flex items-center px-3.5 py-3 min-h-[44px] rounded-xl text-sm transition-all duration-150 group relative overflow-hidden
                     ${isActive
-                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300 shadow-sm ring-1 ring-primary-200 dark:ring-primary-500/20'
-                        : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-neutral-900 dark:hover:text-neutral-200'
+                        ? 'bg-gradient-to-r from-primary-500/15 to-primary-500/5 text-primary-700 dark:text-primary-300 font-semibold shadow-sm ring-1 ring-primary-200 dark:ring-primary-500/20'
+                        : 'font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100/80 dark:hover:bg-neutral-700/50 hover:text-neutral-900 dark:hover:text-neutral-100'
                     }
                     ${isCollapsed ? 'justify-center px-0' : ''}
                   `}
@@ -121,8 +121,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isCollapsed, t
                 >
                   {({ isActive }) => (
                     <>
-                      {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary-600 rounded-r-full"></div>}
-                      <div className={`flex-shrink-0 transition-colors duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300'}`}>
+                      {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary-500 rounded-r-full"></div>}
+                      <div className={`flex-shrink-0 p-1.5 rounded-lg transition-colors duration-200 ${isActive ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400' : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300'}`}>
                         {React.cloneElement(item.icon as React.ReactElement, { className: "w-[20px] h-[20px]" })}
                       </div>
                       <span className={`ml-3 whitespace-nowrap transition-all duration-200 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>{t(item.labelKey) === item.labelKey ? item.labelKey : t(item.labelKey)}</span>
