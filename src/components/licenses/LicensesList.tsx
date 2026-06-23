@@ -409,8 +409,9 @@ const LicensesList: React.FC = () => {
                                         )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium sticky right-0 z-10 bg-white dark:bg-neutral-800 group-hover:bg-primary-50/30 dark:group-hover:bg-primary-900/10 shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.3)] transition-colors duration-150">
-                                        <button onClick={() => setSelectedLicenseId(license.id)} className="text-primary-600 dark:text-primary-400 hover:underline font-semibold text-sm">
+                                        <button onClick={() => setSelectedLicenseId(license.id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200/60 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40 dark:border-primary-800/40 transition-all duration-150">
                                             {t('details')}
+                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                                         </button>
                                     </td>
                                 </tr>
@@ -481,8 +482,9 @@ const LicensesList: React.FC = () => {
                                 <span className="text-xs font-medium text-neutral-400">
                                     {t('expires')}: <span className={isExpired ? 'text-red-500 font-bold' : 'text-neutral-600 dark:text-neutral-300'}>{license.expirationDate ? new Date(license.expirationDate).toLocaleDateString() : 'N/A'}</span>
                                 </span>
-                                <button onClick={() => setSelectedLicenseId(license.id)} className="text-sm font-bold text-primary-600 dark:text-primary-400 hover:underline">
-                                    {t('details')} &rarr;
+                                <button onClick={() => setSelectedLicenseId(license.id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200/60 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40 dark:border-primary-800/40 transition-all duration-150">
+                                    {t('details')}
+                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                                 </button>
                             </div>
                         </div>

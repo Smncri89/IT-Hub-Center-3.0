@@ -578,7 +578,10 @@ export const TicketsList: React.FC = () => {
                                             </span>
                                         </td>
                                         <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-sm font-medium">
-                                            <Link to={`/tickets/${ticket.id}`} className="text-primary-600 dark:text-primary-400 hover:underline">{t('details')}</Link>
+                                            <Link to={`/tickets/${ticket.id}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200/60 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40 dark:border-primary-800/40 transition-all duration-150">
+                                                {t('details')}
+                                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))}
