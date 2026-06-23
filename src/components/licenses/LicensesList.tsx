@@ -357,7 +357,7 @@ const LicensesList: React.FC = () => {
             </MobileFilterToggle>
 
             {/* Desktop Table View */}
-            <div className="hidden lg:block bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm overflow-hidden">
+            <div className="hidden lg:block bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full">
                         <thead className="bg-neutral-50 dark:bg-neutral-800/80 border-b-2 border-neutral-100 dark:border-neutral-700">
