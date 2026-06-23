@@ -129,7 +129,7 @@ const LicensesList: React.FC = () => {
 
     const formatCurrency = (value: number | undefined) => {
         if (value === undefined || value === null) return 'N/A';
-        return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(value);
+        return new Intl.NumberFormat(navigator.language, { style: 'currency', currency: 'EUR' }).format(value);
     };
 
     const handleExport = () => {

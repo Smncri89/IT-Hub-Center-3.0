@@ -106,21 +106,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isCollapsed, t
           <ul>
             {[...allowedNavItems, ...extraItems].map(item => (
               <li key={item.id}>
-                <NavLink 
-                  to={item.path} 
+                <NavLink
+                  to={item.path}
                   className={({ isActive }) => `
-                    flex items-center px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden
-                    ${isActive 
-                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300 shadow-sm ring-1 ring-primary-200 dark:ring-primary-500/20' 
+                    flex items-center px-3.5 py-3 min-h-[44px] rounded-xl text-sm font-medium transition-all duration-300 group relative overflow-hidden
+                    ${isActive
+                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300 shadow-sm ring-1 ring-primary-200 dark:ring-primary-500/20'
                         : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-neutral-900 dark:hover:text-neutral-200'
                     }
                     ${isCollapsed ? 'justify-center px-0' : ''}
                   `}
                   title={isCollapsed ? (t(item.labelKey) === item.labelKey ? item.labelKey : t(item.labelKey)) : undefined}
+                  aria-label={isCollapsed ? (t(item.labelKey) === item.labelKey ? item.labelKey : t(item.labelKey)) : undefined}
                 >
                   {({ isActive }) => (
                     <>
-                      {isActive && !isCollapsed && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary-600 rounded-r-full"></div>}
+                      {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-primary-600 rounded-r-full"></div>}
                       <div className={`flex-shrink-0 transition-colors duration-200 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300'}`}>
                         {React.cloneElement(item.icon as React.ReactElement, { className: "w-[20px] h-[20px]" })}
                       </div>
@@ -137,7 +138,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isCollapsed, t
             <div className="relative">
                 <button
                     onClick={() => setIsLangOpen(!isLangOpen)}
-                    className={`flex items-center w-full p-2.5 rounded-xl text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:shadow-sm hover:text-neutral-900 dark:hover:text-neutral-200 transition-all duration-200 border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 ${isCollapsed ? 'justify-center' : ''}`}
+                    className={`flex items-center w-full p-2.5 min-h-[44px] rounded-xl text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:shadow-sm hover:text-neutral-900 dark:hover:text-neutral-200 transition-all duration-300 border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700 ${isCollapsed ? 'justify-center' : ''}`}
                     title={t('language')}
                 >
                     <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 shadow-sm ring-1 ring-neutral-200 dark:ring-neutral-700 transition-all">{FLAGS[language]}</div>
@@ -161,17 +162,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isCollapsed, t
             </div>
             
             {permissions.includes('settings') && (
-              <NavLink 
+              <NavLink
                 to="/settings"
                 className={({ isActive }) => `
-                    flex items-center p-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative
-                    ${isActive 
-                        ? 'bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-neutral-200 dark:ring-neutral-700' 
+                    flex items-center p-2.5 min-h-[44px] rounded-xl text-sm font-medium transition-all duration-300 group relative
+                    ${isActive
+                        ? 'bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-neutral-200 dark:ring-neutral-700'
                         : 'text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-200 hover:shadow-sm border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700'
                     }
                     ${isCollapsed ? 'justify-center' : ''}
                 `}
                 title={t('settings')}
+                aria-label={isCollapsed ? t('settings') : undefined}
               >
                  {({ isActive }) => (
                     <>

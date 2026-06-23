@@ -190,7 +190,7 @@ const NewTicketModal: React.FC<{
                     </div>
 
                     <div className="border-t border-neutral-100 dark:border-neutral-700 pt-4 mt-4">
-                        <h3 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-3 uppercase tracking-wide">Location & Contact Details</h3>
+                        <h3 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-3 uppercase tracking-wide">{t('location and contact details')}</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                              <div>
                                 <label className={labelStyle}>{t('contact info')}</label>
@@ -230,24 +230,14 @@ const NewTicketModal: React.FC<{
 
 const TicketBoard: React.FC<{ tickets: Ticket[], navigate: any, t: any }> = ({ tickets, navigate, t }) => {
     const columns = Object.values(TicketStatus);
-    const isMobile = window.innerWidth < 768;
 
     return (
-        <div
-            style={{
-                overflowX: 'auto',
-                overflowY: 'hidden',
-                WebkitOverflowScrolling: 'touch',
-                paddingBottom: 16,
-                marginBottom: -16,
-                touchAction: 'pan-x pan-y',
-            }}
-        >
-        <div style={{ display: 'flex', gap: isMobile ? 12 : 24, minWidth: 'max-content' }}>
+        <div className="overflow-x-auto overflow-y-hidden pb-4 -mb-4 touch-pan-x">
+        <div className="flex gap-3 sm:gap-6 min-w-max">
             {columns.map(status => {
                 const columnTickets = tickets.filter(t => t.status === status);
                 return (
-                    <div key={status} style={{ width: isMobile ? '72vw' : 320, flexShrink: 0 }}>
+                    <div key={status} className="w-[85vw] sm:w-80 flex-shrink-0">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-bold text-neutral-700 dark:text-neutral-200 uppercase text-xs tracking-wider flex items-center gap-2">
                                 <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[status].split(' ')[0]}`}></span>
@@ -255,10 +245,10 @@ const TicketBoard: React.FC<{ tickets: Ticket[], navigate: any, t: any }> = ({ t
                             </h3>
                             <span className="text-xs font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 px-2 py-0.5 rounded-full">{columnTickets.length}</span>
                         </div>
-                        <div className="space-y-3 custom-scrollbar" style={{ overflowY: 'auto', maxHeight: isMobile ? '55vh' : '65vh' }}>
+                        <div className="space-y-3 custom-scrollbar overflow-y-auto max-h-[55vh] sm:max-h-[65vh]">
                             {columnTickets.map(ticket => (
-                                <div 
-                                    key={ticket.id} 
+                                <div
+                                    key={ticket.id}
                                     onClick={() => navigate(`/tickets/${ticket.id}`)}
                                     className={`bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-sm border-l-4 cursor-pointer hover:shadow-md transition-all hover:-translate-y-1 ${
                                         ticket.priority === 'Urgent' ? 'border-l-red-500 dark:border-l-red-600' :
@@ -285,7 +275,7 @@ const TicketBoard: React.FC<{ tickets: Ticket[], navigate: any, t: any }> = ({ t
                             ))}
                             {columnTickets.length === 0 && (
                                 <div className="h-24 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl flex items-center justify-center text-neutral-400 text-xs font-medium">
-                                    Empty
+                                    {t('empty')}
                                 </div>
                             )}
                         </div>
