@@ -20,12 +20,24 @@ CREATE TABLE IF NOT EXISTS notifications (
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- Policy: users can read their own notifications
-CREATE POLICY IF NOT EXISTS "users_read_own_notifications" ON notifications
-  FOR SELECT USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'notifications' AND policyname = 'users_read_own_notifications'
+  ) THEN
+    CREATE POLICY "users_read_own_notifications" ON notifications
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
 -- Policy: service role can insert notifications
-CREATE POLICY IF NOT EXISTS "service_insert_notifications" ON notifications
-  FOR INSERT WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'notifications' AND policyname = 'service_insert_notifications'
+  ) THEN
+    CREATE POLICY "service_insert_notifications" ON notifications
+      FOR INSERT WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Enable realtime on notifications
 ALTER PUBLICATION supabase_realtime ADD TABLE notifications;
