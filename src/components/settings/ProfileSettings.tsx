@@ -8,6 +8,7 @@ import { Language, User } from '@/types';
 import { FLAGS, ICONS } from '@/constants';
 import { useData } from '@/hooks/useData';
 import * as api from '@/services/api';
+import SelectField from '@/components/ui/SelectField';
 
 // ... (UpdateAvatarModal, ThemeOption, ToggleSwitch components remain mostly the same but I'll refresh the whole file to be safe and clean)
 
@@ -461,14 +462,14 @@ const ProfileSettings: React.FC = () => {
                  </div>
             ) : (
                 <div className="space-y-2">
-                    <select value={tempMuteSelection} onChange={handleMuteChange} className="w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-md">
+                    <SelectField value={tempMuteSelection} onChange={handleMuteChange}>
                         <option value="">{t('select mute duration')}</option>
                         <option value="30m">{t('mute for 30 mins')}</option>
                         <option value="1h">{t('mute for 1 hour')}</option>
                         <option value="4h">{t('mute for 4 hours')}</option>
                         <option value="tomorrow">{t('mute until tomorrow')}</option>
                         <option value="custom">{t('mute custom')}</option>
-                    </select>
+                    </SelectField>
                     {tempMuteSelection === 'custom' && (
                         <div className="flex items-center gap-2">
                             <input type="datetime-local" value={customMuteDateTime} onChange={e => setCustomMuteDateTime(e.target.value)} className="w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-md"/>

@@ -13,6 +13,7 @@ import AssetMap from '@/components/maps/AssetMap';
 import ImportModal from '@/components/ImportModal';
 import { getLocations, Location } from '@/services/locationsService';
 import MobileFilterToggle from '@/components/MobileFilterToggle';
+import SelectField from '@/components/ui/SelectField';
 
 // --- HELPER: CSV PARSER ---
 const parseCsvRow = (row: string): string[] => {
@@ -125,40 +126,39 @@ const BulkEditModal: React.FC<{
                 <main className="p-6 space-y-4">
                     <div>
                         <label className={labelStyle}>{t('status')}</label>
-                        <select value={status} onChange={e => setStatus(e.target.value)} className={inputStyle}>
+                        <SelectField value={status} onChange={e => setStatus(e.target.value)}>
                             <option value="__NO_CHANGE__">-- No Change --</option>
                             {statusOptions.map(s => <option key={s} value={s}>{t(`status ${s.toLowerCase().replace(/ /g, ' ')}`)}</option>)}
-                        </select>
+                        </SelectField>
                     </div>
 
                     <div>
                         <label className={labelStyle}>{t('assigned to')}</label>
-                        <select value={assignedTo} onChange={e => setAssignedTo(e.target.value)} className={inputStyle}>
+                        <SelectField value={assignedTo} onChange={e => setAssignedTo(e.target.value)}>
                             <option value="__NO_CHANGE__">-- No Change --</option>
                             <option value="__UNASSIGN__">Unassign (Clear User)</option>
                             {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                        </select>
+                        </SelectField>
                     </div>
 
                     <div>
                         <div className="flex items-center justify-between mb-1">
                             <label className={labelStyle}>{t('location')}</label>
                             <div className="flex items-center gap-2">
-                                <input 
-                                    type="checkbox" 
-                                    id="changeLoc" 
-                                    checked={changeLocation} 
+                                <input
+                                    type="checkbox"
+                                    id="changeLoc"
+                                    checked={changeLocation}
                                     onChange={e => setChangeLocation(e.target.checked)}
                                     className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
                                 />
                                 <label htmlFor="changeLoc" className="text-xs text-neutral-500 cursor-pointer">Update Location</label>
                             </div>
                         </div>
-                        <select 
-                            value={location} 
-                            onChange={e => setLocation(e.target.value)} 
+                        <SelectField
+                            value={location}
+                            onChange={e => setLocation(e.target.value)}
                             disabled={!changeLocation}
-                            className={`${inputStyle} ${!changeLocation ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <option value="">{changeLocation ? "-- Select Location --" : "Check box to update"}</option>
                             {locations.map(loc => (
@@ -166,7 +166,7 @@ const BulkEditModal: React.FC<{
                                     {loc.name}{loc.city ? ` - ${loc.city}` : ''}{loc.is_headquarters ? ' (HQ)' : ''}
                                 </option>
                             ))}
-                        </select>
+                        </SelectField>
                     </div>
                 </main>
 
@@ -185,12 +185,9 @@ const BulkEditModal: React.FC<{
 
 // Reusable Filter Select Component
 const FilterSelectWrapper: React.FC<{name: string, value: string, children: React.ReactNode, label: string, onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void}> = ({name, value, children, label, onChange}) => (
-    <div>
-        <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{label}</label>
-        <select name={name} value={value} onChange={onChange} className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 w-full p-2.5 appearance-none text-neutral-900 dark:text-neutral-100">
-            {children}
-        </select>
-    </div>
+    <SelectField name={name} value={value} onChange={onChange} label={label}>
+        {children}
+    </SelectField>
 );
 
 export const AssetsList: React.FC = () => {

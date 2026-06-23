@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Asset } from '@/types';
 import { useData } from '@/hooks/useData';
 import { getLocations, Location } from '@/services/locationsService';
+import SelectField from '@/components/ui/SelectField';
 
 const AssetMap: React.FC<{ assets?: Asset[] }> = ({ assets: propAssets }) => {
     const { assets: contextAssets } = useData();
@@ -175,16 +176,16 @@ const AssetMap: React.FC<{ assets?: Asset[] }> = ({ assets: propAssets }) => {
                     <p className="text-xs text-neutral-500 mb-3">Showing {mappedAssets.length} assets with location data.</p>
                     
                     {/* Location Filter */}
-                    <select
+                    <SelectField
                         value={filterLocation}
                         onChange={e => setFilterLocation(e.target.value)}
-                        className="w-full px-3 py-2 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-neutral-900 dark:text-neutral-100"
+                        containerClassName="w-full"
                     >
                         <option value="all">All Locations</option>
                         {uniqueLocations.map(loc => (
                             <option key={loc} value={loc}>{loc}</option>
                         ))}
-                    </select>
+                    </SelectField>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">

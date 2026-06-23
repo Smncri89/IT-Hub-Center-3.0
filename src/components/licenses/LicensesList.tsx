@@ -14,6 +14,7 @@ import { createLicense } from '@/services/api';
 import LicenseDetail from './LicenseDetail';
 import ImportModal from '@/components/ImportModal';
 import MobileFilterToggle from '@/components/MobileFilterToggle';
+import SelectField from '@/components/ui/SelectField';
 
 const parseCsvRow = (row: string): string[] => {
     const values = [];
@@ -344,17 +345,12 @@ const LicensesList: React.FC = () => {
                     </div>
                      <div>
                         <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-1.5 uppercase tracking-wider block">{t('status')}</label>
-                        <div className="relative">
-                            <select name="status" value={filters.status} onChange={handleFilterChange} className="w-full bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-200 dark:border-neutral-600 rounded-xl shadow-sm text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 pl-3 pr-8 py-2.5 appearance-none text-neutral-700 dark:text-neutral-200 transition-all hover:border-neutral-300 dark:hover:border-neutral-500">
-                                <option value="all">{t('all')}</option>
-                                <option value="active">{t('expiration status active')}</option>
-                                <option value="expired">{t('expiration status expired')}</option>
-                                <option value="low">{t('low licenses')}</option>
-                            </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-500">
-                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                            </div>
-                        </div>
+                        <SelectField name="status" value={filters.status} onChange={handleFilterChange} containerClassName="w-full">
+                            <option value="all">{t('all')}</option>
+                            <option value="active">{t('expiration status active')}</option>
+                            <option value="expired">{t('expiration status expired')}</option>
+                            <option value="low">{t('low licenses')}</option>
+                        </SelectField>
                     </div>
                 </div>
             </div>

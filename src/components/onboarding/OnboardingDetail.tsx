@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Role, Asset } from '@/types';
+import SelectField from '@/components/ui/SelectField';
 import { getAssets } from '@/services/api';
 import {
   OnboardingProcess,
@@ -241,9 +242,12 @@ const OnboardingDetail: React.FC = () => {
             {proc.employee_email && <p className="text-sm text-neutral-400 mt-0.5">{proc.employee_email}</p>}
           </div>
           {isAdminOrAgent && (
-            <select value={proc.status} onChange={e => handleStatusChange(e.target.value)} className="px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm font-medium text-neutral-900 dark:text-white outline-none">
+            <SelectField
+              value={proc.status}
+              onChange={e => handleStatusChange(e.target.value)}
+            >
               {statusOptions.map(s => (<option key={s.value} value={s.value}>{s.label}</option>))}
-            </select>
+            </SelectField>
           )}
         </div>
 

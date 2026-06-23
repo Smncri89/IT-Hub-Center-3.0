@@ -12,6 +12,7 @@ import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import * as api from '@/services/api';
 import ImportModal from '@/components/ImportModal';
 import MobileFilterToggle from '@/components/MobileFilterToggle';
+import SelectField from '@/components/ui/SelectField';
 
 // Helper for CSV parsing (copied from other lists)
 const parseCsvRow = (row: string): string[] => {
@@ -164,28 +165,28 @@ const NewTicketModal: React.FC<{
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className={labelStyle}>{t('category')}</label>
-                            <select name="category" value={formData.category} onChange={handleChange} className={inputStyle}>
+                            <SelectField name="category" value={formData.category} onChange={handleChange}>
                                 {categories.map(c => <option key={c} value={c}>{t(`category ${c.toLowerCase()}`)}</option>)}
-                            </select>
+                            </SelectField>
                         </div>
                         <div>
                             <label className={labelStyle}>{t('subcategory')}</label>
-                            <select name="subcategory" value={formData.subcategory} onChange={handleChange} className={inputStyle}>
+                            <SelectField name="subcategory" value={formData.subcategory} onChange={handleChange}>
                                 {subcategories.map(s => <option key={s} value={s}>{t(`subcategory ${formData.category.toLowerCase()} ${s.toLowerCase().replace(/ /g, '_')}`)}</option>)}
-                            </select>
+                            </SelectField>
                         </div>
                         <div>
                             <label className={labelStyle}>{t('priority')}</label>
-                            <select name="priority" value={formData.priority} onChange={handleChange} className={inputStyle}>
+                            <SelectField name="priority" value={formData.priority} onChange={handleChange}>
                                 {Object.values(TicketPriority).map(p => <option key={p} value={p}>{t(p.toLowerCase())}</option>)}
-                            </select>
+                            </SelectField>
                         </div>
                         <div>
                             <label className={labelStyle}>{t('related asset')}</label>
-                            <select name="asset_id" value={formData.asset_id} onChange={handleChange} className={inputStyle}>
+                            <SelectField name="asset_id" value={formData.asset_id} onChange={handleChange}>
                                 <option value="">{t('none')}</option>
                                 {assets.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                            </select>
+                            </SelectField>
                         </div>
                     </div>
 
@@ -289,12 +290,9 @@ const TicketBoard: React.FC<{ tickets: Ticket[], navigate: any, t: any }> = ({ t
 
 // Defined outside to prevent re-creation on every render
 const FilterSelect: React.FC<{name: string, value: string, children: React.ReactNode, label: string, onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void}> = ({name, value, children, label, onChange}) => (
-    <div>
-        <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{label}</label>
-        <select name={name} value={value} onChange={onChange} className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 w-full p-2.5 appearance-none text-neutral-900 dark:text-neutral-100">
-            {children}
-        </select>
-    </div>
+    <SelectField name={name} value={value} onChange={onChange} label={label}>
+        {children}
+    </SelectField>
 );
 
 export const TicketsList: React.FC = () => {

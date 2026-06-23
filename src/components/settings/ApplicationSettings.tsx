@@ -5,6 +5,7 @@ import { useLocalization } from '@/hooks/useLocalization';
 import { useAuth } from '@/hooks/useAuth';
 import { ICONS } from '@/constants';
 import { Role } from '@/types';
+import SelectField from '@/components/ui/SelectField';
 
 const ApplicationSettings: React.FC = () => {
   const { t } = useLocalization();
@@ -101,18 +102,15 @@ const ApplicationSettings: React.FC = () => {
                       />
                   </div>
 
-                  <div>
-                      <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Type</label>
-                      <select 
-                          value={bannerConfig.type}
-                          onChange={e => setBannerConfig(prev => ({...prev, type: e.target.value}))}
-                          className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-md shadow-sm text-neutral-900 dark:text-neutral-100 focus:ring-primary-500 focus:border-primary-500"
-                      >
-                          <option value="info">Info (Blue)</option>
-                          <option value="warning">Warning (Orange)</option>
-                          <option value="error">Critical (Red)</option>
-                      </select>
-                  </div>
+                  <SelectField
+                      label="Type"
+                      value={bannerConfig.type}
+                      onChange={e => setBannerConfig(prev => ({...prev, type: e.target.value}))}
+                  >
+                      <option value="info">Info (Blue)</option>
+                      <option value="warning">Warning (Orange)</option>
+                      <option value="error">Critical (Red)</option>
+                  </SelectField>
 
                   <div className="flex justify-end items-center gap-3 pt-2">
                       {isBannerSaved && <span className="text-sm text-green-600 font-medium animate-fade-in">Saved & Published!</span>}

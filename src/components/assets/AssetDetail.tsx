@@ -11,6 +11,7 @@ import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import { useData } from '@/hooks/useData';
 import { calculateCurrentValue } from '@/utils/depreciation';
 import * as QRCode from 'qrcode';
+import SelectField from '@/components/ui/SelectField';
 
 const DetailRow: React.FC<{label: string, value?: string, children?: React.ReactNode}> = ({label, value, children}) => (
     <div className="flex justify-between items-start py-2 border-b border-neutral-200 dark:border-neutral-700/50 last:border-b-0">
@@ -336,16 +337,15 @@ const AssetDetail: React.FC = () => {
                              <div className="space-y-3 text-sm">
                                 <DetailRow label={t('status')}>
                                     {canManage ? (
-                                        <select
+                                        <SelectField
                                             value={asset.status}
                                             onChange={(e) => handleFieldUpdate({ status: e.target.value as Asset['status'] })}
-                                            className="w-full p-1 text-sm bg-neutral-100 dark:bg-neutral-700 rounded-md border-transparent focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-neutral-900 dark:text-neutral-100"
                                             aria-label={t('status')}
                                         >
                                             {statusOptions.map((opt: any) => (
                                                 <option key={opt.value} value={opt.value}>{t(opt.labelKey.replace(/_/g, ' '))}</option>
                                             ))}
-                                        </select>
+                                        </SelectField>
                                     ) : (
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[asset.status]}`}>
                                             {t(getStatusTranslationKey(asset.status))}
@@ -355,17 +355,16 @@ const AssetDetail: React.FC = () => {
                                 <DetailRow label={t('asset type')} value={t(`asset type ${asset.type.toLowerCase().replace('/','-').replace(/ /g, ' ')}`)} />
                                 <DetailRow label={t('assigned to')}>
                                     {canManage ? (
-                                        <select
+                                        <SelectField
                                             value={asset.assignedTo?.id || ''}
                                             onChange={(e) => handleFieldUpdate({ assignedTo: allUsers.find(u => u.id === e.target.value) })}
-                                            className="w-full p-1 text-sm bg-neutral-100 dark:bg-neutral-700 rounded-md border-transparent focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-neutral-900 dark:text-neutral-100"
                                             aria-label={t('assigned to')}
                                         >
                                             <option value="">{t('unassigned')}</option>
                                             {allUsers.map(user => (
                                                 <option key={user.id} value={user.id}>{user.name}</option>
                                             ))}
-                                        </select>
+                                        </SelectField>
                                     ) : (
                                         <span>{asset.assignedTo?.name || t('unassigned')}</span>
                                     )}
@@ -468,16 +467,16 @@ const AssetDetail: React.FC = () => {
                     <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
                         <h2 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">{t('check out')}</h2>
                         <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-4">{t('confirm checkout')}</p>
-                        <select
+                        <SelectField
                             value={checkoutUserId}
                             onChange={e => setCheckoutUserId(e.target.value)}
-                            className="w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md mb-4"
+                            containerClassName="mb-4"
                         >
                             <option value="">{t('select user for checkout')}</option>
                             {allUsers.map(user => (
                                 <option key={user.id} value={user.id}>{user.name}</option>
                             ))}
-                        </select>
+                        </SelectField>
                         <div className="flex justify-end gap-2">
                             <button onClick={() => setShowCheckoutModal(false)} className="px-4 py-2 text-sm font-medium rounded-md bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-100">{t('cancel')}</button>
                             <button onClick={handleCheckout} disabled={!checkoutUserId} className="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50">{t('check out')}</button>

@@ -10,6 +10,7 @@ import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import { ICONS } from '@/constants';
 import { useData } from '@/hooks/useData';
 import ImportModal from '@/components/ImportModal';
+import SelectField from '@/components/ui/SelectField';
 
 const parseCsvRow = (row: string): string[] => {
     const values = [];
@@ -149,12 +150,18 @@ const UserFormModal: React.FC<{
                             </div>
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label htmlFor="role" className={labelStyle}>{t('user role')}</label>
-                                    <select name="role" id="role" value={formData.role} onChange={handleChange} disabled={isEditingSelf} className={`${inputStyle} disabled:opacity-50 disabled:cursor-not-allowed`}>
+                                    <SelectField
+                                        label={t('user role')}
+                                        name="role"
+                                        id="role"
+                                        value={formData.role}
+                                        onChange={handleChange}
+                                        disabled={isEditingSelf}
+                                    >
                                         {Object.values(Role).map((role: string) => (
                                             <option key={role} value={role}>{t(`role ${role.toLowerCase().replace(/ /g, '-')}`)}</option>
                                         ))}
-                                    </select>
+                                    </SelectField>
                                     {isEditingSelf && <p className="text-xs text-neutral-500 mt-1">{t('cannot change own role')}</p>}
                                 </div>
                                 <div>

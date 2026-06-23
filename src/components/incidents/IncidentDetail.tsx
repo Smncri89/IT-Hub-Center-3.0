@@ -9,6 +9,7 @@ import Spinner from '@/components/Spinner';
 import { ICONS, INCIDENT_STATUS_COLORS, INCIDENT_CATEGORY_COLORS } from '@/constants';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import { useData } from '@/hooks/useData';
+import SelectField from '@/components/ui/SelectField';
 
 const DetailRow: React.FC<{label: string, value?: string | React.ReactNode, children?: React.ReactNode}> = ({label, value, children}) => (
     <div className="py-3 border-b border-neutral-200 dark:border-neutral-700/50 last:border-b-0">
@@ -305,9 +306,9 @@ const IncidentDetail: React.FC = () => {
                 <dl>
                     <DetailRow label={t('status')}>
                         {canManage ? (
-                            <select value={incident.status} onChange={e => handleUpdate({ status: e.target.value as Incident['status'] })} className="w-full p-1 bg-neutral-100 dark:bg-neutral-700/50 rounded-md border-transparent focus:ring-1 focus:ring-primary-500 text-sm">
+                            <SelectField value={incident.status} onChange={e => handleUpdate({ status: e.target.value as Incident['status'] })} containerClassName="w-full">
                                 {incidentStatuses.map(s => <option key={s} value={s}>{t(`incident status ${s.toLowerCase()}`)}</option>)}
-                            </select>
+                            </SelectField>
                         ) : (
                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${INCIDENT_STATUS_COLORS[incident.status]}`}>
                                 {t(`incident status ${incident.status.toLowerCase()}`)}
@@ -316,9 +317,9 @@ const IncidentDetail: React.FC = () => {
                     </DetailRow>
                      <DetailRow label={t('severity')}>
                         {canManage ? (
-                            <select value={incident.severity} onChange={e => handleUpdate({ severity: e.target.value as Incident['severity'] })} className="w-full p-1 bg-neutral-100 dark:bg-neutral-700/50 rounded-md border-transparent focus:ring-1 focus:ring-primary-500 text-sm">
+                            <SelectField value={incident.severity} onChange={e => handleUpdate({ severity: e.target.value as Incident['severity'] })} containerClassName="w-full">
                                 {severities.map(s => <option key={s} value={s}>{t(`severity ${s.toLowerCase()}`)}</option>)}
-                            </select>
+                            </SelectField>
                         ) : (<span>{t(`severity ${incident.severity.toLowerCase()}`)}</span>)}
                     </DetailRow>
                     <DetailRow label={t('category')}>
@@ -329,10 +330,10 @@ const IncidentDetail: React.FC = () => {
                     <DetailRow label={t('reporter')} value={incident.reporter?.name} />
                     <DetailRow label={t('assignee')}>
                     {canManage ? (
-                        <select value={incident.assignee?.id || ''} onChange={e => handleUpdate({ assignee: assignableUsers.find(u => u.id === e.target.value) })} className="w-full p-1 bg-neutral-100 dark:bg-neutral-700/50 rounded-md border-transparent focus:ring-1 focus:ring-primary-500 text-sm">
+                        <SelectField value={incident.assignee?.id || ''} onChange={e => handleUpdate({ assignee: assignableUsers.find(u => u.id === e.target.value) })} containerClassName="w-full">
                             <option value="">{t('unassigned')}</option>
                             {assignableUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                        </select>
+                        </SelectField>
                     ) : (<span>{incident.assignee?.name || t('unassigned')}</span>)}
                     </DetailRow>
                     <DetailRow label={t('created at')} value={new Date(incident.createdAt).toLocaleString()} />

@@ -3,12 +3,13 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Asset, User } from '@/types';
 import { getAssetById, getUsers, createAsset, updateAsset, uploadAssetImage, getAssetImageSuggestion, findImageForModel } from '@/services/api';
 import { useLocalization } from '@/hooks/useLocalization';
-import { useAuth } from '@/hooks/useAuth'; 
+import { useAuth } from '@/hooks/useAuth';
 import Spinner from '@/components/Spinner';
 import { ICONS, ASSET_TYPES_CONFIG, ASSET_IMAGE_LIBRARY } from '@/constants';
 import { useData } from '@/hooks/useData';
 import { calculateCurrentValue } from '@/utils/depreciation';
 import { getLocations, Location } from '@/services/locationsService';
+import SelectField from '@/components/ui/SelectField';
 
 const AddAsset: React.FC = () => {
     const { assetId } = useParams<{ assetId: string }>();
@@ -292,14 +293,14 @@ const AddAsset: React.FC = () => {
             return (
                 <div key={field.id} className={field.grid_span || 'col-span-1'}>
                     {label}
-                    <select {...commonProps}>
+                    <SelectField {...commonProps}>
                         <option value="">{t('select location')}</option>
                         {locations.map(loc => (
                             <option key={loc.id} value={loc.name}>
                                 {loc.name}{loc.city ? ` - ${loc.city}` : ''}{loc.is_headquarters ? ' (HQ)' : ''}
                             </option>
                         ))}
-                    </select>
+                    </SelectField>
                 </div>
             );
         }
@@ -353,16 +354,16 @@ const AddAsset: React.FC = () => {
                 return <div key={field.id} className={field.grid_span || 'col-span-1'}>{label}<textarea {...commonProps} rows={3}></textarea></div>;
             case 'select':
                 if (field.id === 'type') {
-                    return <div key={field.id} className={field.grid_span || 'col-span-1'}>{label}<select {...commonProps}>
+                    return <div key={field.id} className={field.grid_span || 'col-span-1'}>{label}<SelectField {...commonProps}>
                         {Object.keys(ASSET_TYPES_CONFIG).map(key => {
                             const typeLabelKey = `asset type ${key.toLowerCase().replace('/',' ')}`;
                             return <option key={key} value={key}>{t(typeLabelKey)}</option>
                         })}
-                    </select></div>;
+                    </SelectField></div>;
                  }
-                return <div key={field.id} className={field.grid_span || 'col-span-1'}>{label}<select {...commonProps}>
+                return <div key={field.id} className={field.grid_span || 'col-span-1'}>{label}<SelectField {...commonProps}>
                     {field.options.map((opt: any) => <option key={opt.value} value={opt.value}>{t(opt.labelKey.replace(/_/g, ' '))}</option>)}
-                </select></div>;
+                </SelectField></div>;
             default:
                 return null;
         }
@@ -539,10 +540,10 @@ const AddAsset: React.FC = () => {
                         <h3 className="font-semibold text-neutral-800 dark:text-neutral-100">{t('assignment')}</h3>
                         <div>
                             <label htmlFor="assignedTo" className="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">{t('assigned to')}</label>
-                            <select name="assignedTo" id="assignedTo" value={formData.assignedTo as any || ''} onChange={handleChange} className="w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-md shadow-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
+                            <SelectField name="assignedTo" id="assignedTo" value={formData.assignedTo as any || ''} onChange={handleChange}>
                                 <option value="">{t('unassigned')}</option>
                                 {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                            </select>
+                            </SelectField>
                         </div>
                     </div>
                 </main>

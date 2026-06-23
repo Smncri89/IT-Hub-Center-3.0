@@ -23,6 +23,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useData } from '@/hooks/useData';
 import Spinner from '@/components/Spinner';
 import { ICONS, STATUS_COLORS, PRIORITY_COLORS } from '@/constants';
+import SelectField from '@/components/ui/SelectField';
 
 const DetailRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
     <div className="grid grid-cols-3 gap-4 py-3 border-b border-neutral-200 dark:border-neutral-700/50">
@@ -295,25 +296,25 @@ export const TicketDetail: React.FC = () => {
                     <dl>
                         <DetailRow label={t('status')}>
                             {canManage ? (
-                                <select value={ticket.status} onChange={e => handleUpdate({ status: e.target.value as TicketStatus })} className="w-full p-1 bg-neutral-100 dark:bg-neutral-900 rounded-md border-transparent focus:border-primary-500 focus:ring-1 focus:ring-primary-500">
+                                <SelectField value={ticket.status} onChange={e => handleUpdate({ status: e.target.value as TicketStatus })}>
                                     {Object.values(TicketStatus).map(s => <option key={s} value={s}>{t(`ticket status ${s.toLowerCase().replace(/ /g, ' ')}`)}</option>)}
-                                </select>
+                                </SelectField>
                             ) : <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${STATUS_COLORS[ticket.status]}`}>{t(`ticket status ${(ticket.status || '').toLowerCase().replace(/ /g, ' ')}`)}</span>}
                         </DetailRow>
                         <DetailRow label={t('priority')}>
                             {canManage ? (
-                                <select value={ticket.priority} onChange={e => handleUpdate({ priority: e.target.value as TicketPriority })} className="w-full p-1 bg-neutral-100 dark:bg-neutral-900 rounded-md border-transparent focus:border-primary-500 focus:ring-1 focus:ring-primary-500">
+                                <SelectField value={ticket.priority} onChange={e => handleUpdate({ priority: e.target.value as TicketPriority })}>
                                     {Object.values(TicketPriority).map(p => <option key={p} value={p}>{t(`priority ${p.toLowerCase()}`)}</option>)}
-                                </select>
+                                </SelectField>
                             ) : <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${PRIORITY_COLORS[ticket.priority]}`}>{t(`priority ${(ticket.priority || '').toLowerCase()}`)}</span>}
                         </DetailRow>
                         <DetailRow label={t('category')}>{translateCategory(ticket.category)}</DetailRow>
                         <DetailRow label={t('assignee')}>
                             {canManage ? (
-                                <select value={ticket.assignee?.id || ''} onChange={e => handleUpdate({ assignee: assignableUsers.find(u => u.id === e.target.value) })} className="w-full p-1 bg-neutral-100 dark:bg-neutral-900 rounded-md border-transparent focus:border-primary-500 focus:ring-1 focus:ring-primary-500">
+                                <SelectField value={ticket.assignee?.id || ''} onChange={e => handleUpdate({ assignee: assignableUsers.find(u => u.id === e.target.value) })}>
                                     <option value="">{t('unassigned')}</option>
                                     {assignableUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                                </select>
+                                </SelectField>
                             ) : (
                                 <span>{ticket.assignee?.name || t('unassigned')}</span>
                             )}

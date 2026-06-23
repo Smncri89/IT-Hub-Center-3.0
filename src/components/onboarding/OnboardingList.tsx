@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalization } from '@/hooks/useLocalization';
 import { Role } from '@/types';
+import SelectField from '@/components/ui/SelectField';
 import {
   OnboardingProcess,
   OnboardingTemplate,
@@ -291,26 +292,24 @@ const OnboardingList: React.FC = () => {
             onChange={e => setSearch(e.target.value)}
             className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700/50 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none transition"
           />
-          <select
+          <SelectField
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value as any)}
-            className="px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700/50 text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none transition"
           >
             <option value="all">Tutti i tipi</option>
             <option value="onboarding">Onboarding</option>
             <option value="offboarding">Offboarding</option>
-          </select>
-          <select
+          </SelectField>
+          <SelectField
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700/50 text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none transition"
           >
             <option value="all">Tutti gli stati</option>
             <option value="pending">In attesa</option>
             <option value="in_progress">In corso</option>
             <option value="completed">Completato</option>
             <option value="cancelled">Annullato</option>
-          </select>
+          </SelectField>
         </div>
       </div>
 
@@ -416,23 +415,18 @@ const OnboardingList: React.FC = () => {
 
             {/* template selector */}
             {templates.filter(tp => tp.type === form.type).length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-                  Template (opzionale)
-                </label>
-                <select
-                  value={form.template_id}
-                  onChange={e => setForm(f => ({ ...f, template_id: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-white outline-none"
-                >
-                  <option value="">— Nessun template —</option>
-                  {templates.filter(tp => tp.type === form.type).map(tp => (
-                    <option key={tp.id} value={tp.id}>
-                      {tp.name} — {tp.items?.length ?? 0} task
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectField
+                label="Template (opzionale)"
+                value={form.template_id}
+                onChange={e => setForm(f => ({ ...f, template_id: e.target.value }))}
+              >
+                <option value="">— Nessun template —</option>
+                {templates.filter(tp => tp.type === form.type).map(tp => (
+                  <option key={tp.id} value={tp.id}>
+                    {tp.name} — {tp.items?.length ?? 0} task
+                  </option>
+                ))}
+              </SelectField>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -445,11 +439,14 @@ const OnboardingList: React.FC = () => {
                 <input type="email" value={form.employee_email} onChange={e => setForm(f => ({ ...f, employee_email: e.target.value }))} className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-white outline-none" placeholder="email@azienda.com" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Tipo</label>
-                <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as any, template_id: '' }))} className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-white outline-none">
+                <SelectField
+                  label="Tipo"
+                  value={form.type}
+                  onChange={e => setForm(f => ({ ...f, type: e.target.value as any, template_id: '' }))}
+                >
                   <option value="onboarding">Onboarding</option>
                   <option value="offboarding">Offboarding</option>
-                </select>
+                </SelectField>
               </div>
               <div>
                 <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Data inizio</label>
@@ -464,24 +461,30 @@ const OnboardingList: React.FC = () => {
                 <input value={form.position} onChange={e => setForm(f => ({ ...f, position: e.target.value }))} className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-white outline-none" placeholder="Es. Junior Developer" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Sede</label>
-                <select value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-white outline-none">
+                <SelectField
+                  label="Sede"
+                  value={form.location}
+                  onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
+                >
                   <option value="">— Seleziona sede —</option>
                   {locations.map(loc => (
                     <option key={loc.id} value={loc.name}>
                       {loc.name}{loc.city ? ` — ${loc.city}` : ''}{loc.is_headquarters ? ' (HQ)' : ''}
                     </option>
                   ))}
-                </select>
+                </SelectField>
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Assegnato a</label>
-                <select value={form.assigned_to} onChange={e => setForm(f => ({ ...f, assigned_to: e.target.value }))} className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm text-neutral-900 dark:text-white outline-none">
+                <SelectField
+                  label="Assegnato a"
+                  value={form.assigned_to}
+                  onChange={e => setForm(f => ({ ...f, assigned_to: e.target.value }))}
+                >
                   <option value="">— Nessuno —</option>
                   {users.filter(u => u.role === Role.Admin || u.role === Role.Agent).map(u => (
                     <option key={u.id} value={u.id}>{u.name}</option>
                   ))}
-                </select>
+                </SelectField>
               </div>
             </div>
 

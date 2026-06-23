@@ -10,6 +10,7 @@ import * as api from '@/services/api';
 import { ICONS } from '@/constants';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import LicenseFormModal from './LicenseFormModal';
+import SelectField from '@/components/ui/SelectField';
 
 const DeleteConfirmationModal: React.FC<{
   isOpen: boolean;
@@ -225,15 +226,10 @@ const LicenseDetail: React.FC<LicenseDetailProps> = ({ licenseIdOverride, onClos
                             <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-700">
                                 <label className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2 block">{t('assign user')}</label>
                                 <div className="flex gap-3">
-                                    <div className="relative flex-grow">
-                                        <select value={userToAssign} onChange={e => setUserToAssign(e.target.value)} className="w-full pl-4 pr-10 py-2.5 bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-200 dark:border-neutral-600 rounded-xl shadow-sm text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 appearance-none text-neutral-700 dark:text-neutral-200">
-                                            <option value="">{t('select user')}...</option>
-                                            {availableUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                                        </select>
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-neutral-500">
-                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                        </div>
-                                    </div>
+                                    <SelectField value={userToAssign} onChange={e => setUserToAssign(e.target.value)} containerClassName="flex-grow">
+                                        <option value="">{t('select user')}...</option>
+                                        {availableUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                                    </SelectField>
                                     <button onClick={handleAssignUser} disabled={isSubmitting || !userToAssign} className="px-6 py-2.5 text-sm font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-primary-500/20 transition-all active:scale-95">
                                         {isSubmitting ? <Spinner size="sm"/> : t('assign')}
                                     </button>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocalization } from '@/hooks/useLocalization';
 import { getAuditLog, AuditLogEntry } from '@/services/auditService';
 import Spinner from '@/components/Spinner';
+import SelectField from '@/components/ui/SelectField';
 
 const ACTION_COLORS: Record<string, string> = {
     create: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
@@ -45,10 +46,9 @@ const AuditLogSettings: React.FC = () => {
             <p className="text-neutral-500 dark:text-neutral-400 mb-6">{t('audit log desc')}</p>
 
             <div className="flex gap-3 mb-6">
-                <select
+                <SelectField
                     value={filterType}
                     onChange={e => setFilterType(e.target.value)}
-                    className="px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200"
                 >
                     <option value="">{t('all entity types')}</option>
                     <option value="ticket">{t('entity ticket')}</option>
@@ -59,11 +59,10 @@ const AuditLogSettings: React.FC = () => {
                     <option value="vendor">{t('entity vendor')}</option>
                     <option value="user">{t('entity user')}</option>
                     <option value="system">{t('entity system')}</option>
-                </select>
-                <select
+                </SelectField>
+                <SelectField
                     value={filterAction}
                     onChange={e => setFilterAction(e.target.value)}
-                    className="px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200"
                 >
                     <option value="">{t('all actions')}</option>
                     <option value="create">{t('action create')}</option>
@@ -74,7 +73,7 @@ const AuditLogSettings: React.FC = () => {
                     <option value="checkout">{t('action checkout')}</option>
                     <option value="import">{t('action import')}</option>
                     <option value="export">{t('action export')}</option>
-                </select>
+                </SelectField>
             </div>
 
             {entries.length === 0 ? (
