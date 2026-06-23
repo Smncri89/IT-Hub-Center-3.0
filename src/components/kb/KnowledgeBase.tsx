@@ -234,7 +234,7 @@ const KnowledgeBase: React.FC = () => {
             <div className="flex items-center gap-2 mt-4 md:mt-0">
                 <button
                     onClick={handleImportClick}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-600"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors"
                     title={t('import')}
                 >
                     {React.cloneElement(ICONS.upload, { className: "h-4 w-4"})}
@@ -243,15 +243,15 @@ const KnowledgeBase: React.FC = () => {
                  <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={handleFileImport} />
                  <button
                     onClick={handleExport}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-600"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors"
                     title={t('export')}
                 >
                     {React.cloneElement(ICONS.download, { className: "h-4 w-4"})}
                     <span>{t('export')}</span>
                 </button>
-                <button 
+                <button
                   onClick={() => navigate('/kb/new')}
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                  className="px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 rounded-xl shadow-md shadow-primary-500/20 transition-all active:scale-95"
                 >
                     {t('create article')}
                 </button>
@@ -264,7 +264,7 @@ const KnowledgeBase: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('kb search placeholder')}
-            className="w-full px-4 py-3 text-lg bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-3 text-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all"
           />
         </div>
 
@@ -273,10 +273,10 @@ const KnowledgeBase: React.FC = () => {
           <button
             key={category}
             onClick={() => setActiveCategory(category)}
-            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${
+            className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-150 ${
               activeCategory === category
-                ? 'bg-primary-600 text-white'
-                : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-600'
+                ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-md shadow-primary-500/20'
+                : 'bg-neutral-100 dark:bg-neutral-700/60 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600 border border-neutral-200 dark:border-neutral-600'
             }`}
           >
             {category === 'all' ? t('all categories') : translateCategory(category)}
@@ -290,7 +290,7 @@ const KnowledgeBase: React.FC = () => {
             <div
               key={article.id}
               onClick={() => navigate(`/kb/${article.id}`)}
-              className="bg-white dark:bg-neutral-800 rounded-xl shadow-md p-6 flex flex-col cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all"
+              className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 p-6 flex flex-col cursor-pointer"
               role="link"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && navigate(`/kb/${article.id}`)}
@@ -305,9 +305,9 @@ const KnowledgeBase: React.FC = () => {
                   {article.content[language] || article.content.en}
                 </p>
               </div>
-              <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700 flex flex-wrap gap-2">
+              <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-700/50 flex flex-wrap gap-2">
                 {article.tags.map(tag => (
-                  <span key={tag} className="text-xs bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 px-2 py-1 rounded-full">
+                  <span key={tag} className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-neutral-100 dark:bg-neutral-700/60 text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-600">
                     {tag}
                   </span>
                 ))}

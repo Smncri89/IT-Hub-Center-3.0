@@ -193,7 +193,7 @@ const ChangePasswordForm: React.FC = () => {
             {success && <p className="text-sm text-green-500">{success}</p>}
 
             <div className="flex justify-end pt-2">
-                <button type="submit" disabled={isSaving} className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:bg-primary-300">
+                <button type="submit" disabled={isSaving} className="px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 rounded-xl shadow-md shadow-primary-500/20 disabled:opacity-50 transition-all active:scale-95">
                     {isSaving ? <Spinner size="sm" /> : t('change password')}
                 </button>
             </div>
@@ -369,22 +369,26 @@ export const SecuritySettings: React.FC = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="space-y-4">
-                <h3 className="text-xl font-semibold">{t('change password')}</h3>
+        <div className="space-y-6">
+            <div>
+                <h2 className="border-l-4 border-primary-500 pl-3 text-base font-bold text-neutral-900 dark:text-white">{t('change password')}</h2>
+            </div>
+            <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm p-6">
                 <ChangePasswordForm />
             </div>
-            <div className="space-y-4 pt-8 border-t dark:border-neutral-700">
-                 <h3 className="text-xl font-semibold">{t('two factor authentication')}</h3>
+            <div>
+                <h2 className="border-l-4 border-primary-500 pl-3 text-base font-bold text-neutral-900 dark:text-white">{t('two factor authentication')}</h2>
+            </div>
+            <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm p-6 space-y-4">
                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
                     {user?.isTwoFactorEnabled ? t('2fa status enabled') : t('2fa status disabled')}
                 </p>
                 <button
                     onClick={handleToggle2FA}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg text-white transition-colors ${
-                        user?.isTwoFactorEnabled 
-                        ? 'bg-red-600 hover:bg-red-700' 
-                        : 'bg-primary-600 hover:bg-primary-700'
+                    className={`px-4 py-2 text-sm font-bold rounded-xl text-white transition-all active:scale-95 shadow-md ${
+                        user?.isTwoFactorEnabled
+                        ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 shadow-red-500/20'
+                        : 'bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 shadow-primary-500/20'
                     }`}
                 >
                     {user?.isTwoFactorEnabled ? t('disable 2fa') : t('enable 2fa')}

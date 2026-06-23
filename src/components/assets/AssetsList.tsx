@@ -588,7 +588,7 @@ export const AssetsList: React.FC = () => {
         <div className="space-y-6 animate-fade-in pb-10">
             
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{t('page title assets')}</h1>
+                <h1 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">{t('page title assets')}</h1>
                 
                 <div className="flex gap-2 items-center">
                     {user?.role !== Role.EndUser && (
@@ -620,15 +620,15 @@ export const AssetsList: React.FC = () => {
                                 </button>
                             )}
                             
-                            <button onClick={handleImportClick} className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700">
+                            <button onClick={handleImportClick} className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700 shadow-sm transition-all">
                                 {React.cloneElement(ICONS.upload as React.ReactElement<{ className?: string }>, { className: "h-4 w-4"})}
                                 <span>{t('import')}</span>
                             </button>
-                            <button onClick={handleExport} className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700">
+                            <button onClick={handleExport} className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700 shadow-sm transition-all">
                                 {React.cloneElement(ICONS.download as React.ReactElement<{ className?: string }>, { className: "h-4 w-4"})}
                                 <span>{t('export')}</span>
                             </button>
-                            <Link to="/assets/new" className="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 active:scale-95">
+                            <Link to="/assets/new" className="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white px-4 py-2 rounded-xl font-semibold text-sm shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 active:scale-95">
                                 {React.cloneElement(ICONS.plus as React.ReactElement<{ className?: string }>, { className: "h-5 w-5"})}
                                 <span className="hidden sm:inline">{t('add asset')}</span>
                             </Link>
@@ -738,7 +738,7 @@ export const AssetsList: React.FC = () => {
             {viewMode === 'map' ? (
                  <AssetMap assets={filteredAssets} />
             ) : (
-                <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-md overflow-hidden">
+                <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
                             <thead className="bg-neutral-50 dark:bg-neutral-800/80 border-b-2 border-neutral-100 dark:border-neutral-700">
@@ -746,13 +746,13 @@ export const AssetsList: React.FC = () => {
                                     <th scope="col" className="px-6 py-3 text-left">
                                         <input type="checkbox" onChange={handleSelectAll} checked={selectedAssetIds.length === filteredAssets.length && filteredAssets.length > 0} className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500 bg-neutral-100 dark:bg-neutral-800 dark:border-neutral-700" />
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider"></th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('asset name')}</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('asset type')}</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('status')}</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('assigned to')}</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('purchase date')}</th>
-                                    <th className="px-6 py-3 text-right text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">{t('actions')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider"></th>
+                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">{t('asset name')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">{t('asset type')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">{t('status')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">{t('assigned to')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">{t('purchase date')}</th>
+                                    <th className="px-6 py-3 text-right text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">{t('actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-neutral-100/70 dark:divide-neutral-700/50">
@@ -777,34 +777,38 @@ export const AssetsList: React.FC = () => {
                                             <div className="text-sm font-bold text-neutral-900 dark:text-white">{asset.name}</div>
                                             <div className="text-xs text-neutral-500 font-mono">{asset.assetTag}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-neutral-600 dark:text-neutral-300">{t(`asset type ${asset.type.toLowerCase().replace('/','-').replace(/ /g, ' ')}`)}</td>
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
+                                                {t(`asset type ${asset.type.toLowerCase().replace('/','-').replace(/ /g, ' ')}`)}
+                                            </span>
+                                        </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[asset.status] || 'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300'}`}>
                                                 <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
                                                 {t(getStatusTranslationKey(asset.status))}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4 max-w-[200px]">
                                             {asset.assignedTo ? (
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-3 min-w-0">
                                                     {asset.assignedTo.avatarUrl ? (
-                                                        <img src={asset.assignedTo.avatarUrl} alt={asset.assignedTo.name} className="w-8 h-8 rounded-full object-cover border border-neutral-200 dark:border-neutral-700" />
+                                                        <img src={asset.assignedTo.avatarUrl} alt={asset.assignedTo.name} className="w-8 h-8 rounded-full object-cover border border-neutral-200 dark:border-neutral-700 flex-shrink-0" />
                                                     ) : (
-                                                        <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 flex items-center justify-center text-xs font-bold">
+                                                        <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
                                                             {asset.assignedTo.name.charAt(0)}
                                                         </div>
                                                     )}
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm font-medium text-neutral-900 dark:text-white">{asset.assignedTo.name}</span>
-                                                        <span className="text-xs text-neutral-500 dark:text-neutral-400">{asset.assignedTo.email}</span>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <span className="text-sm font-medium text-neutral-900 dark:text-white truncate">{asset.assignedTo.name}</span>
+                                                        <span className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{asset.assignedTo.email}</span>
                                                     </div>
                                                 </div>
                                             ) : (
                                                 <span className="text-sm text-neutral-400 italic">{t('unassigned')}</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-neutral-500 dark:text-neutral-400 font-medium">
-                                            {asset.purchaseDate ? new Date(asset.purchaseDate).toLocaleDateString() : 'N/A'}
+                                        <td className="px-6 py-4 text-sm text-neutral-600 dark:text-neutral-300">
+                                            {asset.purchaseDate ? new Date(asset.purchaseDate).toLocaleDateString() : <span className="text-xs text-neutral-400 dark:text-neutral-500">N/A</span>}
                                         </td>
                                         <td className="px-6 py-4 text-right whitespace-nowrap text-sm font-medium">
                                             <div className="flex items-center justify-end gap-3">
@@ -819,11 +823,14 @@ export const AssetsList: React.FC = () => {
                         </table>
                     </div>
                     {filteredAssets.length === 0 && (
-                        <div className="py-16 flex flex-col items-center gap-3">
-                            <div className="p-4 rounded-full bg-neutral-100 dark:bg-neutral-800">
-                                {React.cloneElement(ICONS.assets as React.ReactElement<{ className?: string }>, { className: "w-8 h-8 text-neutral-400 dark:text-neutral-500" })}
+                        <div className="py-16 flex flex-col items-center gap-4">
+                            <div className="p-5 rounded-full bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700">
+                                {React.cloneElement(ICONS.assets as React.ReactElement<{ className?: string }>, { className: "w-10 h-10 text-neutral-400 dark:text-neutral-500" })}
                             </div>
-                            <p className="text-neutral-500 text-sm font-medium">{t('no results found')}</p>
+                            <div className="text-center">
+                                <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">{t('no results found')}</p>
+                                <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">Try adjusting your filters or add a new asset.</p>
+                            </div>
                         </div>
                     )}
                 </div>

@@ -23,8 +23,9 @@ const badge = (
   label: string
 ) => (
   <span
-    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${color}`}
+    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${color}`}
   >
+    <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
     {label}
   </span>
 );
@@ -231,7 +232,7 @@ const OnboardingList: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
+          <h1 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
             Onboarding / Offboarding
           </h1>
           <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
@@ -270,86 +271,93 @@ const OnboardingList: React.FC = () => {
         ].map(k => (
           <div
             key={k.label}
-            className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-neutral-200 dark:border-neutral-700 shadow-sm"
+            className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl p-4 border border-neutral-100 dark:border-neutral-700/50 shadow-sm"
           >
-            <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
+            <p className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
               {k.label}
             </p>
-            <p className={`text-2xl font-bold mt-1 ${k.color}`}>{k.value}</p>
+            <p className={`text-2xl font-black mt-1 ${k.color}`}>{k.value}</p>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <input
-          type="text"
-          placeholder="Cerca dipendente, reparto, sede..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition"
-        />
-        <select
-          value={typeFilter}
-          onChange={e => setTypeFilter(e.target.value as any)}
-          className="px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white outline-none"
-        >
-          <option value="all">Tutti i tipi</option>
-          <option value="onboarding">Onboarding</option>
-          <option value="offboarding">Offboarding</option>
-        </select>
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white outline-none"
-        >
-          <option value="all">Tutti gli stati</option>
-          <option value="pending">In attesa</option>
-          <option value="in_progress">In corso</option>
-          <option value="completed">Completato</option>
-          <option value="cancelled">Annullato</option>
-        </select>
+      <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm p-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Cerca dipendente, reparto, sede..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="flex-1 px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700/50 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none transition"
+          />
+          <select
+            value={typeFilter}
+            onChange={e => setTypeFilter(e.target.value as any)}
+            className="px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700/50 text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none transition"
+          >
+            <option value="all">Tutti i tipi</option>
+            <option value="onboarding">Onboarding</option>
+            <option value="offboarding">Offboarding</option>
+          </select>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700/50 text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none transition"
+          >
+            <option value="all">Tutti gli stati</option>
+            <option value="pending">In attesa</option>
+            <option value="in_progress">In corso</option>
+            <option value="completed">Completato</option>
+            <option value="cancelled">Annullato</option>
+          </select>
+        </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm overflow-hidden">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-neutral-400 dark:text-neutral-500">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-            <p className="text-sm">Nessun processo trovato</p>
+          <div className="py-16 flex flex-col items-center gap-4">
+            <div className="p-5 rounded-full bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-neutral-400 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Nessun processo trovato</p>
+              <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">Prova a modificare i filtri o crea un nuovo processo.</p>
+            </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead>
-                <tr className="border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/60">
-                  <th className="px-5 py-3 font-semibold text-neutral-500 dark:text-neutral-400">Dipendente</th>
-                  <th className="px-5 py-3 font-semibold text-neutral-500 dark:text-neutral-400">Tipo</th>
-                  <th className="px-5 py-3 font-semibold text-neutral-500 dark:text-neutral-400">Stato</th>
-                  <th className="px-5 py-3 font-semibold text-neutral-500 dark:text-neutral-400">Sede</th>
-                  <th className="px-5 py-3 font-semibold text-neutral-500 dark:text-neutral-400">Progresso</th>
-                  <th className="px-5 py-3 font-semibold text-neutral-500 dark:text-neutral-400">Assegnato a</th>
-                  <th className="px-5 py-3 font-semibold text-neutral-500 dark:text-neutral-400">Data inizio</th>
+                <tr className="bg-neutral-50 dark:bg-neutral-800/80 border-b-2 border-neutral-100 dark:border-neutral-700">
+                  <th className="px-5 py-3 text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Dipendente</th>
+                  <th className="px-5 py-3 text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Tipo</th>
+                  <th className="px-5 py-3 text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Stato</th>
+                  <th className="px-5 py-3 text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Sede</th>
+                  <th className="px-5 py-3 text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Progresso</th>
+                  <th className="px-5 py-3 text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Assegnato a</th>
+                  <th className="px-5 py-3 text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Data inizio</th>
                   {isAdminOrAgent && <th className="px-5 py-3" />}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-700/50">
+              <tbody className="divide-y divide-neutral-100/70 dark:divide-neutral-700/50">
                 {filtered.map(p => {
                   const pct = progress(p);
                   return (
                     <tr
                       key={p.id}
-                      className="hover:bg-neutral-50 dark:hover:bg-neutral-700/30 cursor-pointer transition-colors"
+                      className="hover:bg-primary-50/30 dark:hover:bg-primary-900/10 cursor-pointer transition-colors duration-150"
                       onClick={() => nav(`/onboarding/${p.id}`)}
                     >
-                      <td className="px-5 py-3.5">
-                        <div className="font-medium text-neutral-900 dark:text-white">{p.employee_name}</div>
-                        {p.position && <div className="text-xs text-neutral-400">{p.position}{p.department ? ` · ${p.department}` : ''}</div>}
+                      <td className="px-5 py-4">
+                        <div className="text-sm font-bold text-neutral-900 dark:text-white">{p.employee_name}</div>
+                        {p.position && <div className="text-xs text-neutral-400 dark:text-neutral-500">{p.position}{p.department ? ` · ${p.department}` : ''}</div>}
                       </td>
-                      <td className="px-5 py-3.5">{badge(typeColor[p.type], p.type === 'onboarding' ? 'Onboarding' : 'Offboarding')}</td>
-                      <td className="px-5 py-3.5">{badge(statusColor[p.status] ?? '', statusLabel[p.status] || p.status)}</td>
-                      <td className="px-5 py-3.5 text-neutral-600 dark:text-neutral-300">{p.location || '—'}</td>
-                      <td className="px-5 py-3.5">
+                      <td className="px-5 py-4">{badge(typeColor[p.type], p.type === 'onboarding' ? 'Onboarding' : 'Offboarding')}</td>
+                      <td className="px-5 py-4">{badge(statusColor[p.status] ?? '', statusLabel[p.status] || p.status)}</td>
+                      <td className="px-5 py-4 text-sm text-neutral-600 dark:text-neutral-300">{p.location || '—'}</td>
+                      <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
                           <div className="w-24 h-2 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden">
                             <div
@@ -357,14 +365,14 @@ const OnboardingList: React.FC = () => {
                               style={{ width: `${pct}%` }}
                             />
                           </div>
-                          <span className="text-xs font-medium text-neutral-500">{pct}%</span>
+                          <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">{pct}%</span>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5 text-neutral-600 dark:text-neutral-300">
-                        {p.assignee?.name || '—'}
+                      <td className="px-5 py-4 text-sm text-neutral-600 dark:text-neutral-300">
+                        {p.assignee?.name || <span className="text-xs text-neutral-400 dark:text-neutral-500">—</span>}
                       </td>
-                      <td className="px-5 py-3.5 text-neutral-500">
-                        {p.start_date ? new Date(p.start_date).toLocaleDateString('it-IT') : '—'}
+                      <td className="px-5 py-4 text-sm text-neutral-600 dark:text-neutral-300">
+                        {p.start_date ? new Date(p.start_date).toLocaleDateString('it-IT') : <span className="text-xs text-neutral-400 dark:text-neutral-500">—</span>}
                       </td>
                       {isAdminOrAgent && (
                         <td className="px-5 py-3.5">

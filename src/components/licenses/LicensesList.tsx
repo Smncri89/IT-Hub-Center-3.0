@@ -272,7 +272,7 @@ const LicensesList: React.FC = () => {
     return (
         <div className="space-y-6">
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
-                <h1 className="text-3xl font-black text-neutral-900 dark:text-white tracking-tight">{t('page title licenses')}</h1>
+                <h1 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">{t('page title licenses')}</h1>
                  <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto">
                     <button onClick={handleImportClick} className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700 shadow-sm transition-all">
                         {React.cloneElement(ICONS.upload, { className: "h-4 w-4"})}
@@ -284,7 +284,7 @@ const LicensesList: React.FC = () => {
                     </button>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="flex-1 xl:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-500/30 transition-all hover:-translate-y-0.5 active:scale-95"
+                        className="flex-1 xl:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 rounded-xl shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 active:scale-95"
                     >
                         {React.cloneElement(ICONS.plus, { className: 'w-5 h-5' })}
                         <span>{t('new license')}</span>
@@ -361,31 +361,32 @@ const LicensesList: React.FC = () => {
             </MobileFilterToggle>
 
             {/* Desktop Table View */}
-            <div className="hidden lg:block bg-white dark:bg-neutral-800 rounded-3xl shadow-soft border border-neutral-100 dark:border-neutral-800 overflow-hidden">
+            <div className="hidden lg:block bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full">
-                        <thead className="bg-neutral-50/50 dark:bg-neutral-900/30 border-b border-neutral-100 dark:border-neutral-800">
+                        <thead className="bg-neutral-50 dark:bg-neutral-800/80 border-b-2 border-neutral-100 dark:border-neutral-700">
                             <tr>
                                 {tableHeaders.map(header => (
-                                    <th key={header} className={`px-6 py-4 text-left text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider ${header === 'actions' ? 'text-right sticky right-0 bg-white dark:bg-neutral-800 z-20 shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.3)]' : ''}`}>{t(header)}</th>
+                                    <th key={header} className={`px-6 py-3 text-left text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider ${header === 'actions' ? 'text-right sticky right-0 bg-neutral-50 dark:bg-neutral-800 z-20 shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.3)]' : ''}`}>{t(header)}</th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                            {filteredLicenses.map((license, index) => {
+                        <tbody className="divide-y divide-neutral-100/70 dark:divide-neutral-700/50">
+                            {filteredLicenses.map((license) => {
                                 const usedSeats = license.assignments.length;
                                 const totalSeats = license.totalSeats;
                                 const isExpired = license.expirationDate && new Date(license.expirationDate) < new Date();
+                                const daysUntilExpiry = license.expirationDate ? Math.ceil((new Date(license.expirationDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
+                                const isExpiringSoon = !isExpired && daysUntilExpiry !== null && daysUntilExpiry <= 30;
                                 const usagePercentage = totalSeats > 0 ? (usedSeats / totalSeats) * 100 : 0;
-                                const rowClass = index % 2 === 0 ? 'bg-white dark:bg-neutral-800' : 'bg-neutral-50/30 dark:bg-neutral-800/50';
 
                                 return (
-                                <tr key={license.id} className={`${rowClass} hover:bg-neutral-50 dark:hover:bg-neutral-700/30 transition-colors group`}>
+                                <tr key={license.id} className="hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors duration-150 group">
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-bold text-neutral-900 dark:text-neutral-100">{license.name}</div>
+                                        <div className="text-sm font-bold text-neutral-900 dark:text-white">{license.name}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-medium text-neutral-600 dark:text-neutral-300">{license.software}</div>
+                                        <div className="text-sm text-neutral-600 dark:text-neutral-300">{license.software}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap align-middle">
                                         <div className="flex items-center gap-3 w-48">
@@ -397,17 +398,22 @@ const LicensesList: React.FC = () => {
                                     </td>
                                     {isAdmin && (
                                         <>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-neutral-500 dark:text-neutral-400">{formatCurrency(license.totalCost)}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-neutral-500 dark:text-neutral-400">{formatCurrency(license.costPerSeat)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-600 dark:text-neutral-300 font-mono">{formatCurrency(license.totalCost)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-600 dark:text-neutral-300 font-mono">{formatCurrency(license.costPerSeat)}</td>
                                         </>
                                     )}
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span className={`font-medium ${isExpired ? 'text-red-600' : 'text-neutral-500 dark:text-neutral-400'}`}>
-                                            {license.expirationDate ? new Date(license.expirationDate).toLocaleDateString() : 'N/A'}
-                                        </span>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {license.expirationDate ? (
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${isExpired ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : isExpiringSoon ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
+                                                {new Date(license.expirationDate).toLocaleDateString()}
+                                            </span>
+                                        ) : (
+                                            <span className="text-xs text-neutral-400 dark:text-neutral-500">N/A</span>
+                                        )}
                                     </td>
-                                    <td className={`px-6 py-4 whitespace-nowrap text-right text-sm font-medium sticky right-0 z-10 ${rowClass} shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.3)]`}>
-                                        <button onClick={() => setSelectedLicenseId(license.id)} className="text-primary-600 dark:text-primary-400 hover:underline font-medium text-sm">
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium sticky right-0 z-10 bg-white dark:bg-neutral-800 group-hover:bg-primary-50/30 dark:group-hover:bg-primary-900/10 shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.3)] transition-colors duration-150">
+                                        <button onClick={() => setSelectedLicenseId(license.id)} className="text-primary-600 dark:text-primary-400 hover:underline font-semibold text-sm">
                                             {t('details')}
                                         </button>
                                     </td>
@@ -416,6 +422,17 @@ const LicensesList: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+                {filteredLicenses.length === 0 && (
+                    <div className="py-16 flex flex-col items-center gap-4">
+                        <div className="p-5 rounded-full bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700">
+                            {React.cloneElement(ICONS.licenses ?? ICONS.file, { className: "w-10 h-10 text-neutral-400 dark:text-neutral-500" })}
+                        </div>
+                        <div className="text-center">
+                            <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">{t('no results found')}</p>
+                            <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">Try adjusting your filters or add a new license.</p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Card View for Mobile */}

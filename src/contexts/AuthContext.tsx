@@ -150,11 +150,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = useCallback(async (email: string, pass: string): Promise<LoginResult> => {
     const result = await authService.login(email, pass);
+    if (result.user) {
+      setUser(result.user);
+      setStatus(UserStatus.Online);
+    }
     return result;
   }, []);
-  
+
   const verify2FA = useCallback(async (token: string): Promise<{ user?: User; error?: string }> => {
     const result = await authService.verify2FA(token);
+    if (result.user) {
+      setUser(result.user);
+      setStatus(UserStatus.Online);
+    }
     return result;
   }, []);
 

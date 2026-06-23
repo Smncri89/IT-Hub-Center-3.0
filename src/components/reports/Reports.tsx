@@ -64,10 +64,10 @@ const ChartWrapper: React.FC<{ title: string; children: React.ReactNode; hasData
         <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">{title}</h3>
         {subtitle && <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{subtitle}</p>}
     </div>
-    {/* Explicitly setting min-height helps Recharts calculate dimensions correctly */}
-    <div style={{ height, minHeight: height }} className="w-full relative flex-grow">
-      {hasData ? <div className="absolute inset-0 w-full h-full">{children}</div> : 
-        <div className="h-full flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl">
+    {/* flex-1 min-h-0 lets Recharts measure the available space correctly without absolute positioning */}
+    <div style={{ minHeight: height }} className="w-full flex flex-col flex-1 min-h-0">
+      {hasData ? <div className="flex flex-col flex-1 min-h-0">{children}</div> :
+        <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl">
           <span className="text-sm font-medium opacity-50">No data available</span>
         </div>}
     </div>
@@ -75,7 +75,7 @@ const ChartWrapper: React.FC<{ title: string; children: React.ReactNode; hasData
 );
 
 const StatCard = ({ title, value, subtext, icon, trend, trendValue, colorClass }: any) => (
-  <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50">
+  <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-neutral-100 dark:border-neutral-700/50 hover:shadow-md transition-shadow duration-200 border-l-4 border-l-primary-500/40">
     <div className="flex justify-between items-start mb-4">
       <span className="text-xs font-bold uppercase text-neutral-500 dark:text-neutral-400 tracking-wider truncate pr-2">{title}</span>
       <div className={`p-2 rounded-lg ${colorClass} bg-opacity-10 dark:bg-opacity-20 flex-shrink-0`}>
@@ -586,9 +586,9 @@ const Reports: React.FC = () => {
                     {ICONS.reports ? React.cloneElement(ICONS.reports as React.ReactElement<any>, { className: 'w-6 h-6 text-primary-600' }) : null}
                     {t('page title reports')}
                 </h1>
-                <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl overflow-x-auto max-w-full">
+                <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl overflow-x-auto max-w-full gap-0.5">
                     {['overview', 'financials', 'assets', 'analysis', 'users', 'audit'].map((tab) => (
-                        <button key={tab} onClick={() => setActiveTab(tab as any)} className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${activeTab === tab ? 'bg-white dark:bg-neutral-700 text-primary-600 shadow-sm' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400'}`}>
+                        <button key={tab} onClick={() => setActiveTab(tab as any)} className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${activeTab === tab ? 'bg-white dark:bg-neutral-700 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-white/50 dark:hover:bg-neutral-700/50'}`}>
                             {t(`report tab ${tab}`)}
                         </button>
                     ))}
@@ -943,11 +943,11 @@ const Reports: React.FC = () => {
             )}
 
             {activeTab === 'audit' && (
-                <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm rounded-2xl border border-neutral-200/50 dark:border-neutral-700/50 overflow-hidden">
-                    <div className="p-6 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-800/20">
+                <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-neutral-100 dark:border-neutral-700/50 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-800/20">
                         <div>
-                            <h3 className="font-bold text-lg text-neutral-900 dark:text-white">Audit Trail</h3>
-                            <p className="text-xs font-medium text-neutral-500 mt-1">Full chronological activity log</p>
+                            <h3 className="border-l-4 border-primary-500 pl-3 text-base font-bold text-neutral-900 dark:text-white">Audit Trail</h3>
+                            <p className="text-xs font-medium text-neutral-500 mt-1 pl-4">Full chronological activity log</p>
                         </div>
                         <div className="text-xs font-mono bg-neutral-200 dark:bg-neutral-700 px-2 py-1 rounded text-neutral-600 dark:text-neutral-300">
                             {activityStream.length} Events
@@ -955,18 +955,18 @@ const Reports: React.FC = () => {
                     </div>
                     <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-neutral-50 dark:bg-neutral-800/80 text-xs uppercase text-neutral-500 sticky top-0 backdrop-blur-sm z-10">
+                            <thead className="bg-neutral-50 dark:bg-neutral-800/80 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 border-b-2 border-neutral-100 dark:border-neutral-700 sticky top-0 backdrop-blur-sm z-10">
                                 <tr>
-                                    <th className="px-6 py-4 font-bold tracking-wider">Timestamp</th>
-                                    <th className="px-6 py-4 font-bold tracking-wider">Type</th>
-                                    <th className="px-6 py-4 font-bold tracking-wider">User</th>
-                                    <th className="px-6 py-4 font-bold tracking-wider">Action</th>
-                                    <th className="px-6 py-4 font-bold tracking-wider">Details</th>
+                                    <th className="px-6 py-4">Timestamp</th>
+                                    <th className="px-6 py-4">Type</th>
+                                    <th className="px-6 py-4">User</th>
+                                    <th className="px-6 py-4">Action</th>
+                                    <th className="px-6 py-4">Details</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-700/50">
                                 {activityStream.map((log, i) => (
-                                    <tr key={i} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors group">
+                                    <tr key={i} className="hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors duration-150 cursor-pointer group">
                                         <td className="px-6 py-3 font-mono text-xs text-neutral-500 whitespace-nowrap">
                                             {DateUtils.formatDate(log.date)} <span className="opacity-50 ml-1">{DateUtils.formatTime(log.date)}</span>
                                         </td>

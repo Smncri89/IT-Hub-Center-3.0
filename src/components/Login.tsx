@@ -40,7 +40,7 @@ const Login: React.FC = () => {
             navigate('/dashboard');
         }
     } else {
-        const { user, error: apiError, requires2FA: needs2FA } = await login(email, password);
+        const { user, error: apiError, requires2FA: needs2FA } = await login(email.trim(), password);
         setIsLoading(false);
         if (apiError) {
           if (apiError.startsWith('account_locked:')) {

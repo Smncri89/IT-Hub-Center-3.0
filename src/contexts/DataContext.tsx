@@ -98,6 +98,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 });
                 break;
             case 'tickets':
+                if (payload.eventType === 'DELETE') {
+                    setTickets(prev => prev.filter(t => t.id !== payload.old.id));
+                    break;
+                }
                 const hasValidRequester = usersMap.has(payload.new.requester_id);
                 if (!hasValidRequester) {
                     if (payload.eventType === 'UPDATE') {
@@ -108,7 +112,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setTickets(prev => {
                     if (payload.eventType === 'INSERT') return [mapTicketData(payload.new, usersMap, assetsMap), ...prev];
                     if (payload.eventType === 'UPDATE') return prev.map(t => t.id === payload.new.id ? mapTicketData(payload.new, usersMap, assetsMap) : t);
-                    if (payload.eventType === 'DELETE') return prev.filter(t => t.id !== payload.old.id);
                     return prev;
                 });
                 break;
@@ -162,6 +165,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 });
                 break;
             case 'incidents':
+                if (payload.eventType === 'DELETE') {
+                    setIncidents(prev => prev.filter(i => i.id !== payload.old.id));
+                    break;
+                }
                 const hasValidReporter = usersMap.has(payload.new.reporter_id);
                 if (!hasValidReporter) {
                     if (payload.eventType === 'UPDATE') {
@@ -172,11 +179,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setIncidents(prev => {
                     if (payload.eventType === 'INSERT') return [mapIncidentData(payload.new, usersMap), ...prev];
                     if (payload.eventType === 'UPDATE') return prev.map(i => i.id === payload.new.id ? mapIncidentData(payload.new, usersMap) : i);
-                    if (payload.eventType === 'DELETE') return prev.filter(i => i.id !== payload.old.id);
                     return prev;
                 });
                 break;
             case 'kb_articles':
+                if (payload.eventType === 'DELETE') {
+                    setArticles(prev => prev.filter(a => a.id !== payload.old.id));
+                    break;
+                }
                 const hasValidAuthor = usersMap.has(payload.new.author_id);
                 if (!hasValidAuthor) {
                     if (payload.eventType === 'UPDATE') {
@@ -187,7 +197,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setArticles(prev => {
                     if (payload.eventType === 'INSERT') return [mapKBArticleData(payload.new, usersMap), ...prev];
                     if (payload.eventType === 'UPDATE') return prev.map(a => a.id === payload.new.id ? mapKBArticleData(payload.new, usersMap) : a);
-                    if (payload.eventType === 'DELETE') return prev.filter(a => a.id !== payload.old.id);
                     return prev;
                 });
                 break;

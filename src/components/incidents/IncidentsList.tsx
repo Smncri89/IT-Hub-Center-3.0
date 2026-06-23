@@ -130,7 +130,7 @@ const IncidentFormModal: React.FC<{
     const inputStyle = "w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md shadow-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition";
 
     return (
-        <div className={`fixed inset-0 bg-black z-40 flex justify-center items-center transition-opacity duration-200 ${isAnimating ? 'bg-opacity-60' : 'bg-opacity-0'}`} onClick={onClose}>
+        <div className={`fixed inset-0 bg-black z-50 flex justify-center items-center transition-opacity duration-200 ${isAnimating ? 'bg-opacity-60' : 'bg-opacity-0'}`} onClick={onClose}>
             <div className={`bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col transition-all duration-300 transform ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`} onClick={e => e.stopPropagation()}>
                 <header className="p-6 border-b border-neutral-200 dark:border-neutral-700 flex-shrink-0">
                     <h2 className="text-xl font-bold text-neutral-900 dark:text-white">{isEditMode ? t('edit incident') : t('create incident')}</h2>
@@ -179,7 +179,7 @@ const IncidentFormModal: React.FC<{
                 </main>
                 <footer className="p-6 bg-neutral-50 dark:bg-neutral-900/50 border-t border-neutral-200 dark:border-neutral-700 flex justify-end gap-3 flex-shrink-0 rounded-b-2xl">
                     <button onClick={onClose} className="px-4 py-2 text-sm font-bold rounded-xl bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-200 transition-colors">{t('cancel')}</button>
-                    <button onClick={handleSave} disabled={isSaving} className="px-6 py-2 text-sm font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 disabled:opacity-50 shadow-lg shadow-primary-500/30 transition-all active:scale-95">
+                    <button onClick={handleSave} disabled={isSaving} className="px-6 py-2 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 rounded-xl shadow-md shadow-primary-500/20 disabled:opacity-50 transition-all active:scale-95">
                         {isSaving ? <Spinner size="sm" /> : (isEditMode ? t('save changes') : t('create incident'))}
                     </button>
                 </footer>
@@ -192,7 +192,7 @@ const IncidentFormModal: React.FC<{
 const FilterSelect: React.FC<{name: string, value: string, children: React.ReactNode, label: string, onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void}> = ({name, value, children, label, onChange}) => (
     <div>
         <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{label}</label>
-        <select name={name} value={value} onChange={onChange} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-sm text-sm focus:ring-primary-500 focus:border-primary-500 w-full p-2.5 appearance-none text-neutral-900 dark:text-neutral-100">
+        <select name={name} value={value} onChange={onChange} className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 w-full p-2.5 appearance-none text-neutral-900 dark:text-neutral-100">
             {children}
         </select>
     </div>
@@ -443,16 +443,16 @@ export const IncidentsList: React.FC = () => {
                 <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-100">{t('page title incidents')}</h1>
                 {canCreate && (
                      <div className="flex items-center gap-2">
-                        <button onClick={handleImportClick} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-600">
+                        <button onClick={handleImportClick} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors">
                             {React.cloneElement(ICONS.upload as React.ReactElement<{ className?: string }>, { className: "h-4 w-4"})}
                             <span>{t('import')}</span>
                         </button>
                         <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={e => {if(e.target.files?.[0]) handleFileImport(e.target.files[0])}} />
-                        <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-600">
+                        <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors">
                             {React.cloneElement(ICONS.download as React.ReactElement<{ className?: string }>, { className: "h-4 w-4"})}
                             <span>{t('export')}</span>
                         </button>
-                        <button onClick={() => { setIncidentToEdit(null); setIsModalOpen(true); }} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">
+                        <button onClick={() => { setIncidentToEdit(null); setIsModalOpen(true); }} className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 rounded-xl shadow-md shadow-primary-500/20 transition-all active:scale-95">
                             {React.cloneElement(ICONS.plus as React.ReactElement<{ className?: string }>, { className: 'w-5 h-5' })}
                             <span>{t('create incident')}</span>
                         </button>
@@ -461,12 +461,12 @@ export const IncidentsList: React.FC = () => {
             </div>
 
              <MobileFilterToggle>
-             <div className="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow-md">
+             <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm p-4 rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
                     <div className="lg:col-span-2">
                          <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1">{t('search')}</label>
                          <div className="relative">
-                            <input type="search" placeholder={t('incident search placeholder')} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-neutral-900 dark:text-neutral-100"/>
+                            <input type="search" placeholder={t('incident search placeholder')} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 text-neutral-900 dark:text-neutral-100"/>
                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
                                 {React.cloneElement(ICONS.search as React.ReactElement<{ className?: string }>, { className: 'w-5 h-5' })}
                             </div>
@@ -492,22 +492,27 @@ export const IncidentsList: React.FC = () => {
             </div>
             </MobileFilterToggle>
 
-            <div className="space-y-4">
+            <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm overflow-hidden">
+                <div className="px-4 py-3 border-b border-neutral-100 dark:border-neutral-700/50">
+                    <h2 className="border-l-4 border-primary-500 pl-3 text-base font-bold text-neutral-900 dark:text-white">{t('page title incidents')} <span className="ml-2 text-sm font-normal text-neutral-500 dark:text-neutral-400">({filteredIncidents.length})</span></h2>
+                </div>
+                <div className="divide-y divide-neutral-100 dark:divide-neutral-700/50">
                 {filteredIncidents.map(incident => (
-                    <div key={incident.id} onClick={() => navigate(`/incidents/${incident.id}`)} className="bg-white dark:bg-neutral-800 rounded-xl shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow">
+                    <div key={incident.id} onClick={() => navigate(`/incidents/${incident.id}`)} className="p-4 hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors duration-150 cursor-pointer">
                         <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
                             <div className="flex-grow">
-                                <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${INCIDENT_CATEGORY_COLORS[incident.category]}`}>{t(`incident category ${(incident.category || '').toLowerCase().replace(/ /g, ' ')}`)}</span>
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${INCIDENT_CATEGORY_COLORS[incident.category]}`}>{t(`incident category ${(incident.category || '').toLowerCase().replace(/ /g, ' ')}`)}</span>
                                 <h3 className="font-bold text-lg mt-1 text-neutral-900 dark:text-neutral-100">{incident.title}</h3>
                                 <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-1">{incident.description}</p>
                             </div>
                             <div className="flex-shrink-0 flex sm:flex-col items-end gap-2 sm:gap-0 sm:items-end w-full sm:w-auto">
-                                <span className={`px-2 py-1 text-sm font-semibold rounded-full ${INCIDENT_STATUS_COLORS[incident.status]}`}>{t(`incident status ${incident.status.toLowerCase()}`)}</span>
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${INCIDENT_STATUS_COLORS[incident.status]}`}>{t(`incident status ${incident.status.toLowerCase()}`)}</span>
                                 <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">{new Date(incident.updatedAt).toLocaleString()}</p>
                             </div>
                         </div>
                     </div>
                 ))}
+                </div>
             </div>
             
             <IncidentFormModal 
@@ -518,7 +523,7 @@ export const IncidentsList: React.FC = () => {
             />
 
             {isImportModalRendered && (
-                <div className={`fixed inset-0 bg-black z-40 flex justify-center items-center transition-opacity duration-200 ${isImportModalAnimating ? 'bg-opacity-60' : 'bg-opacity-0'}`} onClick={() => setIsImportModalOpen(false)}>
+                <div className={`fixed inset-0 bg-black z-50 flex justify-center items-center transition-opacity duration-200 ${isImportModalAnimating ? 'bg-opacity-60' : 'bg-opacity-0'}`} onClick={() => setIsImportModalOpen(false)}>
                     <div className={`bg-white dark:bg-neutral-800 rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-all duration-300 ${isImportModalAnimating ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-10 scale-95'}`} onClick={e => e.stopPropagation()}>
                         <h2 className="text-xl font-semibold">{t('import status')}</h2>
                         {isImporting ? (

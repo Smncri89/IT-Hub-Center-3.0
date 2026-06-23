@@ -554,27 +554,27 @@ export const TicketsList: React.FC = () => {
                             <tbody className="divide-y divide-neutral-100/70 dark:divide-neutral-700/50">
                                 {filteredTickets.map(ticket => (
                                     <tr key={ticket.id} className="hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors duration-150 cursor-pointer border-b border-neutral-100/70 dark:border-neutral-700/50">
-                                        <td className="px-3 sm:px-6 py-3 sm:py-4">
-                                            <div className="text-sm font-medium text-neutral-900 dark:text-white">{ticket.subject}</div>
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 max-w-xs">
+                                            <div className="text-sm font-medium text-neutral-900 dark:text-white truncate">{ticket.subject}</div>
                                             <div className="text-xs text-neutral-500">{ticket.id}</div>
                                         </td>
                                         <td className="px-3 sm:px-6 py-3 sm:py-4">
-                                            <div className="flex items-center gap-3">
-                                                <img src={ticket.requester.avatarUrl} alt={ticket.requester.name} className="w-8 h-8 rounded-full object-cover" />
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-medium text-neutral-900 dark:text-white">{ticket.requester.name}</span>
-                                                    <span className="text-xs text-neutral-500 dark:text-neutral-400">{ticket.requester.email}</span>
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <img src={ticket.requester.avatarUrl} alt={ticket.requester.name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-sm font-medium text-neutral-900 dark:text-white truncate">{ticket.requester.name}</span>
+                                                    <span className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{ticket.requester.email}</span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-3 sm:px-6 py-3 sm:py-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[ticket.status]}`}>
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0 ${STATUS_COLORS[ticket.status]}`}>
                                                 <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
                                                 {t(`ticket status ${ticket.status.toLowerCase().replace(/ /g, ' ')}`)}
                                             </span>
                                         </td>
-                                        <td className="px-3 sm:px-6 py-3 sm:py-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${PRIORITY_COLORS[ticket.priority]}`}>
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0 ${PRIORITY_COLORS[ticket.priority]}`}>
                                                 <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
                                                 {t(ticket.priority.toLowerCase())}
                                             </span>

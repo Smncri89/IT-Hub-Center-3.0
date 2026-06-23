@@ -683,15 +683,15 @@ const VendorsList: React.FC = () => {
     return (
         <div className="space-y-6 animate-fade-in">
              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Vendor Management</h1>
+                <h1 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">Vendor Management</h1>
                 <div className="flex items-center gap-2">
                     <div className="relative">
-                        <input 
-                            type="search" 
-                            placeholder="Search vendors..." 
-                            value={searchQuery} 
-                            onChange={e => setSearchQuery(e.target.value)} 
-                            className="pl-9 pr-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg text-sm focus:ring-primary-500 focus:border-primary-500 dark:text-neutral-100"
+                        <input
+                            type="search"
+                            placeholder="Search vendors..."
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className="pl-9 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 dark:text-neutral-100 shadow-sm transition-all"
                         />
                         <div className="absolute left-3 top-2.5 text-neutral-400">
                              {React.cloneElement(ICONS.search as React.ReactElement<{ className?: string }>, { className: 'w-4 h-4' })}
@@ -700,18 +700,18 @@ const VendorsList: React.FC = () => {
 
                     {user?.role === Role.Admin && (
                         <>
-                            <button onClick={handleImportClick} className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                            <button onClick={handleImportClick} className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700 shadow-sm transition-all">
                                 {isImporting ? <Spinner size="sm"/> : React.cloneElement(ICONS.upload as React.ReactElement<{ className?: string }>, {className: "w-4 h-4"})}
                                 <span>Import</span>
                             </button>
                             <input type="file" ref={fileInputRef} className="hidden" accept=".csv" onChange={handleFileImport} />
 
-                            <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                            <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700 shadow-sm transition-all">
                                 {React.cloneElement(ICONS.download as React.ReactElement<{ className?: string }>, {className: "w-4 h-4"})}
                                 <span>Export</span>
                             </button>
-                            
-                            <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-bold shadow-lg hover:bg-primary-700 transition-all hover:-translate-y-0.5 text-sm">
+
+                            <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 rounded-xl shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-200 active:scale-95">
                                 {React.cloneElement(ICONS.plus, {className: "w-4 h-4"})} Add Vendor
                             </button>
                         </>
@@ -719,6 +719,17 @@ const VendorsList: React.FC = () => {
                 </div>
             </div>
 
+            {filteredVendors.length === 0 && (
+                <div className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm py-16 flex flex-col items-center gap-4">
+                    <div className="p-5 rounded-full bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700">
+                        {React.cloneElement(ICONS.profile, { className: "w-10 h-10 text-neutral-400 dark:text-neutral-500" })}
+                    </div>
+                    <div className="text-center">
+                        <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">No vendors found</p>
+                        <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">Try adjusting your search or add a new vendor.</p>
+                    </div>
+                </div>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredVendors.map(vendor => {
                     const vendorAssets = assets.filter(a => a.vendorId === vendor.id);
@@ -732,20 +743,22 @@ const VendorsList: React.FC = () => {
                     const activeInteractions = interactionCounts[vendor.id] || 0;
 
                     return (
-                        <div key={vendor.id} className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden hover:shadow-md transition-all flex flex-col group relative">
+                        <div key={vendor.id} className="bg-white dark:bg-neutral-800/60 backdrop-blur-sm rounded-2xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col group relative">
                             <div className="p-6 border-b border-neutral-100 dark:border-neutral-700/50">
                                 <div className="flex justify-between items-start mb-2">
                                     <div>
-                                        <h3 className="font-bold text-xl text-neutral-900 dark:text-white cursor-pointer hover:text-primary-600 transition-colors" onClick={() => handleEdit(vendor)}>{vendor.name}</h3>
+                                        <h3 className="font-bold text-lg text-neutral-900 dark:text-white cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors" onClick={() => handleEdit(vendor)}>{vendor.name}</h3>
                                         <div className="flex flex-wrap gap-2 mt-2">
                                              {hasContract && (
-                                                <span className={`inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${isContractExpired ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full ${isContractExpired ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
                                                     {isContractExpired ? 'Contract Expired' : 'Active Contract'}
                                                 </span>
                                             )}
                                             {activeInteractions > 0 && (
-                                                <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-blue-100 text-blue-700 flex items-center gap-1">
-                                                    🔔 {activeInteractions} Active
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
+                                                    {activeInteractions} Active
                                                 </span>
                                             )}
                                         </div>
@@ -759,22 +772,22 @@ const VendorsList: React.FC = () => {
                                 </div>
                                 <div className="flex flex-wrap gap-1 mt-2">
                                     {vendor.tags && vendor.tags.map(tag => (
-                                        <span key={tag} className="px-2 py-0.5 text-[10px] font-bold uppercase bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 rounded-md">{tag}</span>
+                                        <span key={tag} className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold bg-neutral-100 dark:bg-neutral-700/60 text-neutral-600 dark:text-neutral-300 rounded-full">{tag}</span>
                                     ))}
                                 </div>
                             </div>
                             
-                            <div className="p-6 grid grid-cols-2 gap-4 bg-neutral-50/50 dark:bg-neutral-900/20">
+                            <div className="p-6 grid grid-cols-2 gap-4 bg-neutral-50 dark:bg-neutral-900/30 border-t border-neutral-100 dark:border-neutral-700/50">
                                  <div>
-                                    <p className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Total Spend</p>
-                                    <p className="text-lg font-black text-neutral-800 dark:text-neutral-100">{formatCurrency(totalSpend)}</p>
+                                    <p className="text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Total Spend</p>
+                                    <p className="text-lg font-black text-neutral-900 dark:text-white">{formatCurrency(totalSpend)}</p>
                                  </div>
                                  <div>
-                                    <p className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Performance</p>
-                                    <div className="text-sm text-neutral-800 dark:text-neutral-100">
-                                        <span className="font-bold">{vendor.serviceCount || 0}</span> Interventions
+                                    <p className="text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Performance</p>
+                                    <div className="text-sm text-neutral-700 dark:text-neutral-300">
+                                        <span className="font-bold text-neutral-900 dark:text-white">{vendor.serviceCount || 0}</span> Interventions
                                         <br/>
-                                        <span className="font-bold">{vendor.avgResponseTime || 0}h</span> Avg Response
+                                        <span className="font-bold text-neutral-900 dark:text-white">{vendor.avgResponseTime || 0}h</span> Avg Response
                                     </div>
                                  </div>
                             </div>

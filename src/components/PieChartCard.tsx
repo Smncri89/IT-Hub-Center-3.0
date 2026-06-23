@@ -30,37 +30,35 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 const PieChartCard: React.FC<PieChartCardProps> = ({ title, data, colors, className }) => {
   return (
-    <div className={`w-full h-full min-h-[300px] flex flex-col ${className || ''}`}>
-      
+    <div className={`w-full h-full flex flex-col ${className || ''}`}>
+
       {title && (
-        <h3 className="text-lg font-semibold mb-4 text-neutral-800 dark:text-neutral-100 px-6 pt-6 flex-shrink-0">
+        <h3 className="text-lg font-semibold mb-2 text-neutral-800 dark:text-neutral-100 px-6 pt-6 flex-shrink-0">
           {title}
         </h3>
       )}
 
-      <div className="flex-1 w-full min-h-[250px] relative">
-        <div className="absolute inset-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius="70%"
-                fill="#8884d8"
-                dataKey="value"
-                nameKey="name"
-              >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-              <Legend verticalAlign="bottom" height={36} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      <div className="flex-1 w-full min-h-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="44%"
+              labelLine={false}
+              outerRadius="62%"
+              fill="#8884d8"
+              dataKey="value"
+              nameKey="name"
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+            <Legend verticalAlign="bottom" height={40} />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
