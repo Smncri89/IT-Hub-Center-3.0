@@ -93,7 +93,8 @@ serve(async (req) => {
         method: "POST",
         headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: "IT Hub Center <noreply@yourdomain.com>",
+          from: "IT Hub Center <onboarding@resend.dev>",
+          reply_to: "smncri89@gmail.com",
           to: [fromEmail],
           subject: `[Ticket #${ticket.id.slice(0, 8).toUpperCase()}] ${subject}`,
           html: `<p>Hi ${fromName},</p><p>Your support request has been received and a ticket has been created.</p><p><strong>Ticket ID:</strong> ${ticket.id.slice(0, 8).toUpperCase()}<br><strong>Subject:</strong> ${subject}</p><p>Our team will get back to you shortly.</p><p>IT Hub Center</p>`,
