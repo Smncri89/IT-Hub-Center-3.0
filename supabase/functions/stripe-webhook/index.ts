@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
         cryptoProvider
       );
     } catch (err) {
-      console.error("Webhook signature verification failed:", err.message);
+      console.error("Webhook signature verification failed:", (err as Error).message);
       return new Response(
         JSON.stringify({ error: "Invalid signature" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
@@ -260,7 +260,7 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error("stripe-webhook error:", err);
     return new Response(
-      JSON.stringify({ error: err.message }),
+      JSON.stringify({ error: (err as Error).message }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
