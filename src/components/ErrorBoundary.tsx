@@ -53,7 +53,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
                 if (isChunkError) {
                   window.location.reload();
                 } else {
-                  this.setState({ hasError: false, error: null });
+                  (this as React.Component<{ children: React.ReactNode }, State>).setState({ hasError: false, error: null });
                   window.location.hash = '/dashboard';
                 }
               }}
@@ -65,6 +65,6 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
         </div>
       );
     }
-    return this.props.children;
+    return (this as React.Component<{ children: React.ReactNode }, State>).props.children;
   }
 }

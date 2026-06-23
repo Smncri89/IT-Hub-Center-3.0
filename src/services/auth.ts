@@ -202,7 +202,7 @@ const logFailedLogin = (email: string, details: string) => {
 
 export const verify2FA = async (token: string): Promise<{ user?: User; error?: string }> => {
     try {
-        const verifyPromise = supabase.auth.verifyOtp({
+        const verifyPromise = (supabase.auth.verifyOtp as any)({
             type: 'totp',
             token,
         });

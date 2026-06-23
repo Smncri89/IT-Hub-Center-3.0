@@ -864,7 +864,7 @@ export const getAIChatResponse = async (
     `- [${t.priority}] "${t.subject}" (${t.status}, assigned: ${t.assignee?.name || 'unassigned'}, requester: ${t.requester?.name || 'unknown'})`
   ).join('\n');
 
-  const activeIncidents = context.incidents.filter(i => i.status !== 'Resolved' && i.status !== 'Closed');
+  const activeIncidents = context.incidents.filter(i => i.status !== 'Resolved');
   const incidentsSummary = activeIncidents.slice(0, 15).map(i =>
     `- [${i.priority}] "${i.title}" (${i.status})`
   ).join('\n');

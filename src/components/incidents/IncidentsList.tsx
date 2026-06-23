@@ -230,7 +230,7 @@ export const IncidentsList: React.FC = () => {
     const assignableUsers = useMemo(() => users.filter(u => u.role === Role.Admin || u.role === Role.Agent), [users]);
     
     const availableYears: string[] = useMemo(() => {
-        const years = new Set(incidents.map(i => new Date(i.createdAt).getFullYear().toString()));
+        const years = new Set<string>(incidents.map(i => new Date(i.createdAt).getFullYear().toString()));
         return Array.from(years).sort((a, b) => parseInt(b, 10) - parseInt(a, 10));
     }, [incidents]);
 
