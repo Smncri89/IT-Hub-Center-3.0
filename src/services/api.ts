@@ -161,6 +161,9 @@ export const createTicket = async (ticketData: Partial<Ticket> & { asset_id?: st
     }
   }
   const orgId = await getMyOrgId();
+  const policies = await getSLAPolicies();
+  const policy = policies.find(p => p.priority === (ticketData.priority || TicketPriority.Medium));
+  const slaDueAt = policy ? new Date(Date.now() + policy.resolution_time_minutes * 60 * 1000).toISOString() : null;
   const { data, error } = await supabase.from('tickets').insert({
     subject: ticketData.subject,
     description: ticketData.description,
@@ -177,7 +180,8 @@ export const createTicket = async (ticketData: Partial<Ticket> & { asset_id?: st
     site: ticketData.site,
     floor: ticketData.floor,
     office: ticketData.office,
-    organization_id: orgId
+    organization_id: orgId,
+    sla_due_at: slaDueAt || null
   }).select().single();
   if (error) throw error;
   logAuditEvent({ userId: requester.id, userName: requester.name, action: 'create', entityType: 'ticket', entityId: data.id, entityName: ticketData.subject, details: `Priority: ${ticketData.priority || 'Medium'}` }).catch(() => {});
@@ -742,6 +746,17 @@ export const updateSLAPolicies = async (policies: SLAPolicy[]): Promise<void> =>
   if (error) throw error;
 };
 
+export const getSLAStatus = (ticket: Ticket): 'ok' | 'warning' | 'breached' | null => {
+  if (!ticket.slaDueAt) return null;
+  if (ticket.status === 'Resolved' || ticket.status === 'Closed') return 'ok';
+  const now = Date.now();
+  const due = new Date(ticket.slaDueAt).getTime();
+  const timeLeft = due - now;
+  if (timeLeft < 0) return 'breached';
+  if (timeLeft < 2 * 60 * 60 * 1000) return 'warning'; // < 2 hours
+  return 'ok';
+};
+
 export const createBackup = async (): Promise<Blob> => {
   return new Blob([JSON.stringify({ date: new Date() })], { type: 'application/json' });
 };
@@ -900,5 +915,45 @@ Assistant:`;
   } catch (e) {
     console.error("AI Chat error:", e);
     return "Errore nel contattare l'AI. Riprova tra poco.";
+  }
+};
+
+export const triageTicketWithAI = async (ticket: { subject: string; description?: string }): Promise<{
+  priority: TicketPriority;
+  category: string;
+  subcategory: string;
+  reasoning: string;
+}> => {
+  const prompt = `You are an IT support triage AI. Analyze this support ticket and classify it.
+
+Ticket Subject: ${ticket.subject}
+Description: ${ticket.description || 'No description provided'}
+
+Respond ONLY with valid JSON, no markdown, no explanation:
+{
+  "priority": "Urgent|High|Medium|Low",
+  "category": "Hardware|Software|Network|Access|Security|Other",
+  "subcategory": "one specific subcategory",
+  "reasoning": "one sentence why"
+}`;
+
+  try {
+    const text = await callGemini(prompt);
+    const jsonStart = text.indexOf('{');
+    const jsonEnd = text.lastIndexOf('}') + 1;
+    const parsed = JSON.parse(text.slice(jsonStart, jsonEnd));
+
+    const validPriorities = ['Urgent', 'High', 'Medium', 'Low'];
+    const priority = validPriorities.includes(parsed.priority) ? parsed.priority as TicketPriority : TicketPriority.Medium;
+
+    return {
+      priority,
+      category: parsed.category || 'Other',
+      subcategory: parsed.subcategory || '',
+      reasoning: parsed.reasoning || '',
+    };
+  } catch (e) {
+    console.error('AI triage failed:', e);
+    return { priority: TicketPriority.Medium, category: 'Other', subcategory: '', reasoning: '' };
   }
 };

@@ -10,6 +10,7 @@ import { ICONS, STATUS_COLORS, PRIORITY_COLORS, TICKET_CATEGORIES } from '@/cons
 import { useDebounce } from '@/hooks/useDebounce';
 import { useAnimatedModal } from '@/hooks/useAnimatedModal';
 import * as api from '@/services/api';
+import { getSLAStatus } from '@/services/api';
 import ImportModal from '@/components/ImportModal';
 import MobileFilterToggle from '@/components/MobileFilterToggle';
 import SelectField from '@/components/ui/SelectField';
@@ -131,9 +132,22 @@ const NewTicketModal: React.FC<{
         setIsSaving(true);
         setError('');
         try {
-            await api.createTicket(formData, user!, []); // Attachments handled separately usually, passing empty array for now
+            const createdTicket = await api.createTicket(formData, user!, []); // Attachments handled separately usually, passing empty array for now
             refetchData('tickets');
             onClose();
+            // After successful ticket creation, run AI triage in background
+            if (createdTicket && !createdTicket.isAiTriaged) {
+                api.triageTicketWithAI({ subject: createdTicket.subject, description: createdTicket.description })
+                    .then(async (triage) => {
+                        await api.updateTicket(createdTicket.id, {
+                            priority: triage.priority,
+                            category: triage.category,
+                            subcategory: triage.subcategory,
+                            isAiTriaged: true,
+                        } as any);
+                    })
+                    .catch(() => {}); // silent fail
+            }
         } catch (e: any) {
             setError(t('unexpected error'));
         } finally {
@@ -553,7 +567,14 @@ export const TicketsList: React.FC = () => {
                                 {filteredTickets.map(ticket => (
                                     <tr key={ticket.id} className="hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors duration-150 cursor-pointer border-b border-neutral-100/70 dark:border-neutral-700/50">
                                         <td className="px-3 sm:px-6 py-3 sm:py-4 max-w-xs">
-                                            <div className="text-sm font-medium text-neutral-900 dark:text-white truncate">{ticket.subject}</div>
+                                            <div className="flex items-center text-sm font-medium text-neutral-900 dark:text-white truncate">
+                                                <span className="truncate">{ticket.subject}</span>
+                                                {ticket.isAiTriaged && (
+                                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400 border border-violet-200 dark:border-violet-800/40 ml-1.5 flex-shrink-0">
+                                                        AI
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div className="text-xs text-neutral-500">{ticket.id}</div>
                                         </td>
                                         <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -572,10 +593,26 @@ export const TicketsList: React.FC = () => {
                                             </span>
                                         </td>
                                         <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                            <div className="flex items-center gap-2 flex-wrap">
                                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0 ${PRIORITY_COLORS[ticket.priority]}`}>
                                                 <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 flex-shrink-0"></span>
                                                 {t(ticket.priority.toLowerCase())}
                                             </span>
+                                            {(() => {
+                                              const slaStatus = getSLAStatus(ticket);
+                                              if (!slaStatus || slaStatus === 'ok') return null;
+                                              return (
+                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                                                  slaStatus === 'breached'
+                                                    ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800/40'
+                                                    : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/40'
+                                                }`}>
+                                                  <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/></svg>
+                                                  {slaStatus === 'breached' ? 'SLA!' : 'SLA⚠'}
+                                                </span>
+                                              );
+                                            })()}
+                                            </div>
                                         </td>
                                         <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-sm font-medium">
                                             <Link to={`/tickets/${ticket.id}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200/60 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/40 dark:border-primary-800/40 transition-all duration-150">
